@@ -1,0 +1,52 @@
+# SPDX-FileCopyrightText: 2025 system-under-test contributors
+# SPDX-License-Identifier: Apache-2.0
+
+version = 1
+
+# Set default copyright for the entire project
+SPDX-FileCopyrightText = "2025 system-under-test contributors"
+
+# Root license for the project (lowest precedence)
+SPDX-License-Identifier = "Apache-2.0"
+
+# Configuration & infrastructure files (CC0-1.0) - Highest precedence
+[[annotations]]
+path = [
+    ".gitattributes",
+    ".gitignore",
+    ".pre-commit-config.yaml",
+    ".github/**",
+    ".reuse/**",
+    "sbom/**"
+]
+SPDX-License-Identifier = "CC0-1.0"
+
+# Documentation & content (CC-BY-4.0) - Medium precedence
+[[annotations]]
+path = [
+    "*.md",  # This will catch all root-level markdown files including CHANGELOG.md
+    "**/CHANGELOG.md",  # Explicit pattern for CHANGELOG.md in any directory
+    "CITATION.cff",
+    "docs/source/**",
+    "docs/assets/**",
+    "docs/source/_static/favicon.ico",
+    "docs/source/_static/logo.png",
+    "docs/CODEOWNERS",
+    "docs/source/references.bib",
+    "SECURITY.md",
+    "CONTRIBUTING.md"
+]
+SPDX-License-Identifier = "CC-BY-4.0"
+
+# Code & build scripts (Apache-2.0) - Lower precedence
+[[annotations]]
+path = [
+    "src/**",
+    "scripts/**",
+    "docs/Makefile",
+    "docs/make.bat",
+    "docs/source/conf.py",
+    "tests/**",
+    "pyproject.toml"
+]
+SPDX-License-Identifier = "Apache-2.0"

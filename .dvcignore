@@ -1,0 +1,78 @@
+# SPDX-FileCopyrightText: 2025 best-known-practice contributors
+# SPDX-License-Identifier: CC0-1.0
+
+# Ignore large data files and model artifacts that are tracked by DVC
+# but should not be stored in the DVC remote cache.
+
+# =======================================
+# IGNORE INTERMEDIATE PIPELINE OUTPUTS
+# =======================================
+# Ignore intermediate files that are generated during pipeline runs
+# but are not the final desired output. These are often temporary.
+**/tmp/
+**/temp/
+**/intermediate*/
+**/stage*/
+
+# =======================================
+# IGNORE LARGE LOCAL CACHES
+# =======================================
+# DVC already manages its own cache (.dvc/cache). Ignore other caches
+# that might be created by libraries or tools which are not meant to be stored.
+**/cache/
+*.cache
+
+# =======================================
+# IGNORE SPECIFIC LARGE DATA FORMATS
+# =======================================
+# These are often the primary targets for DVC tracking. We ignore the actual data files
+# so DVC doesn't try to store them in its remote cache, as they are already tracked
+# via the .dvc pointer files which are in Git.
+
+# Tabular Data
+*.csv
+*.tsv
+*.xlsx
+*.xls
+*.parquet
+*.feather
+*.arrow
+
+# Serialized Data
+*.pkl
+*.pickle
+*.joblib
+*.npy
+*.npz
+*.h5
+*.hdf5
+*.mat
+
+# Database Files
+*.db
+*.sqlite
+*.sqlite3
+
+# =======================================
+# IGNORE MODEL ARTIFACTS
+# =======================================
+# Model files are almost always tracked by DVC. We ignore the actual binaries
+# to prevent them from being stored again in the remote cache.
+*.pt
+*.pth
+*.onnx
+*.pb
+*.tflite
+*.keras
+model_weights/
+checkpoints/
+
+# =======================================
+# IGNORE EXPERIMENT TRACKING ARTIFACTS
+# =======================================
+# These directories contain many large runs and artifacts. They are not
+# typically the fundamental data of a project and can be reproduced.
+# Let's assume we might want to push a single final model, but not all runs.
+mlruns/
+wandb/
+tensorboard/

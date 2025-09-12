@@ -1,0 +1,909 @@
+# SPDX-FileCopyrightText: 2025 best-known-practice contributors
+# SPDX-License-Identifier: CC0-1.0
+
+# Virtual environments
+[Bb]in/
+[Pp]ython[Nn]v/
+[Vv]env/
+[Vv]irtual[Nn]v/
+[Vv]irtual[Ee]nv/
+[Vv]irtual-[Ee]nv/
+[Ee]nvironments/
+[Ee]nvironment/
+env/
+ENV/
+.venv/
+venv/
+virtualenv/
+venv*/
+env*/
+.env*/
+
+# =======================================
+# DATA VERSION CONTROL
+# =======================================
+.dvc/
+
+# =======================================
+# LOCAL DATA
+# =======================================
+data/*
+!data/**/*.yaml
+!data/**/*.json
+!data/**/*.md
+
+# =======================================
+# PROJECT JUPYTER
+# =======================================
+.ipynb_checkpoints/
+
+# =======================================
+# BYTE-COMPILED
+# =======================================
+__pycache__/
+*.py[cod]
+*.so
+
+# =======================================
+# BUILD
+# =======================================
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# =======================================
+# PYINSTALLER FILES
+# =======================================
+*.manifest
+*.spec
+
+# =======================================
+# INSTALLER LOGS
+# =======================================
+pip-log.txt
+pip-delete-this-directory.txt
+
+# =======================================
+# TESTS AND COVERAGE REPORTS
+# =======================================
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+cover/
+
+# =======================================
+# MISCELLANEOUS
+# =======================================
+**/.vscode/settings.json    # Often contains paths
+**/temp/                    # Recursive temp directories
+flyte/                      # Flyte workflows
+prefect/                    # Prefect orchestrator
+.DS_Store                   # macOS Finder
+
+# =======================================
+# SECURITY AND COMPLIANCE
+# =======================================
+secrets/
+*.key
+access_tokens/
+*.pem
+.git-credentials
+.vault_pass
+*.jwt                   # JSON Web Tokens
+*.bearer                # Bearer tokens
+vault.token             # HashiCorp Vault tokens
+*.vault                 # Vault-related files
+*.kubeconfig            # Kubernetes configs
+kubeconfig_*.yaml       # K8s config patterns
+
+# Exclude sensitive logs that might contain private or debug information.
+error_reports/
+
+# Exclude database backups, snapshots, or other data storage.
+db_backups/
+*.bak
+snapshots/
+*.swp
+*.tmp
+
+# Exclude caches that may expose environment details.
+.cache/
+
+# Node modules directory
+node_modules/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Documentation builds
+/docs/_build/
+/docs/api/
+
+# Logs
+*.log
+logs/
+/log/
+*.out
+airflow/logs/
+
+# =================================================================
+# SECURITY AND COMPLIANCE
+# =================================================================
+# Compliance Framework Coverage & Controls:
+# - CIS GitLab Benchmark v1.0.1
+#   - 1.5.1: Sensitive Data Detection
+#   - 1.5.2: CI Pipeline Security
+#   - 2.1.7: Build Secrets Management
+# - ISO 27001:2013
+#   - A.10: Cryptography
+#   - A.12: Operations Security
+#   - A.14: System Development
+# - NIST 800-53 Rev 5
+#   - SC-12: Cryptographic Key Management
+#   - SC-28: Protection of Information at Rest
+#   - SI-7: Software and Information Integrity
+# - SOC 2 Type II
+#   - CC6.1: Logical Access Security
+#   - CC8.1: Change Management
+
+# =================================================================
+# Environment & Configuration Files
+# Controls:
+# - NIST 800-53: CM-6 (Configuration Settings)
+# - CIS Controls v8: 16.1 (Secure Development Process)
+# - ISO 27001: A.12.1.4 (Development/Testing Separation)
+# =================================================================
+# Secrets and Environment Variables
+.env                    # Environment variables
+.env.*                  # All env variations
+!.env.example           # Allow example env
+!.env.template          # Allow templates
+.envrc                  # Direnv config
+*.env.local             # Local overrides
+*.env.*.local           # Environment-specific overrides
+.config.json            # Configuration files
+*.config.local.*        # Local configs
+config.*.json           # JSON configs
+*.env.ci                # CI environment files
+.ci_secrets/            # CI secrets directory
+
+# Local Overrides
+*.override.yml          # YAML overrides
+*.override.yaml         # YAML overrides
+*.override.json         # JSON overrides
+local.settings.json     # Local settings
+
+**/*.env                # Nested environment files
+**/secrets/             # Recursive secrets directories
+**/credentials/**       # Recursive credentials
+*.jfif                  # Potential steganography risk
+*.heic                  # Image format that can conceal data
+
+# =================================================================
+# Cryptographic Materials
+# Controls:
+# - NIST 800-53: SC-12 (Cryptographic Key Management)
+# - ISO 27001: A.10.1.2 (Key Management)
+# - CIS Controls v8: 3.11 (Encrypt Data at Rest)
+# =================================================================
+# SSH Keys and Config
+**/.ssh/               # SSH directory
+id_rsa                # RSA private key
+id_rsa.pub            # RSA public key
+id_ecdsa              # ECDSA private key
+id_ecdsa.pub          # ECDSA public key
+id_ed25519            # ED25519 private key
+id_ed25519.pub        # ED25519 public key
+known_hosts           # SSH known hosts
+authorized_keys       # Authorized keys
+.ssh/config           # SSH config
+.sshd_config          # SSH daemon config
+
+# PKI & Certificates
+*.pem                 # Privacy Enhanced Mail format
+*.key                 # Private keys
+*.crt                 # Certificates
+*.cer                # Alternative cert format
+*.der                # DER encoded certificates
+*.p7b                # PKCS#7 certificates
+*.p7r                # PKCS#7 request
+*.spc                # Software Publishing Cert
+*.pfx                # PKCS#12 format
+*.p12                # PKCS#12 alternate
+*.crl                # Certificate Revocation List
+
+# Certificate Stores
+.ca/                  # Certificate Authority
+pki/                  # PKI infrastructure
+cacerts/             # CA certificates
+*.keystore           # Java keystore
+*.jks                # Java key store
+*.truststore         # Trust store
+
+# GPG/PGP Keys
+*.gpg                # GPG key
+*.pgp                # PGP key
+*.asc                # ASCII armored key
+secring.*            # Secret keyring
+pubring.*            # Public keyring
+trustdb.gpg          # Trust database
+*.kbx                # New keybox format
+*.kbx~               # Keybox backup
+.gnupg/              # GPG config directory
+
+# =================================================================
+# CI/CD Pipeline Security
+# Controls:
+# - CIS GitLab: 1.5.2 (Pipeline Security)
+# - NIST 800-53: SA-11 (Developer Security Testing)
+# - ISO 27001: A.14.2.8 (System Security Testing)
+# =================================================================
+# Security Scanning
+.gitlab/security-reports/       # Security reports
+.gitlab-security/               # Security configs
+**/security-scan-*.json         # Scan results
+**/dast-*.json                  # DAST results
+**/sast-*.json                  # SAST results
+**/dependency-scan-*.json       # Dependency scans
+
+# Pipeline Configuration
+.gitlab-ci.secrets.yml          # Pipeline secrets
+.gitlab-ci.*.secrets.yml        # Pipeline env secrets
+.gitlab/merge-rules-*.json      # Merge rules
+.gitlab/branch-rules-*.json     # Branch protection
+
+# =================================================================
+# Audit & Compliance
+# Controls:
+# - NIST 800-53: AU-2 (Audit Events)
+# - ISO 27001: A.12.4 (Logging and Monitoring)
+# - SOC 2: CC7.2 (Security Incident Procedures)
+# =================================================================
+# Audit Records
+audit/                          # Audit directory
+*.audit.log                     # Audit logs
+*-audit-*.json                  # Audit data
+evidence/                       # Audit evidence
+*.evidence.pdf                  # Evidence files
+
+# Security Documentation
+security-policies/              # Security policies
+procedures/                     # Security procedures
+**/security-*.md                # Security documentation
+**/compliance-*.pdf             # Compliance docs
+
+# Security Assessments
+vulnerabilities/                # Vulnerability dir
+**/vulnerability-*.json         # Vulnerability data
+**/security-*.json              # Security findings
+.gitlab-sast/                   # SAST results
+.gitlab-dast/                   # DAST results
+dependency-check-report.json    # Dependency check
+
+# =================================================================
+# Platform & Infrastructure
+# Controls:
+# - CIS Controls v8: 4.1 (Secure Configuration Process)
+# - ISO 27001: A.13.1 (Network Security)
+# - NIST 800-53: CM-2 (Baseline Configuration)
+# =================================================================
+# Cloud Provider Credentials
+.aws/                           # AWS config
+credentials                     # AWS credentials
+aws_access_key_id               # AWS access key
+aws_secret_access_key           # AWS secret key
+.azure/                         # Azure config
+.gcloud/                        # Google Cloud
+*.publishsettings               # Azure publish settings
+.gcp/                   # Google Cloud config
+azure_profile.json      # Azure profile
+.c9/                    # AWS Cloud9
+amplify/                # AWS Amplify
+
+# Infrastructure Configuration
+terraform.tfstate*              # Terraform state
+.terraform/                     # Terraform directory
+*.tfvars                        # Terraform variables
+*.tfvars.json                   # Terraform JSON vars
+ansible-vault.txt               # Ansible Vault
+.terraformrc                    # Terraform config
+terraform.rc                    # Terraform runtime
+.vagrant/                       # Vagrant files
+
+# Container Security
+.docker/                        # Docker directory
+.dockercfg                      # Docker config
+docker.conf                     # Docker settings
+.docker/config.json             # Docker credentials
+.trivyignore                    # Trivy scanner ignore
+.containerignore                # Container ignore
+
+# =================================================================
+# Database & Storage
+# Controls:
+# - CIS Controls v8: 3.11 (Data Encryption)
+# - ISO 27001: A.10.1.1 (Cryptographic Controls)
+# =================================================================
+# Database Credentials
+.pgpass                         # PostgreSQL password
+.my.cnf                         # MySQL config
+.mysqlpass                      # MySQL password
+.oracle_jre_usage/              # Oracle settings
+*.sqlite-shm                    # SQLite shared memory
+*.sqlite-wal                    # SQLite WAL
+*.sqlite-journal                # SQLite journal
+
+# Connection Information
+connection.*.json               # Connection strings
+database.*.yaml                 # Database config
+*.connection.json               # Connection info
+
+# PostgreSQL
+postgres_data/
+!postgres_data/postgresql.conf
+!postgres_data/pg_hba.conf
+!postgres_data/pg_ident.conf
+
+# =================================================================
+# Package Registry & Artifacts
+# Controls:
+# - CIS Controls v8: 2.5 (Software Inventory)
+# - ISO 27001: A.12.5 (Control of Operational Software)
+# =================================================================
+# Registry Authentication
+.npmrc               # NPM config
+.yarnrc             # Yarn config
+.bundle/config      # Ruby config
+pip.conf            # Python pip config
+.pypirc             # Python package index
+.gem/credentials    # Ruby gems
+_netrc              # Network auth
+
+# Build Artifacts
+*.jks.bak           # Java keystore backup
+*.keystore.bak      # Keystore backup
+*.p12.bak           # PKCS#12 backup
+artifacts.*.key     # Artifact keys
+signing.properties  # Signing config
+
+# =================================================================
+# Authentication & Access
+# Controls:
+# - CIS Controls v8: 6.3-6.5 (Access Control)
+# - ISO 27001: A.9 (Access Control)
+# - NIST 800-53: AC-3 (Access Enforcement)
+# =================================================================
+# Access Tokens
+*.key                # Key files
+.key                # Hidden keys
+api.key             # API keys
+*.token             # Token files
+.token              # Hidden tokens
+.api_key            # API keys
+*token*             # Token patterns
+*secret*            # Secret patterns
+
+# Access Control Files
+.htpasswd           # Apache auth
+.htaccess           # Apache access
+.user.ini           # PHP user config
+.credentials/       # Credentials dir
+auth.json           # Auth config
+permissions.acl     # ACL files
+
+# =================================================================
+# GITHUB PLATFORM
+# =================================================================
+# Purpose: GitHub-specific files and directories that may contain
+#          sensitive information or are automatically generated
+# Security Level: Medium - Prevents exposure of workflow artifacts
+# Compliance: GitHub Enterprise security best practices
+
+# GitHub Actions
+.github/actions/           # Local Action repositories
+.github/workspaces/        # GitHub Workspaces
+action-artifacts/          # Action workflow artifacts
+*.action.yml               # Local Action definitions
+*.action.yaml
+
+# GitHub Pages
+_site/                    # Jekyll build output
+.jekyll-cache/           # Jekyll cache directory
+.github/pages/           # Pages deployment artifacts
+
+# GitHub Codespaces
+.devcontainer/           # Codespaces configuration (cache)
+.codespaces/             # Codespaces metadata
+.devcontainer.json       # Alternate configuration
+
+# GitHub Dependency Graph
+dependency-graph/        # Dependency graph data
+.generated-dependencies/ # Auto-generated dependencies
+
+# GitHub Security
+codeql-database/         # CodeQL database outputs
+github-apps/             # Local GitHub Apps configuration
+*.github-token           # GitHub token files
+*.github-secret          # GitHub secret files
+
+# GitHub Discussions
+discussions/             # Local discussions cache
+*.discussion.json        # Discussion data files
+
+# GitHub Sponsors
+.sponsors/               # Sponsors configuration data
+
+# =================================================================
+# GITLAB PLATFORM
+# =================================================================
+# Purpose: GitLab-specific files and directories that may contain
+#          sensitive information, CI/CD artifacts, or security reports
+# Security Level: High - Prevents exposure of pipeline artifacts and tokens
+# Compliance: GitLab Enterprise security best practices
+
+# -------------------------------
+# GitLab CI/CD Artifacts
+# -------------------------------
+.gitlab/ci/               # Local CI configuration variants
+.gitlab/runner-token      # Runner registration token
+.gitlab/runner-cache/     # Runner cache directories
+.gitlab/artifacts/        # Pipeline artifacts (local)
+.gitlab/job-output/       # Individual job output files
+
+# -------------------------------
+# GitLab Security Reports
+# -------------------------------
+.gitlab/security-reports/       # Security scanning reports :cite[1]
+.gitlab-secrets/                # Secret detection results
+.gitlab-dependency-scan/        # Dependency scanning results
+.gitlab-sast/                   # Static Application Security Testing :cite[1]
+.gitlab-dast/                   # Dynamic Application Security Testing :cite[1]
+.gitlab-container-scan/         # Container scanning reports
+.gitlab-api-fuzzing/            # API fuzzing results
+
+# -------------------------------
+# GitLab Merge and Branch Rules
+# -------------------------------
+.gitlab/merge-rule-*.json      # Merge request rules :cite[1]
+.gitlab/branch-rule-*.json     # Branch protection rules :cite[1]
+
+# -------------------------------
+# GitLab Local Development
+# -------------------------------
+.gitlab-webide.yml             # Web IDE configuration
+.gitlab-local-ci.yml           # Local CI testing configuration
+.gitlab-runner-config.toml     # Local runner configuration
+.gitlab/runner-config/         # Runner configuration directory
+
+# -------------------------------
+# GitLab Dependency Proxy
+# -------------------------------
+.gitlab-dependency-cache/      # Dependency proxy cache
+.gitlab-container-registry/    # Local container registry data
+
+# -------------------------------
+# GitLab Pages
+# -------------------------------
+.gitlab/pages/                 # GitLab Pages build artifacts
+public.original/               # Original public directory backup
+
+# -------------------------------
+# GitLab Wikis
+# -------------------------------
+.wiki/                         # Local wiki content
+.gitlab-wiki/                  # Alternative wiki directory
+
+# =================================================================
+# DATA FILES
+# =================================================================
+# Security Level: High - Prevents sensitive data leakage
+# Compliance: GDPR, CCPA, HIPAA for data privacy
+
+# Tabular Data Files
+*.csv                         # Comma-separated values
+*.tsv                         # Tab-separated values
+*.xlsx                        # Excel files
+*.xls                         # Legacy Excel
+*.ods                         # OpenDocument spreadsheets
+
+# Optimized Data Formats
+*.parquet                     # Apache Parquet files
+*.feather                     # Feather format
+*.arrow                       # Apache Arrow files
+*.avro                        # Apache Avro files
+
+# Database Files
+*.db                          # Generic database
+*.sqlite                      # SQLite database
+*.sqlite3                     # SQLite3 database
+*.db-journal                  # Database journal files
+*.db-wal                      # Write-ahead log
+*.db-shm                      # Shared memory file
+
+# =================================================================
+# Binary and Serialized Data
+# =================================================================
+# HDF5 and Similar
+*.h5                          # HDF5 files
+*.hdf                         # Hierarchical Data Format
+*.hdf5                        # HDF5 alternate extension
+*.mat                         # MATLAB data files
+
+# Serialized Python Objects
+*.pkl                         # Pickle files
+*.pickle                      # Alternate pickle extension
+*.joblib                      # Joblib serialization
+*.npy                         # NumPy array files
+*.npz                         # NumPy compressed arrays
+
+# =================================================================
+# MODEL FILES
+# =================================================================
+*.pt                          # PyTorch models
+*.pth                         # PyTorch alternate extension
+*.onnx                        # ONNX models
+*.pb                          # Protocol buffers (TensorFlow)
+*.tflite                      # TensorFlow Lite
+*.savedmodel/                 # TensorFlow SavedModel
+*.keras                       # Keras models
+model_weights/                # Model weights directory
+checkpoints/                  # Training checkpoints
+
+# =======================================
+# EXPERIMENT TRACKING
+# =======================================
+
+# MLflow
+mlruns/                 # Already covered
+.mlflow/                # Local MLflow config
+
+# Weights & Biases
+wandb/                  # W&B runs
+.wandb/                 # W&B config
+
+# TensorBoard
+tensorboard/            # TensorBoard logs
+*.tensorboard           # TensorBoard files
+
+# =======================================
+# FEATURE STORES
+# =======================================
+.feast/                 # Feast configuration
+feature_repo/data/      # Feast data storage
+
+# =======================================
+# MODEL SERVING
+# =======================================
+models/                 # Trained models directory
+!models/schema/         # Keep model schemas
+serving/                # Serving artifacts
+bentoml/                # BentoML artifacts
+truss/                  # Baseten Truss
+
+# =======================================
+# TELEMETRY
+# =======================================
+loki/*                        # Loki logs
+!loki/**/*.yaml               # Keep Loki configs
+!loki/**/*.json               # Keep Loki JSON configs
+grafana/*                     # Grafana data
+!grafana/**/*.yaml            # Keep Grafana configs
+!grafana/**/*.json            # Keep Grafana JSON configs
+prometheus/                   # Prometheus data
+!prometheus/**/*.yml          # Keep Prometheus configs
+
+# =================================================================
+# MEDIA
+# =================================================================
+# Image Files
+*.ps                          # PostScript
+*.eps                         # Encapsulated PostScript
+*.wmf                         # Windows Metafile
+*.emf                         # Enhanced Metafile
+*.png                         # Portable Network Graphics
+*.jpg                         # JPEG images
+*.jpeg                        # Alternate JPEG extension
+*.tif                         # TIFF images
+*.tiff                        # Alternate TIFF extension
+*.gif                         # GIF images
+*.bmp                         # Bitmap images
+*.svg                         # Scalable Vector Graphics
+
+# =================================================================
+# TEMPORARY AND CACHES
+# =================================================================
+*.temp                        # Alternate temp extension
+.cache/                       # Cache directory
+__pycache__/                  # Python cache
+dask-worker-space/            # Dask temporary files
+
+# =======================================
+# IDE AND EDITOR ARTIFACTS
+# =======================================
+# Purpose: Ignore IDE-specific files that contain local settings,
+#          cached data, or temporary working files
+
+# -------------------------------
+# VS Code
+# -------------------------------
+.vscode/*
+!.vscode/settings.json.example
+!.vscode/extensions.json.example
+.vscode/launch.json
+.vscode/tasks.json
+.vscode/settings.json
+*.code-workspace
+
+# -------------------------------
+# PyCharm/IntelliJ
+# -------------------------------
+.idea/
+*.iml
+*.ipr
+*.iws
+.idea_modules/
+__pycache__/
+misc.xml
+modules.xml
+workspace.xml
+vcs.xml
+datasources.xml
+dataSources.local.xml
+jsLibraryMappings.xml
+
+# -------------------------------
+# Jupyter (beyond checkpoints)
+# -------------------------------
+.jupyter/
+jupyter_notebook_config.py
+jupyter_notebook_config.json
+
+# -------------------------------
+# JupyterLab
+# -------------------------------
+.jupyter/lab/
+settings/
+
+# -------------------------------
+# Spyder
+# -------------------------------
+.spyproject/
+*.spyproject
+
+# -------------------------------
+# Eclipse
+# -------------------------------
+.project
+.classpath
+.pydevproject
+.settings/
+bin/
+
+# -------------------------------
+# Sublime Text
+# -------------------------------
+*.sublime-workspace
+*.sublime-project
+
+# -------------------------------
+# Vim/Neovim
+# -------------------------------
+*.swp
+*.swo
+*~
+.session
+Session.vim
+.netrwhist
+tags
+.lvimrc
+
+# -------------------------------
+# Emacs
+# -------------------------------
+*~
+\#*\#
+.\#*
+auto-save-list/
+tramp
+.elc
+
+# -------------------------------
+# Visual Studio
+# -------------------------------
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# -------------------------------
+# General Editor Artifacts
+# -------------------------------
+.ropeproject/
+__pychache__/
+.history/
+.ionide/
+
+# =================================================================
+# STATISTICAL SOFTWARE
+# =================================================================
+
+# ======================================
+# Stata - Statistical Software
+# ======================================
+*.dta          # Stata dataset
+*.gph          # Stata graph
+*.smcl         # Stata markup and control language
+*.stpr         # Stata project
+*.stsem        # Stata structural equation modeling
+*.ster         # Stored estimates
+
+# ======================================
+# SAS (Statistical Analysis System)
+# ======================================
+# Binary data formats
+*.sas7baud     # SAS audit files
+*.sas7bdat     # SAS dataset
+*.sas7bvew     # SAS views
+*.sas7bndx     # SAS index
+*.sas7bcat     # SAS catalog
+*.sas7bacs     # SAS access control
+*.sas7bfdb     # SAS format database
+*.sas7bmdb     # SAS multidimensional database
+*.sas7bdmd     # SAS data mining database
+*.sas7bitm     # SAS item store
+*.sas7butl     # SAS utility
+*.sas7bput     # SAS put utility
+*.sas7bbak     # SAS backup
+
+# SAS Program and Output files
+*.sas          # SAS program
+*.lst          # SAS listing
+*.log          # SAS log
+*.sc2          # SAS catalog (v6)
+*.sct          # SAS catalog template
+*.sd2          # SAS dataset (v6)
+*.ssd          # SAS sorted data
+*.egd          # SAS enterprise guide
+
+# ======================================
+# SPSS (Statistical Package for Social Sciences)
+# ======================================
+*.sav          # SPSS data
+*.spv          # SPSS output viewer
+*.spo          # SPSS output
+*.sps          # SPSS syntax
+*.zsav         # Compressed SPSS data
+
+# ======================================
+# JASP (JASP Statistics)
+# ======================================
+*.jasp         # JASP project files
+
+# ======================================
+# JMP (SAS JMP)
+# ======================================
+*.jmp          # JMP data
+*.jsl          # JMP scripting
+*.jrn          # JMP journal
+
+# ======================================
+# Minitab
+# ======================================
+*.mpj          # Minitab project
+*.mtw          # Minitab worksheet
+*.mtx          # Minitab exported text
+
+# ======================================
+# Stan (Bayesian Statistics)
+# ======================================
+*.stan         # Stan model specification
+*.stanc        # Stan compiled model
+*.hpp          # Stan generated C++
+
+# ====================================
+# MATLAB/Octave Files
+# ====================================
+
+# Autosave files
+*.asv          # Windows MATLAB autosave
+*.m~           # Unix/macOS MATLAB autosave
+
+# Compiled binary files
+*.mex*         # MEX binaries (platform independent)
+*.p            # MATLAB P-code files
+
+# Application packaging
+*.mlappinstall # MATLAB App installer
+*.mltbx        # MATLAB Toolbox package
+
+# Help and documentation
+helpsearch*/   # Generated help search indices
+
+# Simulink specific
+slprj/         # Simulink project folder
+sccprj/        # Simulink cache folder
+*.slxc         # Simulink cache files
+*.autosave     # Simulink autosave extension
+*.slx.r*       # Simulink backup files
+*.mdl.r*       # Simulink model backup files
+
+# Code generation
+codegen/       # Generated C/C++ code directory
+
+# Session and workspace
+octave-workspace  # Octave session info
+*.mat             # MATLAB/Octave workspace files
+
+# Project and settings
+*.prj            # Project file
+*.tmw            # MATLAB preferences
+*.mlx~           # Live script autosave
+*.mlx.mldatx     # Live script data
+
+# Cache and temporary files
+.matlab/         # MATLAB system folder
+
+# ======================================
+# R Project for Statistical Computing
+# ======================================
+
+.Rhistory         # History
+.Rapp.history
+
+.RData            # Session data
+.RDataTmp
+
+.Ruserdata        # User data
+*-Ex.R            # Example code
+/*.Rcheck/        # R CMD check output
+.Rproj.user/      # RStudio files
+
+# Vignettes
+vignettes/*.html
+vignettes/*.pdf
+
+# OAuth2 token
+.httr-oauth
+
+# Temporary files created by R markdown
+*.utf8.md
+*.knit.md
+
+# R environment variables
+.Renviron
+
+# Translation temp files
+po/*~
+
+# RStudio Connect folder
+rsconnect/
+
+# =================================================================
+# END OF STATISTICS IGNORE
+# =================================================================

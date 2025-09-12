@@ -1,0 +1,255 @@
+# SPDX-FileCopyrightText: 2025 best-known-practice contributors
+# SPDX-License-Identifier: CC0-1.0
+
+---
+default_language_version:
+  python: python3.13
+
+default_stages: [commit-msg, pre-commit, pre-push]
+
+minimum_pre_commit_version: 4.0.0
+
+default_install_hook_types:
+  - commit-msg
+  - pre-commit
+  - pre-push
+
+repos:
+  ##############################
+  # META HOOKS
+  ##############################
+  - repo: meta
+    hooks:
+      - id: check-useless-excludes
+
+  ##############################
+  # SECURITY
+  ##############################
+
+  # Detect secrets in the codebase using Yelp detect-secrets.
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.5.0
+    hooks:
+      - id: detect-secrets
+
+  # Scan Python code for security vulnerabilities using Bandit.
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.8.6
+    hooks:
+      - id: bandit
+        args: ["--recursive", "-ll", "-ii"]
+
+  # Audit installed Python packages for known vulnerabilities.
+  - repo: https://github.com/trailofbits/pip-audit
+    rev: v2.9.0
+    hooks:
+      - id: pip-audit
+        name: Audit Python dependencies for vulnerabilities
+        files: ^(requirements(-[a-zA-Z0-9]+)*\.txt|pyproject\.toml)$
+        args: ["--fix", "--strict"]
+        pass_filenames: false
+
+  # Detect secrets in the codebase using Gitleaks.
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.28.0
+    hooks:
+      - id: gitleaks
+
+  ##############################
+  # CODE QUALITY
+  ##############################
+
+  # Format Python code using Black.
+  - repo: https://github.com/psf/black
+    rev: 25.1.0
+    hooks:
+      - id: black
+        args: ["--config=pyproject.toml"]
+
+  # Sort Python imports using isort with Black compatibility.
+  - repo: https://github.com/PyCQA/isort
+    rev: 6.0.1
+    hooks:
+      - id: isort
+        args: ["--profile", "black"]
+
+  # Automatically upgrade Python syntax.
+  - repo: https://github.com/asottile/pyupgrade
+    rev: v3.20.0
+    hooks:
+      - id: pyupgrade
+        args: ["--py314-plus"]
+
+  ##############################
+  # LINTING
+  ##############################
+
+  # Check the style and quality of Python code.
+  - repo: https://github.com/PyCQA/flake8
+    rev: 7.3.0
+    hooks:
+      - id: flake8
+        args:
+          - --max-line-length=88
+          - --ignore=E203,E501
+        additional_dependencies:
+          - flake8-bugbear
+          - cohesion
+          - flake8-comprehensions
+          - flake8-docstrings
+          - flake8-eradicate
+          - flake8-fixme
+          - flake8-functions-names
+          - flake8-markdown
+          - flake8-secure-coding-standard
+          - flake8-tergeo
+          - flake8-warnings
+
+  # Lint YAML files with Yamllint.
+  - repo: https://github.com/adrienverge/yamllint
+    rev: v1.37.1
+    hooks:
+      - id: yamllint
+        args: ["--strict"]
+
+  # Lint shell scripts for common issues.
+  - repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: v0.11.0.1
+    hooks:
+      - id: shellcheck
+
+  # General-purpose pre-commit hooks for basic file validation.
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: check-added-large-files
+        args: ["--maxkb=500"]
+      - id: check-ast
+      - id: check-builtin-literals
+      - id: check-case-conflict
+      - id: check-docstring-first
+      - id: check-json
+      - id: check-merge-conflict
+        args: ["--assume-in-merge"]
+      - id: check-shebang-scripts-are-executable
+      - id: check-symlinks
+      - id: check-toml
+      - id: check-vcs-permalinks
+      - id: check-xml
+      - id: check-yaml
+      - id: debug-statements
+      - id: destroyed-symlinks
+      - id: detect-private-key
+      - id: end-of-file-fixer
+      - id: fix-byte-order-marker
+      - id: forbid-submodules
+      - id: mixed-line-ending
+        args: ["--fix", "lf"]
+      - id: name-tests-test
+        args: ["--pytest-test-first"]
+      - id: no-commit-to-branch
+        args: ["--branch", "develop"]
+      - id: pretty-format-json
+        args: ["--autofix", "--no-sort-keys"]
+      - id: requirements-txt-fixer
+        files: ^requirements-[^-]+-[^-]+\.txt$
+      - id: trailing-whitespace
+
+  # Check Python code with regex hooks.
+  - repo: https://github.com/pre-commit/pygrep-hooks
+    rev: v1.10.0
+    hooks:
+      - id: python-check-blanket-noqa
+      - id: python-check-blanket-type-ignore
+      - id: python-check-mock-methods
+      - id: python-no-eval
+      - id: python-no-log-warn
+      - id: python-use-type-annotations
+      - id: text-unicode-replacement-char
+
+  # Check code for common misspellings.
+  - repo: https://github.com/codespell-project/codespell
+    rev: v2.4.1
+    hooks:
+      - id: codespell
+        args: ["--ignore-words-list", "CNA"]
+
+  # Automated checks on pyproject.toml.
+  - repo: https://github.com/abravalheri/validate-pyproject
+    rev: v0.24.1
+    hooks:
+      - id: validate-pyproject
+
+  ##############################
+  # TYPE CHECKING
+  ##############################
+
+  # Perform static type checking with Mypy.
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.18.1
+    hooks:
+      - id: mypy
+        args: ["--strict", "--ignore-missing-imports"]
+
+  ##############################
+  # CODE QUALITY
+  ##############################
+
+  # Remove unused code elements.
+  - repo: https://github.com/PyCQA/autoflake
+    rev: v2.3.1
+    hooks:
+      - id: autoflake
+        args:
+          [
+            "--remove-all-unused-imports",
+            "--remove-unused-variables",
+            "--in-place",
+          ]
+
+  # Enforce complexity thresholds with xenon.
+  - repo: https://github.com/rubik/xenon
+    rev: v0.9.3
+    hooks:
+      - id: xenon
+        args: ["--max-absolute=A", "--max-modules=A", "--max-average=A"]
+
+  ##############################
+  # DOCUMENTATION
+  ##############################
+
+  # Enforce docstring coverage.
+  - repo: https://github.com/econchick/interrogate
+    rev: 1.7.0
+    hooks:
+      - id: interrogate
+        args: ["--fail-under=80", "--verbose"]
+
+  ##############################
+  # INTELLECTUAL PROPERTY
+  ##############################
+
+  # Check SPDX licensing information.
+  - repo: https://github.com/fsfe/reuse-tool
+    rev: v5.1.1
+    hooks:
+      - id: reuse-lint-file
+
+  ##############################
+  # OTHER UTILITIES
+  ##############################
+
+  # Strip output from Jupyter notebooks to avoid unnecessary diffs.
+  - repo: https://github.com/kynan/nbstripout
+    rev: 0.8.1
+    hooks:
+      - id: nbstripout
+        args: ["--drop-empty-cells"]
+
+# Configure automated updates and autofix behavior for pre-commit.ci.
+ci:
+  autofix_prs: true
+  autofix_commit_msg: "ci(linting): apply pre-commit fixes"
+  autoupdate_commit_msg: "ci(pre-commit): update pre-commit hooks"
+  autoupdate_pr_title: "ci(pre-commit): update pre-commit hooks"
+  autoupdate_schedule: weekly

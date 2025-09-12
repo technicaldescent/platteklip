@@ -1,0 +1,147 @@
+# SPDX-FileCopyrightText: 2025 best-known-practice contributors
+# SPDX-License-Identifier: CC0-1.0
+
+# ====================
+# General Settings
+# ====================
+*.sh          text eol=lf
+*.txt         text
+*.md          text
+*.rst         text
+*.env         text
+*.toml        text
+*.cfg         text
+*.ini         text
+
+# ====================
+# Git-Specific Files
+# ====================
+.gitignore     text eol=lf export-ignore
+.gitattributes text eol=lf export-ignore
+.gitkeep       text eol=lf export-ignore
+
+# ====================
+# Jupyter Notebooks
+# ====================
+# Note: diff=ipynb requires a custom diff driver (e.g., nbdime)
+*.ipynb       text diff=ipynb
+
+# ====================
+# Model Files (Git LFS)
+# ====================
+*.pt          filter=lfs diff=lfs merge=lfs -text
+*.pth         filter=lfs diff=lfs merge=lfs -text
+*.ckpt        filter=lfs diff=lfs merge=lfs -text
+*.onnx        filter=lfs diff=lfs merge=lfs -text
+*.h5          filter=lfs diff=lfs merge=lfs -text
+*.tflite      filter=lfs diff=lfs merge=lfs -text
+
+# ====================
+# Data Files
+# ====================
+# For large CSV/TSV files, consider using Git LFS:
+# *.csv filter=lfs diff=lfs merge=lfs -text
+*.csv         text
+*.tsv         text
+*.dat         binary
+*.bin         binary
+*.npy         binary
+*.npz         binary
+*.pkl         binary
+*.hdf5        binary
+
+# ====================
+# Source Code
+# ====================
+*.cpp         text
+*.h           text
+*.hpp         text
+*.cu          text
+*.cuh         text
+*.java        text
+*.kt          text
+*.scala       text
+*.go          text
+
+# ====================
+# Python
+# ====================
+# Consolidated all Python extensions with eol=lf and diff=python
+*.pxd         text eol=lf diff=python
+*.py          text eol=lf diff=python
+*.py3         text eol=lf diff=python
+*.pyw         text eol=lf diff=python
+*.pyx         text eol=lf diff=python
+*.pyz         text eol=lf diff=python
+*.pyi         text eol=lf diff=python
+
+# ====================
+# Probabilistic Programming (Pyro)
+# ====================
+*.stan        text
+
+# ====================
+# Visualization and Graphics
+# ====================
+*.png         binary
+*.jpg         binary
+*.jpeg        binary
+*.svg         text
+*.gif         binary
+*.mp4         binary
+
+# ====================
+# Reinforcement Learning and Logs
+# ====================
+*.log         text
+*.event       binary
+*.tfrecord    binary
+
+# ====================
+# Quantum Computing (PennyLane, TorchQuantum)
+# ====================
+*.qasm        text
+*.quil        text
+
+# ====================
+# Documentation and Configurations
+# ====================
+docs/**/*.md  text
+*.html        text
+*.css         text
+*.js          text
+pyproject.toml text
+*.json        text diff=json
+*.yaml        text diff=yaml
+*.yml         text diff=yaml
+
+# ====================
+# Build and Deployment
+# ====================
+*.so          binary
+*.dylib       binary
+*.dll         binary
+*.exe         binary
+*.jar         binary
+*.whl         binary
+*.tar.gz      binary
+*.zip         binary
+
+# ====================
+# Miscellaneous
+# ====================
+*.tgz         binary
+*.xz          binary
+*.bz2         binary
+*.7z          binary
+*.rar         binary
+
+# ====================
+# DVC Ignore
+# ====================
+.dvcignore text eol=lf export-ignore
+
+# ====================
+# Docker Ignore
+# ====================
+.dockerignore text eol=lf export-ignore

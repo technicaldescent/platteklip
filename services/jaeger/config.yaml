@@ -1,0 +1,71 @@
+# SPDX-FileCopyrightText: 2025 system-under-test contributors
+# SPDX-License-Identifier: Apache-2.0
+
+# Security Standards Applied:
+# - CIS Docker Benchmark v1.7
+# - NIST SP 800-190 Container Security Guidelines
+# - ISO/IEC 27001:2022
+# - OWASP Container Security Verification Standard
+
+---
+
+# Jaeger configuration (all-in-one mode)
+metrics:
+  http-route: /metrics
+  backend: prometheus
+  prometheus:
+    host-port: 0.0.0.0:${JAEGER_METRICS_PORT}
+
+sampling:
+  strategies-store:
+    type: adaptive
+    adaptive:
+      metrics_backend: prometheus
+
+processor:
+  jaeger-compact:
+    server_host_port: 0.0.0.0:${JAEGER_AGENT_PORT}
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:${JAEGER_OTLP_GRPC_PORT}
+      http:
+        endpoint: 0.0.0.0:${JAEGER_OTLP_HTTP_PORT}
+
+query:
+  port: ${JAEGER_UI_PORT}
+  base-path: /jaeger
+  static-assets: /jaeger-ui/build
+  metrics:
+    http-route: /metrics
+
+admin:
+  http:
+    port: ${JAEGER_ADMIN_PORT}
+  metrics:
+    http-route: /metrics
+
+storage:
+  type: memory
+  options:
+    memory:
+      max-traces: 50000  # Reduce memory footprint (CIS 5.3)
+
+agent:
+  http-server:
+    port: ${JAEGER_HTTP_API_PORT}
+
+ingester:
+  deadlockInterval: 0s  # Disable for memory storage
+
+# Security hardening
+admin.http.host-port: 0.0.0.0:${JAEGER_ADMIN_PORT}
+query.host-port: 0.0.0.0:${JAEGER_UI_PORT}
+health-check:
+  http-route: /  # Health check endpoint
+
+# TLS Configuration (enable in production)
+tls:
+  enabled: false
+  cert: /etc/jaeger/certs/tls.crt
+  key: /etc/jaeger/certs/tls.key

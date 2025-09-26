@@ -1,0 +1,13 @@
+# SPDX-FileCopyrightText: 2025 system-under-test contributors
+# SPDX-License-Identifier: Apache-2.0
+
+---
+providers:
+  - name: 'Operations'
+    orgId: 1
+    folder: 'operations'
+    type: file
+    disableDeletion: true
+    editable: false
+    options:
+      path: /var/lib/grafana/dashboards

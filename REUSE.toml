@@ -12,6 +12,8 @@ SPDX-License-Identifier = "Apache-2.0"
 # Configuration & infrastructure files (CC0-1.0) - Highest precedence
 [[annotations]]
 path = [
+    ".dockerignore",
+    ".dvcignore",
     ".gitattributes",
     ".gitignore",
     ".pre-commit-config.yaml",

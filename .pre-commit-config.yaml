@@ -61,7 +61,7 @@ repos:
 
   # Format Python code using Black.
   - repo: https://github.com/psf/black
-    rev: 25.1.0
+    rev: 25.9.0
     hooks:
       - id: black
         args: ["--config=pyproject.toml"]
@@ -186,7 +186,7 @@ repos:
 
   # Perform static type checking with Mypy.
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.18.1
+    rev: v1.18.2
     hooks:
       - id: mypy
         args: ["--strict", "--ignore-missing-imports"]

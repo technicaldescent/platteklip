@@ -1,0 +1,483 @@
+# SPDX-FileCopyrightText: 2025 system-under-test contributors
+# SPDX-License-Identifier: Apache-2.0
+
+# =================================================================
+# Project Configuration with Reference Standards
+# =================================================================
+
+# Controls:
+
+# NIST 800-53 Rev 5:
+# - SA-15: Development Process, Standards, and Tools
+# - SA-11: Developer Security Testing
+# - CM-3: Configuration Change Control
+# - CM-7: Least Functionality
+# - SI-7: Software Integrity
+# - RA-5: Vulnerability Scanning
+# - SI-10: Information Input Validation
+# - SA-8: Security and Privacy Engineering Principles
+# - SI-4: System Monitoring
+
+# ISO/IEC 27002:2022:
+# - 5.15-5.18: Access Control & Access Rights
+# - 5.32: Intellectual Property Rights
+# - 8.8: Management of Technical Vulnerabilities
+# - 8.9: Configuration Management
+# - 8.12: Data Leakage Prevention
+# - 8.24: Use of Cryptography
+# - 8.25: Secure Development Life Cycle
+# - 8.27: Secure System Architecture and Engineering
+# - 8.28: Secure Coding
+# - 8.29: Security Testing in Development and Acceptance
+# - 8.32: Change Management
+# - 8.33: Test Information
+
+# Change Control:
+# git >= 2.51.0 (https://git-scm.com/)
+# Conventional Commits 1.0.0 (https://www.conventionalcommits.org/en/v1.0.0/)
+# Semantic Versioning 2.0.0 (https://semver.org/)
+
+# Software Bill of Materials:
+# SPDX Specification 3.0 (https://spdx.github.io/spdx-spec/v3.0.1)
+# Open Source Initiative Approved Licenses (https://opensource.org/licenses)
+# Scientific Python Ecosystem Coordination:
+# SPEC 0 (https://scientific-python.org/specs/spec-0000/)
+# * Python minor versions are dropped after 36 months.
+# * Minor versions of Core Projects are dropped after 24 months, including:
+#   IPython, Matplotlib, NetworkX, NumPy, pandas, PySAL,
+#   Scikit-HEP, scikit-image, scikit-learn, SciPy, xarray, Zarr-Python
+
+# Data Bill of Materials:
+# Data Version Control (DVC)
+# MLCommons Croissant 1.0 (https://docs.mlcommons.org/croissant)
+
+# =================================================================
+# Build Automation
+# =================================================================
+
+[build-system]
+requires = [
+    "hatchling",                        # [MIT]
+    "pip>=25.2.0",                      # [MIT]
+    "python-semantic-release>=9.21.0",  # [MIT]
+    "spdx-tools>=0.8.0",                # [Apache-2.0]
+    "sigstore>=3.6.0",                  # [Apache-2.0]
+]
+build-backend = "hatchling.build"
+
+# =================================================================
+# Project Metadata
+# =================================================================
+
+[project]
+name = "system-under-test"
+dynamic = ["version"]
+description = "Telemetry testing system."
+readme = "README.md"
+requires-python = ">=3.13"
+license-files = ["LICENSE", "LICENSES/*.txt"]
+authors = [
+    {name = "The system-under-test contributors"},
+]
+maintainers = [
+    {name = "Raymond Ellis", email = "raymond.ellis@gmail.com"},
+]
+
+keywords = [
+    "python",
+    "data-science",
+    "machine-learning-engineering",
+    "devsecops-best-practices",
+    "best-current-practice",
+    "best-practices-python",
+    "scientific-python",
+]
+
+classifiers = [
+    "Private :: Do Not Upload",
+
+    "Development Status :: 3 - Alpha",
+
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+
+    "Natural Language :: English",
+
+    "Operating System :: POSIX",
+
+    "Programming Language :: Python :: 3.13",      # Drop support in October 2027
+    "Programming Language :: Python :: 3.14",      # Drop support in October 2028
+    "Programming Language :: Python :: 3.15",      # Drop support in October 2029
+
+    "Topic :: Scientific/Engineering",
+
+    "Typing :: Typed",
+]
+
+# Core dependencies required for running the project.
+dependencies = [
+    "opentelemetry-sdk>=1.37.0",                       # API and SDK [Apache-2.0]
+    "opentelemetry-exporter-otlp-proto-grpc>=1.37.0",  # [Apache-2.0]
+    "opentelemetry-exporter-prometheus>=0.58b0",       # Export metrics to Prometheus [Apache-2.0]
+    "opentelemetry-exporter-richconsole>=0.58b0",      # Console exporter with Rich tree view [Apache-2.0]
+    "opentelemetry-instrumentation-logging>=0.58b0",    # OpenTelemetry logging integration [Apache-2.0]
+    "paho-mqtt>=2.1.0",                                # MQTT client [EPL-2.0 OR BSD-3-Clause]
+]
+
+[project.optional-dependencies]
+# Data management and processing tools.
+data = [
+    "dvc>=3.58.0",              # Data Version Control [Apache-2.0]
+    "mlcroissant>=1.0.0,<2.0.0",  # Metadata standard [Apache-2.0]
+    "pydantic>=2.11.0",         # Data validation using type hints [MIT]
+]
+
+# Development tools for code quality and security.
+develop = [
+    "bandit>=1.8.0",            # Security linting for Python [Apache-2.0]
+    "black>=25.1.0",            # Python code formatter [MIT]
+    "detect-secrets>=1.5.0",    # Detect secrets [Apache-2.0]
+    "flake8>=7.2.0",            # Style and quality of python code [MIT]
+    "flake8-docstrings>=1.7.0", # Extension for pydocstyle to flake8 [MIT]
+    "hypothesis>=6.138.0",      # Property-based testing library [MPL-2.0]
+    "mypy>=1.15.0",             # Static type checker for Python [MIT]
+    "opentelemetry-sdk>=1.36.0",  # OpenTelemetry Python API and SDK
+    "pip-audit>=2.9.0",         # Security audit dependencies [Apache-2.0]
+    "pre-commit>=4.2.0",        # Pre-commit hooks for code quality [MIT]
+    "pylint>=3.3.8",            # Static code analyser [GPL-2.0-or-later]
+    "pytest>=8.4.0",            # Simple powerful testing with Python [MIT]
+    "pytest-cov>=6.0.0",        # Produces coverage reports [MIT]
+    "pytest-mock>=3.14.0",      # Provides a mocker fixture [MIT]
+    "pytest-opentelemetry>=1.1.0",  # Instruments pytest [MIT]
+    "reuse>=5.0.0",             # REUSE recommendations [CC0-1.0]
+    "safety>=3.3.0",            # Checks vulnerable dependencies [MIT]
+    "python-semantic-release>=9.21.0",  # [MIT]
+    "sigstore>=3.6.0",          # Generate and verify signatures [Apache-2.0]
+    "spdx-tools>=0.8.0",        # [Apache-2.0]
+    "tryceratops>=2.4.1",        # Prevent Exception Handling AntiPatterns [MIT]
+    "xenon>=0.9.3",             # Monitors code complexity [MIT]
+]
+
+sbom = [
+    "model-signing>=1.0.0",     # Universal model signing library [Apache-2.0]
+]
+
+torch = [
+    "accelerate>=1.6.0",        # Code for multi-GPUs/TPU/fp16 [Apache-2.0]
+    "onnx>=1.18.0",             # Machine learning interoperability [Apache-2.0]
+    "safetensors>=0.5.0",       # Store and distribute tensors [Apache-2.0]
+    "torch>=2.7.0",             # Tensor computation and NN [BSD-3-Clause]
+    "torchfix>=0.7.0",          # Linter for PyTorch code [BSD License]
+    "torchmetrics>=1.7.0",      # Machine learning metrics [Apache-2.0]
+]
+
+jax = [
+    "jax>=0.6.0",               # Array computation [Apache-2.0]
+]
+
+docs = [
+    "sphinx>=8.2.0",
+    "sphinxcontrib-bibtex>=2.6.0",
+    "pydata-sphinx-theme>=0.16.0,<1.0.0",
+]
+
+observability = [
+    "opentelemetry-sdk",
+    "opentelemetry-exporter-otlp-proto-grpc",
+    "opentelemetry-exporter-prometheus",
+    "opentelemetry-exporter-richconsole",
+]
+
+[project.urls]
+homepage = "https://github.com/tr8craft/system-under-test"
+documentation = "https://github.com/tr8craft/system-under-test/README.md"
+source = "https://github.com/tr8craft/system-under-test"
+issues = "https://github.com/tr8craft/system-under-test/issues"
+changelog = "https://github.com/tr8craft/system-under-test/blob/main/CHANGELOG.md"
+security = "https://github.com/tr8craft/system-under-test/blob/main/SECURITY.md"
+contributing = "https://github.com/tr8craft/system-under-test/blob/main/CONTRIBUTING.md"
+discussion = "https://github.com/tr8craft/system-under-test/discussions"
+
+
+# =================================================================
+# Build Configuration
+# =================================================================
+
+[tool.hatch.version]
+path = "src/system-under-test/__init__.py"
+pattern = '__version__ = "(?P<version>[^"]+)"'
+
+[tool.hatch.build]
+include = [
+    "src/system-under-test",
+]
+
+[tool.hatch.build.targets.sdist]
+exclude = [
+    "/.github",
+    "/docs",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/system-under-test"]
+sign = true
+sbom = true
+sbom-format = "spdx"
+
+[tool.hatch.build.targets.wheel.requires]
+verify_hash = true
+
+[tool.hatch.envs.hatch-static-analysis]
+installer = "pip"
+
+[tool.hatch.envs.quality]
+dependencies = [
+    ".develop",
+]
+
+[tool.hatch.envs.quality.scripts]
+check = [
+    "black --check --diff src tests",
+    "flake8 src tests",
+    "tryceratops check src tests",
+    "interrogate -v .",
+    "xenon --max-absolute A --max-modules A --max-average A src",
+    "bandit -c pyproject.toml -r src",
+    "detect-secrets scan",
+    "pip-audit",
+]
+
+[tool.hatch.envs.docs]
+dependencies = [".docs"]
+
+# =================================================================
+# Release Management & Security
+# =================================================================
+
+[tool.semantic_release]
+version_variable = ["src/system-under-test/__init__.py:__version__"]
+commit_parser = "conventional"
+major_on_zero = false
+allow_zero_version = true
+upload_to_pypi = false
+upload_to_release = true
+commit_message = "ci(release): {version}"
+tag_commit_message = "release {version}"
+no_git_verify = false
+tag_format = "v{version}"
+
+[tool.semantic_release.publish]
+dist_glob_patterns = ["dist/*"]
+upload_to_vcs_release = true
+
+[tool.semantic_release.commit_parser_options]
+allowed_tags = [
+    "build",                # Changes that affect the build system
+    "ci",                   # CI configuration changes
+    "docs",                 # Documentation only changes
+    "feat",                 # New features (minor version)
+    "fix",                  # Bug fixes (patch version)
+    "perf",                 # Performance improvements (patch version)
+    "refactor",             # Code refactoring
+    "revert",               # Revert previous commits
+    "style",                # Code style changes
+    "test",                 # Adding/modifying tests
+]
+major_tags = ["BREAKING", "BREAKING CHANGE"]  # Triggers major version bump
+minor_tags = ["feat"]                         # Triggers minor version bump
+patch_tags = ["fix", "perf"]                  # Triggers patch version bump
+
+default_bump_level = 0
+parse_squash_commits = true
+ignore_merge_commits = true
+
+[tool.semantic_release.remote]
+name = "origin"
+type = "github"
+ignore_token_for_push = false
+insecure = false
+
+[tool.semantic_release.changelog]
+exclude_commit_patterns = []
+mode = "update"
+insertion_flag = "<!-- version list -->"
+template_dir = "templates"
+
+[tool.semantic_release.changelog.default_templates]
+changelog_file = "CHANGELOG.md"
+output_format = "md"
+mask_initial_release = true
+
+[tool.semantic_release.changelog.environment]
+block_start_string = "{%%"
+block_end_string = "%%}"
+variable_start_string = "{{"
+variable_end_string = "}}"
+comment_start_string = "{#"
+comment_end_string = "#}"
+trim_blocks = false
+lstrip_blocks = false
+newline_sequence = "\n"
+keep_trailing_newline = false
+extensions = []
+autoescape = false
+
+[tool.semantic_release.branches.main]
+match = "main"
+prerelease_token = "rc"
+prerelease = false
+
+[tool.semantic_release.branches.develop]
+match = "develop"
+prerelease = true
+prerelease_token = "alpha"      # Results in x.y.z-alpha.n
+
+[tool.semantic_release.branches.alpha]
+# Match branches with the prefixes 'feat/', 'fix/', or 'perf/'.
+match = "^(feat|fix|perf)/.+"
+prerelease = true
+prerelease_token = "alpha"      # Results in x.y.z-alpha.n
+
+[tool.semantic_release.branches.beta]
+match = "beta"
+prerelease = true
+prerelease_token = "beta"       # Results in x.y.z-beta.n
+
+[tool.semantic_release.branches.release]
+match = "release/.*"
+prerelease = true
+prerelease_token = "rc"         # Results in x.y.z-rc.n
+bump_patch_without_tag = false
+
+[tool.sigstore]
+enabled = true
+identity = "https://github.com/tr8craft/system-under-test"
+rekor_url = "https://rekor.sigstore.dev"
+fulcio_url = "https://fulcio.sigstore.dev"
+
+# =================================================================
+# Tools Configuration
+# =================================================================
+
+[tool.pylint.main]
+# Use all available cores.
+jobs = 0
+# Set a high bar for code quality.
+fail-under = 9.5
+# List of plugins to load.
+load-plugins = []
+# Ensure compatibility with Black formatter.
+max-line-length = 88
+disable = [
+    "missing-module-docstring", # Handled by interrogate
+    "fixme",                    # TODOs are not errors
+]
+
+[tool.flake8]
+# Set max line length to be compatible with Black.
+max-line-length = 88
+# Set cyclomatic complexity threshold.
+max-complexity = 10
+# Ignore rules that conflict with Black.
+# E203: whitespace before ':'
+# W503: line break before binary operator
+ignore = ["E203", "W503"]
+exclude = [
+    ".git",
+    "__pycache__",
+    "build",
+    "dist",
+    ".venv",
+]
+
+[tool.interrogate]
+# Enforce 95% docstring coverage.
+fail-under = 95
+# Exclude test files and docs from coverage.
+exclude = ["tests", "docs"]
+# Do not require docstrings for __init__ methods.
+ignore-init-method = true
+# Increase verbosity.
+verbose = 2
+
+[tool.xenon]
+# Define complexity thresholds here instead of in scripts.
+max-absolute = "B"
+max-modules = "A"
+max-average = "A"
+exclude = [
+    "src/system-under-test/vendored/*",
+]
+
+[tool.tryceratops]
+# Exclude test files where exceptions are often deliberately raised.
+exclude = ["tests/*"]
+# Ignore specific violation codes if necessary.
+# E.g., ignore = ["TRY200"]
+
+[tool.black]
+preview = true
+
+[tool.bandit]
+exclude_dirs = []
+targets = ["src"]
+aggregate = "file"
+confidence-level = "MEDIUM"
+severity-level = "LOW"
+
+[tool.pytest.ini_options]
+minversion = "8.4.1"
+pythonpath = "src"
+addopts = "-ra -q --cov --cov-report=xml --junitxml=test-results.xml"
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_functions = "test_*"
+markers = [
+    "benchmark: benchmarking",
+    "compliance: tests for standards compliance",
+    "functional: functional tests for features",
+    "health: health tests for running processes",
+    "integration: integration tests requiring external tools",
+    "network: tests that need network",
+    "performance: performance and benchmark tests",
+    "regression: tests for fixed bugs and refactoring",
+    "security: security checks",
+    "slow: tests that take longer than 1 second to run",
+    "unit: unit tests for individual components",
+]
+xfail_strict = true
+filterwarnings = [
+    "error::DeprecationWarning",
+    "error::FutureWarning",
+    "error::ImportWarning",
+    "error::PendingDeprecationWarning",
+    "error::ResourceWarning",
+]
+
+[tool.coverage.run]
+branch = true
+parallel = true
+source = ["src"]
+omit = [
+    "tests/*",
+]
+
+[tool.coverage.report]
+fail_under = 80
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if TYPE_CHECKING:",
+    "raise NotImplementedError",
+]
+
+[tool.mypy]
+python_version = "3.14"
+namespace_packages = true
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+check_untyped_defs = true
+strict = true
+warn_unreachable = true
+disallow_incomplete_defs = true

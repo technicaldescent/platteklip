@@ -1,0 +1,68 @@
+# SPDX-FileCopyrightText: 2025 system-under-test contributors
+# SPDX-License-Identifier: Apache-2.0
+
+// File discovery
+local.file_match "log_files" {
+    path_targets = [{
+        __path__ = "/processed/*.log.gz",
+        job      = "logs",
+        hostname = constants.hostname,
+    }]
+    sync_period = "30s"
+}
+
+// Log collection and decompression
+loki.source.file "log_logs" {
+    targets    = local.file_match.log_files.targets
+    forward_to = [loki.process.log_processor.receiver]
+
+    decompression {
+        enabled       = true
+        format        = "gz"
+        initial_delay = "10s"
+    }
+}
+
+// Log processing for log files
+loki.process "log_processor" {
+    // Parse the semicolon-delimited format using regex
+    stage.regex {
+        expression = "^(?P<event_code>EV\\d+);\\s?(?P<event_name>[^;]+);\\s?(?P<timestamp>\\d+)(?:;\\s?(?P<additional_fields>.+))?$"
+    }
+
+    // Set timestamp from Unix milliseconds
+    stage.timestamp {
+        source = "timestamp"
+        format = "UnixMs"
+    }
+
+    // Extract labels for easier filtering in Loki/Grafana
+    stage.labels {
+        values = {
+            event_code = "event_code",
+            event_name = "event_name",
+            job        = "logs",
+            host       = constants.hostname,
+        }
+    }
+
+    // Optional: If you want to keep the original log line as the message
+    stage.output {
+        source = "original"
+    }
+
+    forward_to = [loki.write.loki_instance.receiver]
+}
+
+// Write to Loki
+loki.write "loki_instance" {
+    endpoint {
+        url = "http://loki:3100/loki/api/v1/push"
+    }
+
+    external_labels = {
+        source = "source_logs",
+        host   = constants.hostname,
+        job    = "logs",
+    }
+}

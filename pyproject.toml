@@ -204,12 +204,12 @@ discussion = "https://github.com/tr8craft/system-under-test/discussions"
 # =================================================================
 
 [tool.hatch.version]
-path = "src/system-under-test/__init__.py"
+path = "src/system_under_test/__init__.py"
 pattern = '__version__ = "(?P<version>[^"]+)"'
 
 [tool.hatch.build]
 include = [
-    "src/system-under-test",
+    "src/system_under_test",
 ]
 
 [tool.hatch.build.targets.sdist]
@@ -219,7 +219,7 @@ exclude = [
 ]
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/system-under-test"]
+packages = ["src/system_under_test"]
 sign = true
 sbom = true
 sbom-format = "spdx"
@@ -255,7 +255,7 @@ dependencies = [".docs"]
 # =================================================================
 
 [tool.semantic_release]
-version_variable = ["src/system-under-test/__init__.py:__version__"]
+version_variable = ["src/system_under_test/__init__.py:__version__"]
 commit_parser = "conventional"
 major_on_zero = false
 allow_zero_version = true
@@ -406,7 +406,7 @@ max-absolute = "B"
 max-modules = "A"
 max-average = "A"
 exclude = [
-    "src/system-under-test/vendored/*",
+    "src/system_under_test/vendored/*",
 ]
 
 [tool.tryceratops]

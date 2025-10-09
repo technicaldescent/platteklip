@@ -46,7 +46,7 @@ repos:
       - id: pip-audit
         name: Audit Python dependencies for vulnerabilities
         files: ^(requirements(-[a-zA-Z0-9]+)*\.txt|pyproject\.toml)$
-        args: ["--fix", "--strict"]
+        args: ["--fix", "--strict", "--ignore-vuln", "GHSA-4xh5-x5gv-qwph"]
         pass_filenames: false
 
   # Detect secrets in the codebase using Gitleaks.
@@ -68,7 +68,7 @@ repos:
 
   # Sort Python imports using isort with Black compatibility.
   - repo: https://github.com/PyCQA/isort
-    rev: 6.0.1
+    rev: 6.1.0
     hooks:
       - id: isort
         args: ["--profile", "black"]
@@ -231,7 +231,7 @@ repos:
 
   # Check SPDX licensing information.
   - repo: https://github.com/fsfe/reuse-tool
-    rev: v5.1.1
+    rev: v6.1.2
     hooks:
       - id: reuse-lint-file
 

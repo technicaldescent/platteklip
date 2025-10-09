@@ -20,9 +20,6 @@ x-default-config: &default-config
     - NET_RAW
     - SYS_ADMIN
     - SYS_MODULE
-  cap_add:
-    - CHOWN                     # Add only required capabilities
-    - NET_BIND_SERVICE
   deploy:
     resources:
       limits:
@@ -42,11 +39,10 @@ x-default-config: &default-config
     - apparmor=docker-default   # CIS 5.1: AppArmor default profile
   stop_grace_period: 15s
   tmpfs: &default-tmpfs
-    - /tmp:size=8M,uid=1000,gid=1000,noexec
+    - /tmp:size=256M,uid=1000,gid=1000,noexec
     - /run
   user: 1000:1000       # NIST SP 800-190: Least privilege (CIS Docker 1.1.2)
 
-# Default healthcheck
 x-healthcheck: &default-healthcheck
   interval: 90s
   timeout: 10s
@@ -54,18 +50,21 @@ x-healthcheck: &default-healthcheck
   start_period: 30s
   start_interval: 5s
 
-x-logging: &default-logging
-  driver: "json-file"
+x-otel-logging: &otel-logging
+  driver: "otlp"
   options:
-    max-size: "8M"
-    max-file: "3"
-    tag: "{{.Name}}/{{.ID}}"
+    otlp-endpoint: "grpc://otel-collector:4317"  # gRPC endpoint
+    otlp-insecure: "true"                        # DEVELOPMENT ONLY
+    otlp-resource-attributes: >-
+      service.name={{.Name}},
+      container.id={{.ID}},
+      container.name={{.Name}},
+      container.image.name={{.ImageName}}
 
 services:
   # ###########################################################################
   # NGINX REVERSE PROXY
   # ###########################################################################
-
   nginx:
     <<: *default-config
     container_name: nginx
@@ -79,8 +78,7 @@ services:
     ports:
       - "443:443"       # Expose HTTPS externally
     profiles:
-      - development
-    restart: unless-stopped
+      - experimental
     tmpfs:
       - /tmp
       - /var/run
@@ -95,8 +93,6 @@ services:
   # ###########################################################################
   # NETWORK TIME PROTOCOL (NTP)
   # ###########################################################################
-
-  # Network Time Protocol (NTP) Server for Time Synchronization
   chrony:
     <<: *default-config
     cap_add:
@@ -109,8 +105,7 @@ services:
     networks:
       - telemetry
     profiles:
-      - development
-    restart: unless-stopped
+      - experimental
     tmpfs:
       - /run/chrony:rw,mode=1750
     volumes:
@@ -120,31 +115,28 @@ services:
   # ###########################################################################
   # IDENTITY AND ACCESS MANAGEMENT (IAM)
   # ###########################################################################
-
-  # KEYCLOAK STORAGE
   keycloak-postgres:
     <<: *default-config
     container_name: keycloak-postgres
     environment:
-      ALLOW_EMPTY_PASSWORD: true
+      ALLOW_EMPTY_PASSWORD: false
       POSTGRES_DB: keycloak_db
-      POSTGRES_USER: mlops
-      POSTGRES_PASSWORD: mlops   # pragma: allowlist secret
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: mlops      # pragma: allowlist secret
       PGDATA: /var/lib/postgresql/data/pgdata
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U mlops -d keycloak_db"]
+      test: ["CMD-SHELL", "pg_isready -U keycloak -d keycloak_db"]
       <<: *default-healthcheck
-    image: postgres:18rc1
+    image: postgres:18.0-alpine3.22
     networks:
       - back-tier
     profiles:
-      - development
+      - experimental
     tmpfs:
-      - /var/run/postgresql:uid=999,gid=999,mode=0755  # PostgreSQL user
+      - /var/run/postgresql:uid=999,gid=999,mode=0755
     volumes:
       - keycloak-data:/var/lib/postgresql/data
 
-  # KEYCLOAK
   keycloak:
     <<: *default-config
     command: ["start"]
@@ -153,28 +145,27 @@ services:
       keycloak-postgres:
         condition: service_healthy
         required: true
-    env_file: .env
     environment:
-      KC_HTTP_ENABLED: false
-      KEYCLOAK_ENABLE_HTTPS: true
+      KC_HTTP_ENABLED: true
+      KEYCLOAK_ENABLE_HTTPS: false
       KEYCLOAK_HTTPS_CERTIFICATE_FILE:
       KEYCLOAK_HTTPS_CERTIFICATE_KEY_FILE:
       KC_DB: postgres
       DB_ADDR: keycloak-postgres
       DB_DATABASE: keycloak_db
-      KC_DB_USERNAME: mlops
+      KC_DB_USERNAME: keycloak
       KC_DB_PASSWORD: mlops               # pragma: allowlist secret
       KC_DB_SCHEMA: public
       KEYCLOAK_CREATE_ADMIN_USER: true
-      KC_BOOTSTRAP_ADMIN_USERNAME: mlops
+      KC_BOOTSTRAP_ADMIN_USERNAME: keycloak
       KC_BOOTSTRAP_ADMIN_PASSWORD: mlops  # pragma: allowlist secret
       KC_METRICS_ENABLED: true
       KC_HEALTH_ENABLED: true
       KEYCLOAK_PRODUCTION: false
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:4317"]
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
       <<: *default-healthcheck
-    image: bitnami/keycloak:latest
+    image: keycloak/keycloak:26.4.0
     networks:
       - back-tier
       - front-tier
@@ -182,9 +173,7 @@ services:
       - "${KEYCLOAK_HTTP_PORT}:${KEYCLOAK_HTTP_PORT}"
       - "${KEYCLOAK_HTTPS_PORT}:${KEYCLOAK_HTTPS_PORT}"
     profiles:
-      - development
-    volumes:
-      - keycloak-data:/var/lib/postgresql/data
+      - experimental
 
   # ###########################################################################
   # OPENTELEMETRY WEAVER
@@ -192,7 +181,6 @@ services:
   otel-weaver:
     <<: *default-config
     container_name: otel-weaver
-    env_file: .env
     environment:
       - WEAVER_CONFIG_PATH=/etc/weaver/config.yaml
       - WEAVER_OUTPUT_DIR=/generated
@@ -204,7 +192,7 @@ services:
     networks:
       - telemetry
     profiles:
-      - development
+      - experimental
     volumes:
       - ${PROJECT_ROOT}/weaver/semantic-conventions:/etc/weaver:ro
       - ${PROJECT_ROOT}/weaver/generated-code:/generated
@@ -219,18 +207,18 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '1.00'
-          memory: 32M
-          pids: 1024
+          cpus: '2.00'
+          memory: 512M
+          pids: 512
         reservations:
           cpus: '0.25'
-          memory: 8M
-    env_file: .env
+          memory: 128M
     image: eclipse-mosquitto:openssl
     networks:
       - telemetry
     ports:
-      - "${MOSQUITTO_PORT}:${MOSQUITTO_PORT}"
+      - "${MQTT_PORT}:${MQTT_PORT}"             # UNENCRYPTED
+      - "${MQTT_TLS_PORT}:${MQTT_TLS_PORT}"
     profiles:
       - core
     volumes:
@@ -248,21 +236,21 @@ services:
     deploy:
       resources:
         limits:
-          memory: 1G
+          memory: 1024M
         reservations:
           memory: 256M
-    env_file: .env
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_PROCESS_ROLES: 'broker,controller'
       KAFKA_CONTROLLER_QUORUM_VOTERS: '1@kafka:9093'
       KAFKA_LISTENERS: >-
-        PLAINTEXT://kafka:9092,CONTROLLER://kafka:9093,
-        EXTERNAL://0.0.0.0:${KAFKA_PORT}
+        PLAINTEXT://kafka:${KAFKA_BROKER_PORT},
+        CONTROLLER://kafka:${KAFKA_CONTROLLER_PORT}
       KAFKA_ADVERTISED_LISTENERS: >-
-        PLAINTEXT://kafka:9092,EXTERNAL://host.docker.internal:${KAFKA_PORT}
+        PLAINTEXT://kafka:${KAFKA_BROKER_PORT}
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: >-
-        CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,EXTERNAL:PLAINTEXT
+        CONTROLLER:PLAINTEXT,
+        PLAINTEXT:PLAINTEXT
       KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
       KAFKA_INTER_BROKER_LISTENER_NAME: 'PLAINTEXT'
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
@@ -274,15 +262,16 @@ services:
     networks:
       - telemetry
     ports:
-      - "${KAFKA_PORT}:${KAFKA_PORT}"
+      - "${KAFKA_BROKER_PORT}:${KAFKA_BROKER_PORT}"
     profiles:
       - core
     read_only: false
-    restart: unless-stopped
+    tmpfs:
+      - /tmp:size=256M,uid=1000,gid=1000,mode=1777
     volumes:
       - kafka-data:/var/lib/kafka/data
 
-  # KAFKA DASHBOARD (NON-REQUIREMENT)
+  # DASHBOARD (DEVELOPMENT ONLY)
   kafdrop:
     <<: *default-config
     image: obsidiandynamics/kafdrop:latest
@@ -290,19 +279,18 @@ services:
     deploy:
       resources:
         limits:
-          memory: 512M
+          memory: 256M
         reservations:
-          memory: 128M
+          memory: 16M
     networks:
       - telemetry
       - front-tier
     ports:
-      - "9000:9000"
+      - "9005:9000"
     profiles:
       - core
     environment:
-      - KAFKA_BROKERCONNECT=kafka:9092
-    restart: unless-stopped
+      - KAFKA_BROKERCONNECT=kafka:${KAFKA_BROKER_PORT}
 
   # ###########################################################################
   # OPENTELEMETRY COLLECTOR
@@ -313,30 +301,51 @@ services:
     configs:
       - source: otel_collector_config
         target: /etc/otelcol-contrib/config.yaml
+        mode: 0440
     container_name: otel-collector
-    env_file: .env
+    deploy:
+      resources:
+        limits:
+          cpus: '2.00'
+          memory: 1024M
+          pids: 1024
+        reservations:
+          cpus: '0.50'
+          memory: 256M
     environment:
-      - JAEGER_ENDPOINT=jaeger:4317
-      - KAFKA_BROKER=kafka:9092
+      - JAEGER_ENDPOINT=jaeger:${OTLP_GRPC_PORT}
+      - KAFKA_BROKER=kafka:${KAFKA_BROKER_PORT}
+      - PROMETHEUS_ENDPOINT=0.0.0.0:${OTEL_COLLECTOR_METRICS_PORT}
     healthcheck:
-      test: ["CMD", "otelcol-contrib", "--config",
-             "/etc/otelcol-contrib/config.yaml", "--validate"]
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider",
+             "http://localhost:13133/"]
       <<: *default-healthcheck
-    image: otel/opentelemetry-collector-contrib:nightly
+    image: otel/opentelemetry-collector-contrib:latest
+    labels:
+      com.opentelemetry.service: "collector"
+      com.opentelemetry.environment: "development"
+      com.opentelemetry.version: "1.49.0"
+      io.spdx.license: "Apache-2.0"
+      io.spdx.copyright: "2025 system-under-test contributors"
     networks:
       - telemetry
     ports:
       - "${OTLP_GRPC_PORT}:${OTLP_GRPC_PORT}"
       - "${OTLP_HTTP_PORT}:${OTLP_HTTP_PORT}"
-      - "${COLLECTOR_METRICS_PORT}:${COLLECTOR_METRICS_PORT}"
+      - "${OTEL_COLLECTOR_METRICS_PORT}:${OTEL_COLLECTOR_METRICS_PORT}"
+      - "${OTEL_COLLECTOR_HEALTHCHECK_PORT}:${OTEL_COLLECTOR_HEALTHCHECK_PORT}"
     profiles:
       - core
+    read_only: false
+    tmpfs:
+      - /tmp:mode=1777,size=256m
+      - /var/cache:mode=0755,size=64m
     volumes:
       - ${PROJECT_ROOT}/weaver/semantic-conventions:/etc/otelcol-contrib/semantic-conventions:ro
-    restart: unless-stopped
+      - otel-storage:/var/lib/otelcol:rw
 
   # ###########################################################################
-  # ALLOY (NON-REQUIREMENT)
+  # GRAFANA ALLOY OPENTELEMETRY COLLECTOR DISTRIBUTION
   # ###########################################################################
   alloy:
     <<: *default-config
@@ -347,7 +356,6 @@ services:
       - --storage.path=/var/lib/alloy/data
       - --stability.level=experimental
       - /etc/alloy/config.alloy
-    env_file: .env
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:${ALLOY_PORT}/health"]
       <<: *default-healthcheck
@@ -358,10 +366,7 @@ services:
     ports:
       - "${ALLOY_PORT}:${ALLOY_PORT}"
     profiles:
-      - deprecated
-    tmpfs:
-      - /tmp
-      - /run
+      - experimental
     volumes:
       - ./data/processed:/processed
       - ${PROJECT_ROOT}/alloy:/etc/alloy:ro
@@ -372,16 +377,19 @@ services:
   # ###########################################################################
   prometheus:
     <<: *default-config
+    configs:
+      - source: prometheus_config
+        target: /etc/prometheus/config.yaml
+        mode: 0440
     container_name: prometheus
     command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--config.file=/etc/prometheus/config.yaml'
       - '--storage.tsdb.path=/prometheus'
       - '--storage.tsdb.retention.time=1d'
       - '--storage.tsdb.retention.size=256MB'
       - '--web.console.libraries=/usr/share/prometheus/console_libraries'
       - '--web.console.templates=/usr/share/prometheus/consoles'
       - '--web.listen-address=:${PROMETHEUS_PORT}'
-    env_file: .env
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:${PROMETHEUS_PORT}/-/ready"]
       <<: *default-healthcheck
@@ -397,7 +405,6 @@ services:
       - /prometheus/wal:size=256M,uid=65534
     user: "65534:65534"
     volumes:
-      - ${PROJECT_ROOT}/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - prometheus-data:/prometheus:rw
 
   # ###########################################################################
@@ -406,12 +413,11 @@ services:
   grafana:
     <<: *default-config
     container_name: grafana
-    env_file: .env
     environment:
       GF_PATHS_PROVISIONING: /etc/grafana/provisioning
       GF_AUTH_ANONYMOUS_ENABLED: "true"
       GF_AUTH_ANONYMOUS_ORG_ROLE: "Admin"
-      GF_SECURITY_ADMIN_USER: mlops
+      GF_SECURITY_ADMIN_USER: admin
       GF_SECURITY_ADMIN_PASSWORD: mlops    # pragma: allowlist secret
       GF_DASHBOARDS_DEFAULT_HOME: /etc/grafana/dashboards/
       GF_SECURITY_ALLOW_EMBEDDING: "false"
@@ -431,7 +437,7 @@ services:
       - development
     user: "472:472"
     volumes:
-      - grafana_storage:/var/lib/grafana:rw
+      - grafana-storage:/var/lib/grafana:rw
       - ${PROJECT_ROOT}/grafana/dashboards:/var/lib/grafana/dashboards:rw
       - ${PROJECT_ROOT}/grafana/provisioning:/etc/grafana/provisioning:ro
 
@@ -440,17 +446,21 @@ services:
   # ###########################################################################
   loki:
     <<: *default-config
+    configs:
+      - source: loki_config
+        target: /etc/loki/config.yaml
+        mode: 0440
     container_name: loki
     command:
-      - -config.file=/etc/loki/loki.yaml
+      - -config.file=/etc/loki/config.yaml
       - -config.expand-env=true
     deploy:
       resources:
         limits:
-          memory: 128M
-          cpus: '2.0'
+          memory: 512M
+          cpus: '1.0'
         reservations:
-          memory: 8M
+          memory: 128M
     healthcheck:
       test: ["CMD", "curl", "-f",
              "http://localhost:${LOKI_PORT}/loki/api/v1/metrics"]
@@ -460,14 +470,12 @@ services:
       - telemetry
     ports:
       - "${LOKI_PORT}:${LOKI_PORT}"
+      - "${LOKI_GRPC_PORT}:${LOKI_GRPC_PORT}"
     profiles:
-      - development
+      - core
     read_only: false
-    tmpfs:
-      - /tmp
-      - /run
+    user: "10001:10001"
     volumes:
-      - ${PROJECT_ROOT}/loki/loki.yaml:/etc/loki/loki.yaml:ro
       - loki-data:/loki:rw
 
   # ###########################################################################
@@ -475,9 +483,13 @@ services:
   # ###########################################################################
   jaeger:
     <<: *default-config
+    configs:
+      - source: jaeger_config
+        target: /etc/jaeger/config.yaml
+        mode: 0440
     container_name: jaeger
     environment:
-      - JAEGER_AGENT_PORT=${JAEGER_AGENT_PORT}
+      - JAEGER_AGENT_COMPACT_PORT=${JAEGER_AGENT_COMPACT_PORT}
       - JAEGER_SAMPLER_TYPE=${JAEGER_SAMPLER_TYPE}
       - JAEGER_SAMPLER_PARAM=${JAEGER_SAMPLER_PARAM}
     healthcheck:
@@ -490,12 +502,10 @@ services:
     ports:
       - "${OTLP_GRPC_PORT}:${OTLP_GRPC_PORT}"
       - "${JAEGER_UI_PORT}:${JAEGER_UI_PORT}"
-      - "${JAEGER_HTTP_API_PORT}:${JAEGER_HTTP_API_PORT}"
+      - "${OTLP_HTTP_PORT}:${OTLP_HTTP_PORT}"
       - "${JAEGER_ADMIN_PORT}:${JAEGER_ADMIN_PORT}"
     profiles:
       - core
-    volumes:
-      - ${PROJECT_ROOT}/jaeger/config.yaml:/etc/jaeger/config.yaml:ro
 
   # ###########################################################################
   # MQTT CLIENT
@@ -506,8 +516,10 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        - BUILDKIT_INLINE_CACHE=1  # Reproducibility (CIS Docker 4.1)
-        - DOCKER_BUILDKIT=1        # Enable BuildKit for security
+        - BUILDKIT_INLINE_CACHE=1         # Reproducibility (CIS Docker 4.1)
+        - DOCKER_BUILDKIT=1               # Enable BuildKit for security
+        - OTEL_PYTHON_LOG_CORRELATION=1   # Enable trace context injection
+        - OTEL_PYTHON_LOG_LEVEL=debug     # Logging level
     container_name: mqtt-client
     depends_on:
       mqtt-broker:
@@ -516,15 +528,17 @@ services:
       resources:
         limits:
           cpus: '2.00'
-          memory: 512M
+          memory: 256M
           pids: 1024
         reservations:
           cpus: '0.25'
-          memory: 28M
-    env_file: .env
+          memory: 64M
     environment:
+      - MQTT_HOST=mqtt-broker
+      - MQTT_PORT=1883
       - OTEL_SERVICE_NAME=mqtt-client
-      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4317
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:${OTLP_GRPC_PORT}
+      - OTEL_EXPORTER_OTLP_INSECURE=true    # DEVELOPMENT ONLY
       - OTEL_LOGS_EXPORTER=otlp
       - OTEL_METRICS_EXPORTER=otlp
       - OTEL_TRACES_EXPORTER=otlp
@@ -534,7 +548,6 @@ services:
     profiles:
       - core
     pull_policy: build
-    restart: "unless-stopped"
     volumes:
       - ${PROJECT_ROOT}/weaver/generated-code:/app/generated:ro
 
@@ -547,7 +560,7 @@ networks:
     ipam:
       config:
         - subnet: 10.10.0.0/24
-        - subnet: fd00:10::/64  # IPv6 subnet
+        - subnet: fd00:10::/64
 
   front-tier:
     driver: bridge
@@ -558,7 +571,7 @@ networks:
     ipam:
       config:
         - subnet: 10.20.0.0/24
-        - subnet: fd00:20::/64  # IPv6 subnet
+        - subnet: fd00:20::/64
 
   telemetry:
     driver: bridge
@@ -568,7 +581,7 @@ networks:
     ipam:
       config:
         - subnet: 10.30.0.0/24
-        - subnet: fd00:30::/64  # IPv6 subnet
+        - subnet: fd00:30::/64
 
 volumes:
   chrony-data:
@@ -578,8 +591,23 @@ volumes:
   loki-data:
   mosquitto-data:
   mosquitto-log:
+  otel-storage:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${PROJECT_ROOT}/otel-collector/data
+    labels:
+      com.opentelemetry.description: "Persistent storage for file_storage"
+      io.spdx.license: "Apache-2.0"
   prometheus-data:
 
 configs:
+  jaeger_config:
+    file: ${PROJECT_ROOT}/jaeger/config.yaml
+  loki_config:
+    file: ${PROJECT_ROOT}/loki/config.yaml
   otel_collector_config:
     file: ${PROJECT_ROOT}/otel-collector/config.yaml
+  prometheus_config:
+    file: ${PROJECT_ROOT}/prometheus/config.yaml

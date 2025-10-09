@@ -88,8 +88,6 @@ keywords = [
     "data-science",
     "machine-learning-engineering",
     "devsecops-best-practices",
-    "best-current-practice",
-    "best-practices-python",
     "scientific-python",
 ]
 
@@ -133,7 +131,7 @@ data = [
 ]
 
 # Development tools for code quality and security.
-develop = [
+dev = [
     "bandit>=1.8.0",            # Security linting for Python [Apache-2.0]
     "black>=25.1.0",            # Python code formatter [MIT]
     "detect-secrets>=1.5.0",    # Detect secrets [Apache-2.0]

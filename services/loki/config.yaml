@@ -1,0 +1,43 @@
+# SPDX-FileCopyrightText: 2025 system-under-test contributors
+# SPDX-License-Identifier: Apache-2.0
+
+---
+auth_enabled: false
+
+server:
+  http_listen_port: 3100
+  grpc_listen_port: 9095
+
+common:
+  path_prefix: /loki
+  replication_factor: 1
+  ring:
+    instance_addr: loki
+    kvstore:
+      store: inmemory
+
+schema_config:
+  configs:
+    - from: 2025-09-01
+      store: tsdb
+      object_store: filesystem
+      schema: v13
+      index:
+        prefix: index_
+        period: 24h
+
+storage_config:
+  filesystem:
+    directory: /loki/chunks
+  tsdb_shipper:
+    active_index_directory: /loki/tsdb-index
+    cache_location: /loki/tsdb-cache
+
+query_scheduler:
+  max_outstanding_requests_per_tenant: 2048
+
+ingester:
+  lifecycler:
+    ring:
+      kvstore:
+        store: inmemory

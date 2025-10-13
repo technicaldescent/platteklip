@@ -1,0 +1,333 @@
+# SPDX-FileCopyrightText: 2025 system-under-test contributors
+# SPDX-License-Identifier: Apache-2.0
+
+---
+# Receivers define how telemetry data enters the Collector
+receivers:
+  otlp:
+    protocols:
+      # gRPC endpoint for OTLP protocol
+      grpc:
+        endpoint: 0.0.0.0:4317
+        max_recv_msg_size_mib: 4
+        max_concurrent_streams: 100
+        read_buffer_size: 524288
+        write_buffer_size: 524288
+      # HTTP endpoint for OTLP protocol
+      http:
+        endpoint: 0.0.0.0:4318
+        cors:
+          allowed_origins:
+            - "http://localhost:*"
+            - "https://localhost:*"
+        max_request_body_size: 4194304
+
+# Processors transform telemetry data as it flows through pipelines
+processors:
+  # Memory limiter prevents the Collector from consuming excessive memory
+  memory_limiter:
+    check_interval: 5s
+    limit_mib: 512
+    spike_limit_mib: 128
+    limit_percentage: 75
+    spike_limit_percentage: 20
+
+  # Resource detection enriches telemetry with environment metadata
+  resourcedetection:
+    detectors: [env, system, docker]
+    timeout: 5s
+    override: false
+    system:
+      hostname_sources: ["os"]
+      resource_attributes:
+        host.name:
+          enabled: true
+        host.id:
+          enabled: true
+        os.type:
+          enabled: true
+        os.description:
+          enabled: true
+
+  # Attribute processors for data sanitisation and security
+  attributes/sanitise:
+    actions:
+      - key: password
+        action: delete
+      - key: api_key
+        action: delete
+      - key: authorization
+        action: delete
+      - key: token
+        action: delete
+      - key: user.email
+        action: hash
+
+  # Filter processor to drop health check spans (noise reduction)
+  filter/drop_health_checks:
+    error_mode: ignore
+    traces:
+      span:
+        - 'attributes["http.target"] == "/health"'
+        - 'attributes["http.target"] == "/ready"'
+        - 'attributes["http.target"] == "/alive"'
+        - 'attributes["http.target"] == "/healthz"'
+
+  # Batch processors optimised per signal type
+  batch/traces:
+    send_batch_size: 512
+    timeout: 5s
+    send_batch_max_size: 1024
+
+  batch/metrics:
+    send_batch_size: 8192
+    timeout: 10s
+    send_batch_max_size: 16384
+
+  batch/logs:
+    send_batch_size: 2048
+    timeout: 5s
+    send_batch_max_size: 4096
+
+# Exporters define how telemetry data leaves the Collector
+exporters:
+  # Debug exporter for development and troubleshooting
+  debug:
+    verbosity: detailed
+    sampling_initial: 5
+    sampling_thereafter: 200
+
+  # Kafka exporter for traces
+  kafka/traces:
+    brokers: ["kafka:9092"]
+    topic: "telemetry.traces"
+    protocol_version: 2.8.0
+    encoding: otlp_proto
+    timeout: 10s
+    metadata:
+      full: true
+      retry:
+        max: 3
+        backoff: 100ms
+    retry_on_failure:
+      enabled: true
+      initial_interval: 5s
+      max_interval: 30s
+      max_elapsed_time: 300s
+    sending_queue:
+      enabled: true
+      num_consumers: 10
+      queue_size: 5000
+      storage: file_storage
+    producer:
+      max_message_bytes: 1000000
+      required_acks: 1
+      compression: none
+
+  # Kafka exporter for metrics
+  kafka/metrics:
+    brokers: ["kafka:9092"]
+    topic: "telemetry.metrics"
+    protocol_version: 2.8.0
+    encoding: otlp_proto
+    timeout: 10s
+    metadata:
+      full: true
+      retry:
+        max: 3
+        backoff: 100ms
+    retry_on_failure:
+      enabled: true
+      initial_interval: 5s
+      max_interval: 30s
+      max_elapsed_time: 300s
+    sending_queue:
+      enabled: true
+      num_consumers: 10
+      queue_size: 8000
+      storage: file_storage
+    producer:
+      max_message_bytes: 1000000
+      required_acks: 1
+      compression: none
+
+  # Kafka exporter for logs
+  kafka/logs:
+    brokers: ["kafka:9092"]
+    topic: "telemetry.logs"
+    protocol_version: 2.8.0
+    encoding: otlp_proto
+    timeout: 10s
+    metadata:
+      full: true
+      retry:
+        max: 3
+        backoff: 100ms
+    retry_on_failure:
+      enabled: true
+      initial_interval: 5s
+      max_interval: 30s
+      max_elapsed_time: 300s
+    sending_queue:
+      enabled: true
+      num_consumers: 10
+      queue_size: 5000
+      storage: file_storage
+    producer:
+      max_message_bytes: 1000000
+      required_acks: 1
+      compression: none
+
+  # Prometheus exporter for metrics scraping
+  prometheus:
+    endpoint: "0.0.0.0:8889"
+    namespace: "mqtt_client"
+    send_timestamps: true
+    metric_expiration: 5m
+    enable_open_metrics: true
+    resource_to_telemetry_conversion:
+      enabled: true
+
+  # Jaeger exporter for traces (using OTLP protocol)
+  otlp/jaeger:
+    endpoint: "jaeger:4317"
+    tls:
+      # Production: Set insecure to false and configure certificates
+      insecure: true
+      # cert_file: /etc/otel/certs/client.crt
+      # key_file: /etc/otel/certs/client.key
+      # ca_file: /etc/otel/certs/ca.crt
+    compression: gzip
+    timeout: 30s
+    retry_on_failure:
+      enabled: true
+      initial_interval: 5s
+      max_interval: 30s
+      max_elapsed_time: 300s
+    sending_queue:
+      enabled: true
+      num_consumers: 5
+      queue_size: 1000
+      storage: file_storage
+
+  # Loki exporter for logs
+  loki:
+    endpoint: "http://loki:3100/loki/api/v1/push"
+    tls:
+      insecure: true
+    timeout: 30s
+    retry_on_failure:
+      enabled: true
+      initial_interval: 5s
+      max_interval: 30s
+    sending_queue:
+      enabled: true
+      num_consumers: 5
+      queue_size: 1000
+      storage: file_storage
+
+# Extensions add capabilities to the Collector
+extensions:
+  # Health check endpoint for Kubernetes liveness/readiness probes
+  health_check:
+    endpoint: 0.0.0.0:13133
+    path: "/"
+    check_collector_pipeline:
+      enabled: true
+      interval: 5s
+      exporter_failure_threshold: 5
+
+  # Performance profiling endpoint (internal use only)
+  pprof:
+    endpoint: 127.0.0.1:1777
+    block_profile_fraction: 0
+    mutex_profile_fraction: 0
+    save_to_file: ""
+
+  # Debugging and diagnostics endpoint (internal use only)
+  zpages:
+    endpoint: 127.0.0.1:55679
+
+  # File storage for persistent queues
+  file_storage:
+    directory: /var/lib/otelcol/file_storage
+    timeout: 10s
+    create_directory: true
+    compaction:
+      directory: /var/lib/otelcol/file_storage
+      on_start: true
+      on_rebound: true
+      rebound_needed_threshold_mib: 10
+      rebound_trigger_threshold_mib: 100
+
+# Service configuration defines pipelines and enables components
+service:
+  # Extensions to enable
+  extensions:
+    - health_check
+    - pprof
+    - zpages
+    - file_storage
+
+  # Collector internal telemetry configuration
+  telemetry:
+    logs:
+      level: info
+      development: false
+      encoding: json
+      disable_caller: false
+      disable_stacktrace: false
+      output_paths:
+        - stdout
+      error_output_paths:
+        - stderr
+      initial_fields:
+        service: otel-collector
+        environment: production
+    metrics:
+      level: detailed
+
+  # Pipelines define the flow of telemetry data
+  pipelines:
+    # Traces pipeline
+    traces:
+      receivers:
+        - otlp
+      processors:
+        - memory_limiter
+        - resourcedetection
+        - filter/drop_health_checks
+        - attributes/sanitise
+        - batch/traces
+      exporters:
+        - kafka/traces
+        - otlp/jaeger
+        - debug
+
+    # Metrics pipeline
+    metrics:
+      receivers:
+        - otlp
+      processors:
+        - memory_limiter
+        - resourcedetection
+        - attributes/sanitise
+        - batch/metrics
+      exporters:
+        - kafka/metrics
+        - prometheus
+        - debug
+
+    # Logs pipeline
+    logs:
+      receivers:
+        - otlp
+      processors:
+        - memory_limiter
+        - resourcedetection
+        - attributes/sanitise
+        - batch/logs
+      exporters:
+        - kafka/logs
+        - debug
+        - loki

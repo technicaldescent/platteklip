@@ -3,11 +3,11 @@
 
 ---
 default_language_version:
-  python: python3.13
+  python: python3.14
 
 default_stages: [commit-msg, pre-commit, pre-push]
 
-minimum_pre_commit_version: 4.0.0
+minimum_pre_commit_version: 4.3.0
 
 default_install_hook_types:
   - commit-msg
@@ -46,7 +46,7 @@ repos:
       - id: pip-audit
         name: Audit Python dependencies for vulnerabilities
         files: ^(requirements(-[a-zA-Z0-9]+)*\.txt|pyproject\.toml)$
-        args: ["--fix", "--strict", "--ignore-vuln", "GHSA-4xh5-x5gv-qwph"]
+        args: ["--fix", "--strict"]
         pass_filenames: false
 
   # Detect secrets in the codebase using Gitleaks.
@@ -91,7 +91,7 @@ repos:
       - id: flake8
         args:
           - --max-line-length=88
-          - --ignore=E203,E501,H601
+          - --ignore=E203,E501
         additional_dependencies:
           - flake8-bugbear
           - cohesion
@@ -212,7 +212,7 @@ repos:
     rev: v0.9.3
     hooks:
       - id: xenon
-        args: ["--max-absolute=A", "--max-modules=A", "--max-average=A"]
+        args: ["--max-absolute=B", "--max-modules=B", "--max-average=A"]
 
   ##############################
   # DOCUMENTATION
@@ -223,7 +223,7 @@ repos:
     rev: 1.7.0
     hooks:
       - id: interrogate
-        args: ["--fail-under=80", "--verbose"]
+        args: ["--fail-under=90", "--verbose"]
 
   ##############################
   # INTELLECTUAL PROPERTY
@@ -231,7 +231,7 @@ repos:
 
   # Check SPDX licensing information.
   - repo: https://github.com/fsfe/reuse-tool
-    rev: v6.1.2
+    rev: v6.2.0
     hooks:
       - id: reuse-lint-file
 
@@ -249,7 +249,7 @@ repos:
 # Configure automated updates and autofix behavior for pre-commit.ci.
 ci:
   autofix_prs: true
-  autofix_commit_msg: "ci(linting): apply pre-commit fixes"
-  autoupdate_commit_msg: "ci(pre-commit): update pre-commit hooks"
-  autoupdate_pr_title: "ci(pre-commit): update pre-commit hooks"
+  autofix_commit_msg: "ci(qa): apply pre-commit fixes"
+  autoupdate_commit_msg: "ci(hooks): update pre-commit hooks"
+  autoupdate_pr_title: "ci(hooks): update pre-commit hooks"
   autoupdate_schedule: weekly

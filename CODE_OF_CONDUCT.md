@@ -18,10 +18,10 @@ social origin, socio-economic position, level of education, or other status. The
 same privileges of participation are extended to everyone who participates in
 good faith and in accordance with this Covenant.
 
-## Encouraged Behaviors
+## Encouraged Behaviours
 
 While acknowledging differences in social norms, we all strive to meet our
-community's expectations for positive behavior. We also understand that our
+community's expectations for positive behaviour. We also understand that our
 words and actions may be interpreted differently than we intend based on
 culture, background, or native language.
 
@@ -38,10 +38,10 @@ other and act in ways that center our shared values, including:
 7. Behaving in other ways that promote and sustain the **well-being of our
    community**.
 
-## Restricted Behaviors
+## Restricted Behaviours
 
-We agree to restrict the following behaviors in our community. Instances,
-threats, and promotion of these behaviors are violations of this Code of
+We agree to restrict the following behaviours in our community. Instances,
+threats, and promotion of these behaviours are violations of this Code of
 Conduct.
 
 1. **Harassment.** Violating explicitly expressed boundaries or engaging in
@@ -49,7 +49,7 @@ Conduct.
 2. **Character attacks.** Making insulting, demeaning, or pejorative comments
    directed at a community member or group of people.
 3. **Stereotyping or discrimination.** Characterizing anyone’s personality or
-   behavior on the basis of immutable identities or traits.
+   behaviour on the basis of immutable identities or traits.
 4. **Sexualization.** Behaving in a way that would generally be considered
    inappropriately intimate in the context or purpose of the community.
 5. **Violating confidentiality**. Sharing or acting on someone's personal or
@@ -67,13 +67,13 @@ Conduct.
 3. **Promotional materials**. Sharing marketing or other commercial content in a
    way that is outside the norms of the community.
 4. **Irresponsible communication.** Failing to responsibly present content which
-   includes, links or describes any other restricted behaviors.
+   includes, links or describes any other restricted behaviours.
 
 ## Reporting an Issue
 
 Tensions can occur between community members even when they are trying their
 best to collaborate. Not every conflict represents a code of conduct violation,
-and this Code of Conduct reinforces encouraged behaviors and norms that can help
+and this Code of Conduct reinforces encouraged behaviours and norms that can help
 avoid conflicts and minimize harm.
 
 When an incident does occur, it is important to report it promptly. To report a
@@ -85,7 +85,7 @@ effort to respond in a timely manner. They will investigate all reports of code
 of conduct violations, reviewing messages, logs, and recordings, or interviewing
 witnesses and other participants. Community Moderators will keep investigation
 and enforcement actions as transparent as possible while prioritizing safety and
-confidentiality. In order to honor these values, enforcement actions are carried
+confidentiality. In order to honour these values, enforcement actions are carried
 out in private with the involved parties, but communicating to the whole
 community may be part of a mutually agreed upon resolution.
 
@@ -119,7 +119,7 @@ rungs on the ladder may be skipped.
       tried to address with warnings, or a single serious violation.
    2. Consequence: A private written warning with conditions for return from
       suspension. In general, temporary suspensions give the person being
-      suspended time to reflect upon their behavior and possible corrective
+      suspended time to reflect upon their behaviour and possible corrective
       actions.
    3. Repair: Examples of repair include respecting the spirit of the
       suspension, meeting the specified conditions for return, and being
@@ -133,7 +133,7 @@ rungs on the ladder may be skipped.
    2. Consequence: Access to all community spaces, tools, and communication
       channels is removed. In general, permanent bans should be rarely used,
       should have strong reasoning behind them, and should only be resorted to
-      if working through other remedies has failed to change the behavior.
+      if working through other remedies has failed to change the behaviour.
    3. Repair: There is no possible repair in cases of this severity.
 
 This enforcement ladder is intended as a guideline. It does not limit the

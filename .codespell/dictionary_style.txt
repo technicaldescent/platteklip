@@ -1,0 +1,60 @@
+&->and
+America->US
+American->US
+actionable->practical, implementable, manageable, feasible, viable, workable
+agnostic->independent
+aka->also known as
+allows you to->lets you
+blacklist->denylist, excludelist, blocklist
+break-glass->fallback, contingency
+canarying->testing
+comprise->consist of, contains, includes
+cons->disadvantages
+cripple->disable
+deliverable->outcome
+denigrate->disparage
+deselect->clear
+dojo->training, workshop
+downscope->focus
+dumb down->simplify
+e-mail->email
+e.g.->for example
+female adapter->socket
+going forward->in the future
+grandfathered->legacy
+guru->expert
+guys->everyone
+hands off->automated
+hands-off->automated
+housekeeping->maintenance
+i.e.->that is
+interconnect type->connection type
+learnings->lessons
+leverage->use
+male adapter->plug
+man hours->person hours
+man made->artificial, manufactured, synthetic
+man power->personnel, staff, workforce
+man-hours->person hours
+man-power->personnel, staff, workforce
+manhours->person hours
+manmade->artificial, manufactured, synthetic
+manned->staffed, crewed
+manpower->personnel, staff, workforce
+#master->primary, main, original, parent, initiator, driver, controller, manager, mixer, aggregator, publisher, leader, active
+ninja->expert
+off-the-shelf->ready-made, pre-configured, prebuilt
+performant->efficient, high-performance, effective, productive, capable
+postmortem->retrospective
+preferred pronouns->pronouns
+pros->advantages
+retarded->slowed
+sane->valid, sensible
+sanity check->confidence check, coherence check
+sherpa->guide
+slave->worker, replica
+smart phone->mobile phone
+smartphone->mobile phone
+utilize->use
+vs.->versus
+wheelhouse->strength

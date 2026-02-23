@@ -1,137 +1,132 @@
 <!--
-# SPDX-FileCopyrightText: 2025 system-under-test contributors
+# SPDX-FileCopyrightText: 2025 technical descent
 # SPDX-License-Identifier: CC-BY-4.0
 -->
 
------
+# Platteklip
 
-# Observability Reference Architecture
-
-A secure, containerised platform for monitoring event-driven systems.
-
------
+**Zero-Trust Telemetry Gateway and Observability Plane**
 
 ## Table of Contents
 
-  - [About The Project](https://www.google.com/search?q=%23about-the-project)
-  - [Guiding Principles](https://www.google.com/search?q=%23guiding-principles)
-  - [System Architecture](https://www.google.com/search?q=%23system-architecture)
-  - [Getting Started](https://www.google.com/search?q=%23getting-started)
-  - [Contributing](https://www.google.com/search?q=%23contributing)
-  - [License](https://www.google.com/search?q=%23license)
+- [About The Project](#about-the-project)
+- [Compliance & Standards](#compliance--standards)
+- [System Architecture](#system-architecture)
+- [Getting Started](#getting-started)
+- [Development & Contributing](#development--contributing)
+- [License](#license)
 
------
+---
 
-## About The Project
+## About the Project
 
-This project provides a comprehensive, production-ready blueprint for building a highly secure and observable backend system. It integrates a complete telemetry pipeline based on **OpenTelemetry** with event-driven messaging systems like **Kafka** and **MQTT**.
+Platteklip provides a blueprint for building a secure and observable system for complex Data Engineering, DevSecOps, and SCADA environments. It integrates a telemetry pipeline based on **OpenTelemetry** with event-driven messaging systems like **Kafka** and **MQTT**.
 
 The primary goals are:
 
-  - **To provide a reference implementation** for monitoring complex, distributed applications using open standards.
-  - **To demonstrate security-first principles** in a containerised environment, adhering to benchmarks like the CIS Docker Benchmark and NIST guidelines.
-  - **To support resilience and long-term maintainability** through a decoupled architecture and careful component selection.
+- **To provide a reference implementation** for monitoring complex, distributed applications using open standards.
+- **To enforce zero-trust security** through strict policy management, identity verification, and container hardening.
+- **To bridge infrastructure and machine learning workflows** securely.
 
------
+---
 
-## Guiding Principles
+## Compliance and Standards
 
-This project is opinionated and adheres to a set of core principles that lead to more robust, secure, and maintainable systems.
+This project adheres to industry standards to guarantee software supply chain integrity and operational security:
 
-  - **Security by Design**: The entire stack is hardened by default. This includes running containers as non-root users, using read-only filesystems, dropping unnecessary kernel capabilities, enforcing resource limits, and segmenting network traffic.
-  - **Comprehensive Observability**: We implement the three pillars of observability. All telemetry data (logs, metrics, and traces) is generated and collected using the vendor-neutral **OpenTelemetry** standard, ensuring deep introspection into the system's behaviour.
-  - **Resilient & Asynchronous Communication**: The architecture is built around event-driven principles, using **MQTT** for real-time messaging and **Apache Kafka** as a durable, high-throughput message bus for critical data like logs.
+- **NIST 800-53 Rev 5:** Implementing controls for Developer Security Testing (SA-11), Least Functionality (CM-7), and Vulnerability Scanning (RA-5).
+- **ISO/IEC 27002:2022:** Adhering to secure development life cycles (8.25), secure coding practices (8.28), and strict access control parameters.
+- **Scientific Python SPEC 0:** Guaranteeing predictable deprecation cycles for core machine learning and data dependencies.
+- **Software Supply Chain Security:** All builds produce SPDX 3 compliant Software Bills of Materials (SBOMs) and are cryptographically signed via Sigstore.
 
------
+---
 
 ## System Architecture
 
-The stack is composed of several services working in concert. The `compose.yaml` file defines how they are orchestrated.
+The architecture is built around decoupled, asynchronous communication and strict policy enforcement:
 
-| Category                  | Service                               | Role in the Stack                                                                      |
-| ------------------------- | ------------------------------------- | -------------------------------------------------------------------------------------- |
-| **Application** | `mqtt-client`                         | The example application being monitored, instrumented with OpenTelemetry.              |
-| **Access & Security** | `nginx`                               | Secure reverse proxy and entry point for all external traffic.                         |
-|                           | `keycloak` & `keycloak-postgres`      | Provides centralised Identity and Access Management (IAM).                             |
-| **Messaging** | `mqtt-broker`                         | Lightweight broker for real-time pub/sub messaging.                                    |
-|                           | `kafka` & `kafdrop`                   | High-throughput, persistent event streaming platform and a web UI for management.    |
-| **Telemetry Pipeline** | `otel-collector`                      | Central aggregator that receives, processes, and exports telemetry data.               |
-|                           | `jaeger`                              | Stores and visualises distributed traces.                                              |
-|                           | `prometheus`                          | Stores and exposes metrics as a time-series database.                                  |
-|                           | `loki`                                | Stores, aggregates, and enables querying of all system logs.                           |
-|                           | `grafana`                             | The primary UI for creating dashboards from Prometheus, Loki, and Jaeger data.       |
-| **Infrastructure** | `chrony`                              | Provides Network Time Protocol (NTP) to ensure synchronised time across all services. |
+- **Identity and Policy:** Managed by Keycloak (Identity) and Open Policy Agent / OPA (Authorization).
+- **Observability Stack:** Metrics, logs, and distributed traces are collected via the OpenTelemetry Collector and routed to Prometheus, Loki, and Jaeger.
+- **Event Streaming:** Apache Kafka serves as the durable, high-throughput message bus, with MQTT (Mosquitto) handling edge and SCADA telemetry.
+- **Machine Learning Integrations:** PyTorch, ONNX, and Safetensors, tracked via Data Version Control (DVC) and MLCroissant.
 
------
+---
 
 ## Getting Started
 
-To get a local copy up and running, follow these simple steps.
-
-### Prerequisites
-
-  - Docker
-  - Docker Compose
+To get a local development environment running, ensure you have **Docker**, **Docker Compose**, and **Python 3.14+** installed.
 
 ### Installation
 
-1.  **Clone the Repository**
+1. **Clone the Repository**
+   ```bash
+   git clone [https://github.com/technicaldescent/platteklip.git](https://github.com/technicaldescent/platteklip.git)
+   cd platteklip
 
-    ```bash
-    git clone https://github.com/tr8craft/system-under-test.git
-    cd system-under-test
-    ```
+```
 
-2.  **Configure Environment**
-    Create a `.env` file for your local configuration. You can start by copying the example.
+2. **Configure Environment**
+Create a `.env` file for local configuration.
+```bash
+cp .env.example .env
 
-    ```bash
-    cp .env.example .env
-    ```
+```
 
-    Review the `.env` file and adjust any ports if they conflict with other services running on your machine.
+Review the `.env` file and adjust any ports if they conflict with your host machine.
 
-3.  **Launch the Stack**
-    The services are organised into profiles (`core` and `development`). You can launch all services using:
+3. **Launch the Services**
+Platteklip uses modular Docker Compose files. Launch the development and infrastructure services using modern Docker compose syntax:
+```bash
+docker-compose -f compose.yaml -f compose.development.yaml up -d
 
-    ```bash
-    docker compose --profile core --profile development up -d
-    ```
+```
 
-    To shut down the stack, run:
+To cleanly shut down the stack, run:
+```bash
+docker-compose down
 
-    ```bash
-    docker compose down
-    ```
+```
 
-4.  **Accessing Services**
-    Once the containers are running, you can access the UIs in your browser:
+4. **Accessing Services**
+* **Grafana (Dashboards):** `http://localhost:3000`
+* **Jaeger (Traces):** `http://localhost:16686`
+* **Keycloak (Identity):** `http://localhost:8080`
 
-      - **Grafana**: `http://localhost:3000`
-      - **Jaeger UI**: `http://localhost:16686`
-      - **Kafdrop**: `http://localhost:9000`
-      - **Keycloak**: `http://localhost:8080`
+---
 
------
+## Development and Contributing
 
-## Contributing
+### Tooling and Continuous Integration
 
-Contributions are what make the open-source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
+Platteklip uses **Hatch** as its build system and environment manager. Our CI pipeline enforces a rigorous standard of quality:
 
-Please read our `CONTRIBUTING.md` for details on our code of conduct and the process for submitting pull requests to us. Key requirements include:
+* **Quality Checks:** Code must pass Black formatting, strict MyPy type checking, and Bandit/Safety vulnerability scans. Run checks locally:
+```bash
+hatch run quality:check
 
-1.  **Conventional Commits**: All commit messages must adhere to the [Conventional Commits specification](https://www.conventionalcommits.org/en/v1.0.0/).
-2.  **[Developer Certificate of Origin (DCO)](https://developercertificate.org/)**: You must sign off on your commits to certify that you have the right to contribute them. This is done by adding a `Signed-off-by` line to your commit messages.
-    ```bash
-    git commit -s -m "feat(<scope>): create a new feature"
-    ```
+```
 
------
+* **Testing Coverage:** We enforce a strict 100% test coverage requirement and a maximum cyclomatic complexity of 10. Run tests via:
+```bash
+hatch run audit:run mode=safety
+
+```
+
+### Commit Standards
+
+1. **Conventional Commits:** All commit messages MUST adhere to the [Conventional Commits v1.0.0 specification](https://www.conventionalcommits.org/en/v1.0.0/). This triggers our automated semantic versioning and changelog generation.
+2. **Developer Certificate of Origin (DCO):** You must sign off on your commits to certify you have the right to contribute them using the `-s` flag:
+```bash
+git commit -s -m "feat(telemetry): add new OTel processor"
+
+```
+
+---
 
 ## License
 
-This repository is dual-licensed to separate code from documentation.
+This repository uses distinct licensing to separate concerns:
 
-  - All code is licensed under the [Apache License 2.0](https://www.google.com/search?q=LICENSE).
-  - All documentation, including this `README.md`, is licensed under the [Creative Commons Attribution 4.0 International License](https://creativecommons.org/licenses/by/4.0/).
-  - The project additionally adheres to the full [Hippocratic License 3.0](https://firstdonoharm.dev/version/3/0/full.html).
+* All source code is licensed under the **[Apache License 2.0](https://www.google.com/search?q=LICENSES/Apache-2.0.txt)**.
+* All documentation (including this file) is licensed under the **[Creative Commons Attribution 4.0 International License](https://www.google.com/search?q=LICENSES/CC-BY-4.0.txt)**.
+* Adhere to the **REUSE Specification** for clear, machine-readable metadata.

@@ -1,0 +1,11 @@
+kgs->kg
+mgs->mg
+kms->km
+cms->cm
+mms->mm
+lbs->lb
+msec->ms
+usec->µs
+nsec->ns
+mins->min
+hr->h

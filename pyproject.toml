@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: 2025 system-under-test contributors
+# SPDX-FileCopyrightText: 2025 technical descent
 # SPDX-License-Identifier: Apache-2.0
 
 # =================================================================
@@ -33,23 +33,23 @@
 # - 8.33: Test Information
 
 # Change Control:
-# git >= 2.51.0 (https://git-scm.com/)
+# git >= 2.52.0 (https://git-scm.com/)
 # Conventional Commits 1.0.0 (https://www.conventionalcommits.org/en/v1.0.0/)
 # Semantic Versioning 2.0.0 (https://semver.org/)
 
 # Software Bill of Materials:
-# SPDX Specification 3.0 (https://spdx.github.io/spdx-spec/v3.0.1)
+# SPDX Specification 3.1 (https://spdx.github.io/spdx-spec/v3.1-dev/)
 # Open Source Initiative Approved Licenses (https://opensource.org/licenses)
 # Scientific Python Ecosystem Coordination:
 # SPEC 0 (https://scientific-python.org/specs/spec-0000/)
-# * Python minor versions are dropped after 36 months.
-# * Minor versions of Core Projects are dropped after 24 months, including:
+# * Python MINOR versions are dropped after 24 months.
+# * MINOR versions of SPEC Core Projects are dropped after 12 months, including:
 #   IPython, Matplotlib, NetworkX, NumPy, pandas, PySAL,
 #   Scikit-HEP, scikit-image, scikit-learn, SciPy, xarray, Zarr-Python
 
 # Data Bill of Materials:
 # Data Version Control (DVC)
-# MLCommons Croissant 1.0 (https://docs.mlcommons.org/croissant)
+# MLCommons Croissant 1.1 (https://docs.mlcommons.org/croissant)
 
 # =================================================================
 # Build Automation
@@ -57,11 +57,9 @@
 
 [build-system]
 requires = [
-    "hatchling",                        # [MIT]
-    "pip>=25.2.0",                      # [MIT]
-    "python-semantic-release>=9.21.0",  # [MIT]
-    "spdx-tools>=0.8.0",                # [Apache-2.0]
-    "sigstore>=3.6.0",                  # [Apache-2.0]
+    "hatchling",
+    "hatch-vcs",
+    "pip>=26.0.0"
 ]
 build-backend = "hatchling.build"
 
@@ -70,25 +68,23 @@ build-backend = "hatchling.build"
 # =================================================================
 
 [project]
-name = "system-under-test"
+name = "Platteklip"
 dynamic = ["version"]
-description = "Telemetry testing system."
-readme = "README.md"
-requires-python = ">=3.13"
+description = "Zero-Trust Telemetry Gateway and Observability Plane"
+requires-python = ">=3.14"
 license-files = ["LICENSE", "LICENSES/*.txt"]
 authors = [
-    {name = "The system-under-test contributors"},
+    {name = "technical descent"},
 ]
 maintainers = [
     {name = "Raymond Ellis", email = "raymond.ellis@gmail.com"},
 ]
 
 keywords = [
-    "python",
-    "data-science",
-    "machine-learning-engineering",
-    "devsecops-best-practices",
-    "scientific-python",
+    "data-engineering",
+    "devsecops",
+    "open-telemetry",
+    "scada",
 ]
 
 classifiers = [
@@ -103,98 +99,92 @@ classifiers = [
 
     "Operating System :: POSIX",
 
-    "Programming Language :: Python :: 3.13",      # Drop support in October 2027
-    "Programming Language :: Python :: 3.14",      # Drop support in October 2028
-    "Programming Language :: Python :: 3.15",      # Drop support in October 2029
+    "Programming Language :: Python :: 3.14",
+    "Programming Language :: Python :: 3.15",
 
     "Topic :: Scientific/Engineering",
 
     "Typing :: Typed",
 ]
 
-# Core dependencies required for running the project.
+# Core dependencies
 dependencies = [
-    "opentelemetry-sdk>=1.37.0",                       # API and SDK [Apache-2.0]
-    "opentelemetry-exporter-otlp-proto-grpc>=1.37.0",  # [Apache-2.0]
-    "opentelemetry-exporter-prometheus>=0.58b0",       # Export metrics to Prometheus [Apache-2.0]
-    "opentelemetry-exporter-richconsole>=0.58b0",      # Console exporter with Rich tree view [Apache-2.0]
-    "opentelemetry-instrumentation-logging>=0.58b0",    # OpenTelemetry logging integration [Apache-2.0]
-    "paho-mqtt>=2.1.0",                                # MQTT client [EPL-2.0 OR BSD-3-Clause]
 ]
 
 [project.optional-dependencies]
-# Data management and processing tools.
-data = [
-    "dvc>=3.58.0",              # Data Version Control [Apache-2.0]
-    "mlcroissant>=1.0.0,<2.0.0",  # Metadata standard [Apache-2.0]
-    "pydantic>=2.11.0",         # Data validation using type hints [MIT]
-]
 
-# Development tools for code quality and security.
 dev = [
-    "bandit>=1.8.0",            # Security linting for Python [Apache-2.0]
-    "black>=25.1.0",            # Python code formatter [MIT]
-    "detect-secrets>=1.5.0",    # Detect secrets [Apache-2.0]
-    "flake8>=7.2.0",            # Style and quality of python code [MIT]
-    "flake8-docstrings>=1.7.0", # Extension for pydocstyle to flake8 [MIT]
-    "hypothesis>=6.138.0",      # Property-based testing library [MPL-2.0]
-    "mypy>=1.15.0",             # Static type checker for Python [MIT]
-    "opentelemetry-sdk>=1.36.0",  # OpenTelemetry Python API and SDK
-    "pip-audit>=2.9.0",         # Security audit dependencies [Apache-2.0]
-    "pre-commit>=4.2.0",        # Pre-commit hooks for code quality [MIT]
-    "pylint>=3.3.8",            # Static code analyser [GPL-2.0-or-later]
-    "pytest>=8.4.0",            # Simple powerful testing with Python [MIT]
-    "pytest-cov>=6.0.0",        # Produces coverage reports [MIT]
-    "pytest-mock>=3.14.0",      # Provides a mocker fixture [MIT]
-    "pytest-opentelemetry>=1.1.0",  # Instruments pytest [MIT]
-    "reuse>=5.0.0",             # REUSE recommendations [CC0-1.0]
-    "safety>=3.3.0",            # Checks vulnerable dependencies [MIT]
-    "python-semantic-release>=9.21.0",  # [MIT]
-    "sigstore>=3.6.0",          # Generate and verify signatures [Apache-2.0]
-    "spdx-tools>=0.8.0",        # [Apache-2.0]
-    "tryceratops>=2.4.1",        # Prevent Exception Handling AntiPatterns [MIT]
-    "xenon>=0.9.3",             # Monitors code complexity [MIT]
-]
-
-sbom = [
-    "model-signing>=1.0.0",     # Universal model signing library [Apache-2.0]
-]
-
-torch = [
-    "accelerate>=1.6.0",        # Code for multi-GPUs/TPU/fp16 [Apache-2.0]
-    "onnx>=1.18.0",             # Machine learning interoperability [Apache-2.0]
-    "safetensors>=0.5.0",       # Store and distribute tensors [Apache-2.0]
-    "torch>=2.7.0",             # Tensor computation and NN [BSD-3-Clause]
-    "torchfix>=0.7.0",          # Linter for PyTorch code [BSD License]
-    "torchmetrics>=1.7.0",      # Machine learning metrics [Apache-2.0]
-]
-
-jax = [
-    "jax>=0.6.0",               # Array computation [Apache-2.0]
+    "bandit>=1.9.0",
+    "black>=26.1.0",
+    "codecarbon>=3.2.0",
+    "codespell>=2.4.0",
+    "coverage>=7.13.0",
+    "detect-secrets>=1.5.0",
+    "flake8>=7.3.0",
+    "hypothesis>=6.151.0",
+    "interrogate>=1.7.0",
+    "mlcroissant>=1.0.0",
+    "mypy>=1.19.0",
+    "opa-python-client>=2.0.0",
+    "pipdeptree>=2.31.0",
+    "pip-audit>=2.10.0",
+    "pre-commit>=4.5.0",
+    "pylint>=4.0.0",
+    "pytest>=9.0.0",
+    "pytest-bdd>=8.1.0",
+    "pytest-cov>=7.0.0",
+    "pytest-mock>=3.15.0",
+    "pytest-opentelemetry>=1.1.0",
+    "pyyaml>=6.0.0",
+    "reuse>=6.2.0",
+    "safety>=3.7.0",
+    "python-semantic-release>=10.5.0",
+    "sigstore>=4.2.0",
+    "tryceratops>=2.4.0",
+    "xenon>=0.9.3",
 ]
 
 docs = [
-    "sphinx>=8.2.0",
+    "pyyaml>=6.0.0",
+    "sphinx>=9.1.0",
+    "sphinx-autobuild>=2025.8.25",
+    "sphinx-autodoc-typehints>=3.5.0",
     "sphinxcontrib-bibtex>=2.6.0",
-    "pydata-sphinx-theme>=0.16.0,<1.0.0",
+    "sphinx-jsonschema>=1.19.0",
+    "myst-parser>=5.0.0",
 ]
 
 observability = [
-    "opentelemetry-sdk",
-    "opentelemetry-exporter-otlp-proto-grpc",
-    "opentelemetry-exporter-prometheus",
-    "opentelemetry-exporter-richconsole",
+    "opentelemetry-sdk==1.39.0",
+    "opentelemetry-distro==0.59b0",
+    "opentelemetry-exporter-otlp-proto-grpc==1.39.0",
+    "opentelemetry-exporter-prometheus==0.59b0",
+    "opentelemetry-exporter-richconsole==0.59b0",
+    "opentelemetry-instrumentation==0.59b0",
+    "opentelemetry-instrumentation-logging==0.59b0",
+]
+
+sbom = [
+    "model-signing>=1.1.0",
+]
+
+torch = [
+    "accelerate>=1.12.0",
+    "onnx>=1.20.0",
+    "safetensors>=0.7.0",
+    "torch>=2.10.0",
+    "torchmetrics>=1.8.0",
 ]
 
 [project.urls]
-homepage = "https://github.com/tr8craft/system-under-test"
-documentation = "https://github.com/tr8craft/system-under-test/README.md"
-source = "https://github.com/tr8craft/system-under-test"
-issues = "https://github.com/tr8craft/system-under-test/issues"
-changelog = "https://github.com/tr8craft/system-under-test/blob/main/CHANGELOG.md"
-security = "https://github.com/tr8craft/system-under-test/blob/main/SECURITY.md"
-contributing = "https://github.com/tr8craft/system-under-test/blob/main/CONTRIBUTING.md"
-discussion = "https://github.com/tr8craft/system-under-test/discussions"
+homepage = "https://github.com/technicaldescent/platteklip"
+documentation = "https://github.com/technicaldescent/platteklip/README.md"
+source = "https://github.com/technicaldescent/platteklip"
+issues = "https://github.com/technicaldescent/platteklip/issues"
+changelog = "https://github.com/technicaldescent/platteklip/blob/main/CHANGELOG.md"
+security = "https://github.com/technicaldescent/platteklip/blob/main/SECURITY.md"
+contributing = "https://github.com/technicaldescent/platteklip/blob/main/CONTRIBUTING.md"
+discussion = "https://github.com/technicaldescent/platteklip/discussions"
 
 
 # =================================================================
@@ -202,12 +192,15 @@ discussion = "https://github.com/tr8craft/system-under-test/discussions"
 # =================================================================
 
 [tool.hatch.version]
-path = "src/system_under_test/__init__.py"
-pattern = '__version__ = "(?P<version>[^"]+)"'
+fallback-version = "0.0.0"
+source = "vcs"
+
+[tool.hatch.version.raw-options]
+local_scheme = "no-local-version"
 
 [tool.hatch.build]
 include = [
-    "src/system_under_test",
+    "src/platteklip",
 ]
 
 [tool.hatch.build.targets.sdist]
@@ -217,32 +210,62 @@ exclude = [
 ]
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/system_under_test"]
+packages = ["src/platteklip"]
+# Ensures the wheel contains the audit trail for NIST SA-15
 sign = true
 sbom = true
 sbom-format = "spdx"
+# Force reproducible builds for binary hashing (SI-7)
+reproducible = true
 
 [tool.hatch.build.targets.wheel.requires]
 verify_hash = true
+
+# =================================================================
+# Audit Configuration
+# =================================================================
+
+[tool.hatch.envs.audit]
+detached = false
+dependencies = [
+    ".dev",
+    ".observability",
+]
+
+# Defaults to localhost, but allows override via export OTEL_ENDPOINT=...
+[tool.hatch.envs.audit.env-vars]
+OTEL_EXPORTER_OTLP_ENDPOINT = "{env:OTEL_ENDPOINT:http://localhost:4317}"
+OTEL_SERVICE_NAME = "platteklip-audit"
+PYTHONPATH = "src"
+
+[[tool.hatch.envs.audit.matrix]]
+mode = ["safety", "stress"]
+
+[tool.hatch.envs.audit.scripts]
+run = [
+  { value = "pytest -m health", if = ["mode=safety"] },
+  { value = "pytest -m performance --durations=10", if = ["mode=stress"] },
+]
 
 [tool.hatch.envs.hatch-static-analysis]
 installer = "pip"
 
 [tool.hatch.envs.quality]
 dependencies = [
-    ".develop",
+    ".dev",
 ]
 
 [tool.hatch.envs.quality.scripts]
 check = [
-    "black --check --diff src tests",
-    "flake8 src tests",
-    "tryceratops check src tests",
-    "interrogate -v .",
-    "xenon --max-absolute A --max-modules A --max-average A src",
     "bandit -c pyproject.toml -r src",
+    "black --check --diff src tests",
     "detect-secrets scan",
+    "flake8 src tests",
+    "interrogate -vv .",
+    "mlcroissant validate --jsonld ./data/croissant.json",
     "pip-audit",
+    "tryceratops --config pyproject.toml check src tests",
+    "xenon --max-absolute A --max-modules A --max-average A src",
 ]
 
 [tool.hatch.envs.docs]
@@ -253,14 +276,14 @@ dependencies = [".docs"]
 # =================================================================
 
 [tool.semantic_release]
-version_variable = ["src/system_under_test/__init__.py:__version__"]
+version_variable = ["src/platteklip/__init__.py:__version__"]
 commit_parser = "conventional"
 major_on_zero = false
 allow_zero_version = true
 upload_to_pypi = false
 upload_to_release = true
 commit_message = "ci(release): {version}"
-tag_commit_message = "release {version}"
+tag_commit_message = "ci: release {version}"
 no_git_verify = false
 tag_format = "v{version}"
 
@@ -349,34 +372,64 @@ bump_patch_without_tag = false
 
 [tool.sigstore]
 enabled = true
-identity = "https://github.com/tr8craft/system-under-test"
+identity = "https://github.com/technicaldescent/platteklip"
 rekor_url = "https://rekor.sigstore.dev"
 fulcio_url = "https://fulcio.sigstore.dev"
 
 # =================================================================
-# Tools Configuration
+# Linting and Security
 # =================================================================
 
-[tool.pylint.main]
-# Use all available cores.
-jobs = 0
-# Set a high bar for code quality.
-fail-under = 9.5
-# List of plugins to load.
-load-plugins = []
-# Ensure compatibility with Black formatter.
-max-line-length = 88
-disable = [
-    "missing-module-docstring", # Handled by interrogate
-    "fixme",                    # TODOs are not errors
+[tool.bandit]
+exclude_dirs = []
+targets = ["src"]
+aggregate = "file"
+confidence-level = "MEDIUM"
+severity-level = "LOW"
+
+[tool.black]
+preview = true
+
+[tool.codespell]
+check-filenames = true
+check-hidden = false
+skip = [
+    "**/*.bib",
+    "*/build",
+    "./.codespell/*",
+    "./coverage.xml",
+    "./dist",
+    "**/i18n",
+    "LICENSE",
+    "./LICENSES",
+    "**/grafana/dashboards",
+    "**/weaver/semantic-conventions",
+]
+dictionary = [
+    ".codespell/dictionary_en.txt",
+    ".codespell/dictionary_engineering.txt",
+    ".codespell/dictionary_style.txt",
+    ".codespell/dictionary_units.txt",
+    "-"
+]
+ignore-words = ".codespell/codespellignore"
+
+[tool.detect-secrets]
+exclude-lines = [
+    "EXAMPLE=",
+    "SAMPLE_",
 ]
 
 [tool.flake8]
-# Set max line length to be compatible with Black.
+# Compatible with Black.
 max-line-length = 88
-# Set cyclomatic complexity threshold.
+
+# Cyclomatic complexity threshold.
+# NASA Software Assurance and Software Safety maximum is 15.
+# Basis Path Coverage would require no fewer than 15 tests.
 max-complexity = 10
-# Ignore rules that conflict with Black.
+
+# Rules that conflict with Black.
 # E203: whitespace before ':'
 # W503: line break before binary operator
 ignore = ["E203", "W503"]
@@ -388,69 +441,70 @@ exclude = [
     ".venv",
 ]
 
-[tool.interrogate]
-# Enforce 95% docstring coverage.
-fail-under = 95
-# Exclude test files and docs from coverage.
-exclude = ["tests", "docs"]
-# Do not require docstrings for __init__ methods.
-ignore-init-method = true
-# Increase verbosity.
-verbose = 2
+[tool.mypy]
+mypy_path = ["src"]
+files = ["src", "tests"]
+check_untyped_defs = true
+disallow_incomplete_defs = true
+disallow_untyped_defs = true
+enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]
+namespace_packages = true
+plugins = [
+    "numpy.typing.mypy_plugin",
+]
+python_version = "3.14"
+strict = true
+warn_return_any = true
+warn_unused_configs = true
+warn_unreachable = true
+
+[[tool.mypy.overrides]]
+ignore_missing_imports = true
+module = [
+    "numpy.*",
+    "scipy.*",
+]
+
+[tool.pip-audit]
+format = "json"
+desc = true
+
+[tool.pylint.main]
+fail-under = 9.95
+load-plugins = []
+max-line-length = 88
+
+[tool.safety]
+continue-on-error = false
+
+[tool.tryceratops]
+exclude = [
+    "tests/*",
+    "src/platteklip/vendored/*",
+    "docs/*",
+    "scripts/*",
+    "benchmarks/*",
+]
+fix = true
+ignore = [
+    "TRY002",
+    "TRY201",
+    "TRY400",
+]
+include_exit_codes = true
+verbose = true
 
 [tool.xenon]
-# Define complexity thresholds here instead of in scripts.
-max-absolute = "B"
+max-absolute = "A"
 max-modules = "A"
 max-average = "A"
 exclude = [
-    "src/system_under_test/vendored/*",
+    "src/platteklip/vendored/*",
 ]
 
-[tool.tryceratops]
-# Exclude test files where exceptions are often deliberately raised.
-exclude = ["tests/*"]
-# Ignore specific violation codes if necessary.
-# E.g., ignore = ["TRY200"]
-
-[tool.black]
-preview = true
-
-[tool.bandit]
-exclude_dirs = []
-targets = ["src"]
-aggregate = "file"
-confidence-level = "MEDIUM"
-severity-level = "LOW"
-
-[tool.pytest.ini_options]
-minversion = "8.4.1"
-pythonpath = "src"
-addopts = "-ra -q --cov --cov-report=xml --junitxml=test-results.xml"
-testpaths = ["tests"]
-python_files = ["test_*.py"]
-python_functions = "test_*"
-markers = [
-    "benchmark: benchmarking",
-    "compliance: tests for standards compliance",
-    "functional: functional tests for features",
-    "health: health tests for running processes",
-    "integration: integration tests requiring external tools",
-    "network: tests that need network",
-    "performance: performance and benchmark tests",
-    "regression: tests for fixed bugs and refactoring",
-    "security: security checks",
-    "slow: tests that take longer than 1 second to run",
-    "unit: unit tests for individual components",
-]
-xfail_strict = true
-filterwarnings = [
-    "error::DeprecationWarning",
-    "error::FutureWarning",
-    "error::ImportWarning",
-    "error::PendingDeprecationWarning",
-    "error::ResourceWarning",
-]
+# =================================================================
+# Testing
+# =================================================================
 
 [tool.coverage.run]
 branch = true
@@ -461,7 +515,7 @@ omit = [
 ]
 
 [tool.coverage.report]
-fail_under = 80
+fail_under = 100
 exclude_lines = [
     "pragma: no cover",
     "def __repr__",
@@ -469,13 +523,49 @@ exclude_lines = [
     "raise NotImplementedError",
 ]
 
-[tool.mypy]
-python_version = "3.14"
-namespace_packages = true
-warn_return_any = true
-warn_unused_configs = true
-disallow_untyped_defs = true
-check_untyped_defs = true
-strict = true
-warn_unreachable = true
-disallow_incomplete_defs = true
+[tool.interrogate]
+exclude = ["build", "docs"]
+fail-under = 100
+ignore-init-method = false
+ignore-init-module = false
+ignore-magic = false
+ignore-module = false
+ignore-nested-classes = false
+ignore-nested-functions = false
+ignore-overloaded-functions = false
+ignore-private = false
+ignore-property-decorators = false
+ignore-semiprivate = false
+ignore-setters = false
+omit-covered-files = false
+quiet = false
+style = "sphinx"
+verbose = 2
+
+[tool.pytest.ini_options]
+addopts = "-ra -q --cov --cov-report=xml --junitxml=test-results.xml --cov-branch"
+assertion_source_dir = "src"
+assertion_density_limit = "2.0"  # minimum assertion density percentage
+filterwarnings = [
+    "error::DeprecationWarning",
+    "error::FutureWarning",
+    "error::ImportWarning",
+    "error::PendingDeprecationWarning",
+    "error::ResourceWarning",
+]
+log_level = "INFO"
+markers = [
+    "acceptance: test-level to determine whether to accept the system",
+    "adverserial: creation and execution of adversarial examples",
+    "health: health tests for running processes",
+    "integration: interaction-level tests between components or systems",
+    "performance: performance and benchmark tests",
+    "regression: tests for fixed bugs and refactoring",
+    "unit: unit-level tests for individual components",
+]
+minversion = "9.0.0"
+python_files = ["test_*.py"]
+python_functions = "test_*"
+pythonpath = "src"
+testpaths = ["tests"]
+xfail_strict = true

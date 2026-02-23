@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: 2025 best-known-practice contributors
+# SPDX-FileCopyrightText: 2025 technical descent
 # SPDX-License-Identifier: CC0-1.0
 
 ---
@@ -7,7 +7,7 @@ default_language_version:
 
 default_stages: [commit-msg, pre-commit, pre-push]
 
-minimum_pre_commit_version: 4.3.0
+minimum_pre_commit_version: 4.5.0
 
 default_install_hook_types:
   - commit-msg
@@ -31,17 +31,18 @@ repos:
     rev: v1.5.0
     hooks:
       - id: detect-secrets
+        stages: [commit-msg, pre-commit, pre-push]
 
   # Scan Python code for security vulnerabilities using Bandit.
   - repo: https://github.com/PyCQA/bandit
-    rev: 1.8.6
+    rev: 1.9.3
     hooks:
       - id: bandit
         args: ["--recursive", "-ll", "-ii"]
 
   # Audit installed Python packages for known vulnerabilities.
   - repo: https://github.com/trailofbits/pip-audit
-    rev: v2.9.0
+    rev: v2.10.0
     hooks:
       - id: pip-audit
         name: Audit Python dependencies for vulnerabilities
@@ -51,34 +52,65 @@ repos:
 
   # Detect secrets in the codebase using Gitleaks.
   - repo: https://github.com/gitleaks/gitleaks
-    rev: v8.28.0
+    rev: v8.30.0
     hooks:
       - id: gitleaks
+        stages: [commit-msg, pre-commit, pre-push]
 
   ##############################
   # CODE QUALITY
   ##############################
 
-  # Format Python code using Black.
+  # Remove unused code elements.
+  - repo: https://github.com/PyCQA/autoflake
+    rev: v2.3.3
+    hooks:
+      - id: autoflake
+        args:
+          [
+            "--remove-all-unused-imports",
+            "--remove-unused-variables",
+            "--in-place",
+          ]
+
   - repo: https://github.com/psf/black
-    rev: 25.9.0
+    rev: 26.1.0
     hooks:
       - id: black
         args: ["--config=pyproject.toml"]
 
-  # Sort Python imports using isort with Black compatibility.
+  - repo: https://github.com/adamchainz/blacken-docs
+    rev: 1.20.0
+    hooks:
+      - id: blacken-docs
+        additional_dependencies: [black==26.*]
+
+  # Sort Python imports with Black compatibility.
   - repo: https://github.com/PyCQA/isort
-    rev: 7.0.0
+    rev: 8.0.0
     hooks:
       - id: isort
         args: ["--profile", "black"]
 
   # Automatically upgrade Python syntax.
   - repo: https://github.com/asottile/pyupgrade
-    rev: v3.21.0
+    rev: v3.21.2
     hooks:
       - id: pyupgrade
         args: ["--py314-plus"]
+
+  # Exception handling
+  - repo: https://github.com/guilatrova/tryceratops
+    rev: v2.4.1
+    hooks:
+      - id: tryceratops
+
+  # Enforce cyclomatic complexity thresholds.
+  - repo: https://github.com/rubik/xenon
+    rev: v0.9.3
+    hooks:
+      - id: xenon
+        args: ["--max-absolute=A", "--max-modules=A", "--max-average=A"]
 
   ##############################
   # LINTING
@@ -91,7 +123,7 @@ repos:
       - id: flake8
         args:
           - --max-line-length=88
-          - --ignore=E203,E501
+          - --ignore=E203,W503
         additional_dependencies:
           - flake8-bugbear
           - cohesion
@@ -105,9 +137,9 @@ repos:
           - flake8-tergeo
           - flake8-warnings
 
-  # Lint YAML files with Yamllint.
+  # Lint YAML files.
   - repo: https://github.com/adrienverge/yamllint
-    rev: v1.37.1
+    rev: v1.38.0
     hooks:
       - id: yamllint
         args: ["--strict"]
@@ -155,6 +187,13 @@ repos:
         files: ^requirements-[^-]+-[^-]+\.txt$
       - id: trailing-whitespace
 
+  - repo: https://github.com/rbubley/mirrors-prettier
+    rev: v3.8.1
+    hooks:
+      - id: prettier
+        types_or: [css, json]
+        args: [--prose-wrap=always]
+
   # Check Python code with regex hooks.
   - repo: https://github.com/pre-commit/pygrep-hooks
     rev: v1.10.0
@@ -165,18 +204,14 @@ repos:
       - id: python-no-eval
       - id: python-no-log-warn
       - id: python-use-type-annotations
+      - id: rst-backticks
+      - id: rst-directive-colons
+      - id: rst-inline-touching-normal
       - id: text-unicode-replacement-char
-
-  # Check code for common misspellings.
-  - repo: https://github.com/codespell-project/codespell
-    rev: v2.4.1
-    hooks:
-      - id: codespell
-        args: ["--ignore-words-list", "CNA"]
 
   # Automated checks on pyproject.toml.
   - repo: https://github.com/abravalheri/validate-pyproject
-    rev: v0.24.1
+    rev: v0.25
     hooks:
       - id: validate-pyproject
 
@@ -186,47 +221,39 @@ repos:
 
   # Perform static type checking with Mypy.
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.18.2
+    rev: v1.19.1
     hooks:
       - id: mypy
         args: ["--strict", "--ignore-missing-imports"]
 
   ##############################
-  # CODE QUALITY
-  ##############################
-
-  # Remove unused code elements.
-  - repo: https://github.com/PyCQA/autoflake
-    rev: v2.3.1
-    hooks:
-      - id: autoflake
-        args:
-          [
-            "--remove-all-unused-imports",
-            "--remove-unused-variables",
-            "--in-place",
-          ]
-
-  # Enforce complexity thresholds with xenon.
-  - repo: https://github.com/rubik/xenon
-    rev: v0.9.3
-    hooks:
-      - id: xenon
-        args: ["--max-absolute=B", "--max-modules=B", "--max-average=A"]
-
-  ##############################
   # DOCUMENTATION
   ##############################
+
+  # Lint documented code with Black
+  - repo: https://github.com/adamchainz/blacken-docs
+    rev: 1.20.0
+    hooks:
+      - id: blacken-docs
+        additional_dependencies: [black==26.*]
 
   # Enforce docstring coverage.
   - repo: https://github.com/econchick/interrogate
     rev: 1.7.0
     hooks:
       - id: interrogate
-        args: ["--fail-under=90", "--verbose"]
+        args: ["--fail-under=95", "--verbose"]
+
+  # Docstring style checking (PEP 257)
+  - repo: https://github.com/PyCQA/pydocstyle
+    rev: 6.3.0
+    hooks:
+      - id: pydocstyle
+        # Ignore conflicts with formatters like Black
+        args: [--ignore=D100, D104, D203, D213]
 
   ##############################
-  # INTELLECTUAL PROPERTY
+  # LICENSING
   ##############################
 
   # Check SPDX licensing information.
@@ -236,17 +263,30 @@ repos:
       - id: reuse-lint-file
 
   ##############################
-  # OTHER UTILITIES
+  # RELEASE MANAGEMENT
+  ##############################
+
+  # Commit messages and automated versioning.
+  - repo: https://github.com/commitizen-tools/commitizen
+    rev: v4.13.8
+    hooks:
+      - id: commitizen
+        stages: [commit-msg]
+      - id: commitizen-branch
+        stages: [pre-push]
+
+  ##############################
+  # NOTEBOOKS
   ##############################
 
   # Strip output from Jupyter notebooks to avoid unnecessary diffs.
   - repo: https://github.com/kynan/nbstripout
-    rev: 0.8.1
+    rev: 0.9.1
     hooks:
       - id: nbstripout
         args: ["--drop-empty-cells"]
 
-# Configure automated updates and autofix behavior for pre-commit.ci.
+# Configure automated updates and autofix behaviour for pre-commit.ci.
 ci:
   autofix_prs: true
   autofix_commit_msg: "ci(qa): apply pre-commit fixes"

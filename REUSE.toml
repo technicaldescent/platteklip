@@ -1,54 +1,63 @@
-# SPDX-FileCopyrightText: 2025 system-under-test contributors
+# SPDX-FileCopyrightText: 2025 technical descent
 # SPDX-License-Identifier: Apache-2.0
 
 version = 1
 
-# Set default copyright for the entire project
-SPDX-FileCopyrightText = "2025 system-under-test contributors"
-
-# Root license for the project (lowest precedence)
+# Default copyright and license - Lowest precedence
+SPDX-FileCopyrightText = "2025 technical descent"
 SPDX-License-Identifier = "Apache-2.0"
 
-# Configuration & infrastructure files (CC0-1.0) - Highest precedence
+# Configuration and infrastructure (CC0-1.0) - Highest precedence
 [[annotations]]
 path = [
-    ".dockerignore",
-    ".dvcignore",
+    "CITATION.cff",
+    "coverage.xml",
+    ".codespellignore",
     ".gitattributes",
     ".gitignore",
-    ".pre-commit-config.yaml",
+    ".dockerignore",
+    ".dvcignore",
     ".github/**",
-    ".reuse/**",
-    "sbom/**"
+    ".pre-commit-config.yaml",
+    "sbom/**",
+    "**/*.bib"
 ]
 SPDX-License-Identifier = "CC0-1.0"
 
-# Documentation & content (CC-BY-4.0) - Medium precedence
+# Documentation (CC-BY-4.0) - Medium precedence
 [[annotations]]
 path = [
-    "*.md",  # Root-level markdown files including CHANGELOG.md
-    "**/CHANGELOG.md",  # Explicit pattern for CHANGELOG.md in any directory
-    "CITATION.cff",
-    "docs/source/**",
-    "docs/assets/**",
-    "docs/source/_static/favicon.ico",
-    "docs/source/_static/logo.png",
-    "docs/CODEOWNERS",
-    "docs/source/references.bib",
-    "SECURITY.md",
-    "CONTRIBUTING.md"
+    "**/*.md",
+    "**/*.rst",
+    "docs/**",
+    "CODEOWNERS",
+    "CONTRIBUTING.md",
+    "SECURITY.md"
 ]
 SPDX-License-Identifier = "CC-BY-4.0"
 
-# Code & build scripts (Apache-2.0) - Lower precedence
+# Code and Complex Configuration (Apache-2.0) - Lower precedence
 [[annotations]]
 path = [
-    "src/**",
+    "compose*.yaml",
+    "Makefile",
+    "policy/**",
+    "pyproject.toml",
     "scripts/**",
-    "docs/Makefile",
-    "docs/make.bat",
-    "docs/source/conf.py",
+    "src/**",
     "tests/**",
-    "pyproject.toml"
+    "**/*.py",
+    "**/*.rego",
 ]
 SPDX-License-Identifier = "Apache-2.0"
+
+# Data and Metadata (CDLA-Permissive-2.0)
+[[annotations]]
+path = [
+    "dictionary_*.txt",
+    "i18n/dictionary_*.txt",
+    "croissant.json",
+    "policy/data/*.json",
+    "data/**"
+]
+SPDX-License-Identifier = "CDLA-Permissive-2.0"

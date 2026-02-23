@@ -1,0 +1,91 @@
+IaaS->infrastructure as a service (IaaS)
+No-SQL->NoSQL
+NoOps->fully managed
+OpenTelemtry, Opentelemetry->OpenTelemetry
+SIG-DOCS->SIG Docs
+algorythm->algorithm
+anaconda->Anaconda
+analysys->analysis
+asyncronous->asynchronous
+authN->authentication
+authZ, authz->authorization
+back-end->backend
+back-propagation->backpropagation
+check-box->checkbox
+code base, code-base->codebase
+conda->Conda
+configmap->ConfigMap
+daemonset->DaemonSet
+data base, data-base->database
+data-frame->DataFrame
+data-frames->DataFrames
+data-set->dataset
+data-sets->datasets
+dependancies->dependencies
+dependancy->dependency
+devsecops->DevSecOps
+docker-compose.yaml, docker-compose.yml->compose.yaml
+drop-down->drop-down
+environemnt->environment
+firm-ware->firmware
+front-end->frontend
+full-stack->full-stack
+google cloud->Google Cloud
+gradio->Gradio
+graphql->GraphQL
+ground-truth->ground truth
+gui->GUI
+huggingface->Hugging Face
+hyper-parameter->hyperparameter
+hyper-parameters->hyperparameters
+ingress->Ingress
+integar->integer
+libary->library
+life-cycle->lifecycle
+local-host->localhost
+loss-function->loss function
+man-in-the-middle (MITM)->on-path attacker, person-in-the-middle (PITM)
+meta data, meta-data->metadata
+microsoft azure->Microsoft Azure
+middle-ware->middleware
+network IP address->internal IP address
+nosql->NoSQL
+on-premise->on-premises,on-prem
+open-source, opensource->open source
+openstack->OpenStack
+over-fitting->overfitting
+paramater->parameter
+pass-phrase->passphrase
+performence->performance
+plug-in->plugin
+pod->Pod
+postgre->PostgreSQL
+pre-processing->preprocessing
+road-map->roadmap
+run-time->runtime
+screen-cast->screencast
+screen-shot->screenshot
+secops->SecOps
+seperate->separate
+serializible->serializable
+set-up->setup
+sign into->sign in to
+statefulset->StatefulSet
+streamlit->Streamlit
+style-sheet->stylesheet
+syncronize->synchronize
+syncronous->synchronous
+tarball->tar file
+tear-down->teardown
+time-stamp->timestamp
+time-stamps->timestamps
+time-steps->time steps
+time-zone->time zone
+unarchive, uncompress, unzip->extract
+under-fitting->underfitting
+user-name->username
+walk-through->walkthrough
+white-paper->white paper
+whitelist->allowlist, trustlist, safelist
+work-around->workaround
+work-flow->workflow

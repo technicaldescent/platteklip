@@ -35,7 +35,7 @@ repos:
 
   # Scan Python code for security vulnerabilities using Bandit.
   - repo: https://github.com/PyCQA/bandit
-    rev: 1.9.3
+    rev: 1.9.4
     hooks:
       - id: bandit
         args: ["--recursive", "-ll", "-ii"]
@@ -56,6 +56,15 @@ repos:
     hooks:
       - id: gitleaks
         stages: [commit-msg, pre-commit, pre-push]
+
+  ##############################
+  # POLICY LINTING
+  ##############################
+
+  - repo: https://github.com/open-policy-agent/regal
+    rev: v0.39.0
+    hooks:
+      - id: regal-lint
 
   ##############################
   # CODE QUALITY
@@ -87,7 +96,7 @@ repos:
 
   # Sort Python imports with Black compatibility.
   - repo: https://github.com/PyCQA/isort
-    rev: 8.0.0
+    rev: 8.0.1
     hooks:
       - id: isort
         args: ["--profile", "black"]
@@ -123,7 +132,7 @@ repos:
       - id: flake8
         args:
           - --max-line-length=88
-          - --ignore=E203,W503
+          - --ignore=E203,TYP001,W503
         additional_dependencies:
           - flake8-bugbear
           - cohesion
@@ -135,7 +144,6 @@ repos:
           - flake8-markdown
           - flake8-secure-coding-standard
           - flake8-tergeo
-          - flake8-warnings
 
   # Lint YAML files.
   - repo: https://github.com/adrienverge/yamllint
@@ -191,7 +199,7 @@ repos:
     rev: v3.8.1
     hooks:
       - id: prettier
-        types_or: [css, json]
+        types_or: [css, gherkin, json]
         args: [--prose-wrap=always]
 
   # Check Python code with regex hooks.
@@ -214,6 +222,22 @@ repos:
     rev: v0.25
     hooks:
       - id: validate-pyproject
+
+  # Check .feature files for Gherkin conformance
+  - repo: local
+    hooks:
+      - id: mandoline
+        name: check gherkin feature
+        description: check feature files against syntax rules.
+        entry: python pre_commit_hooks/check_gherkin_feature.py
+        language: system
+        files: \.(feature)$
+        args:
+          - --languages
+          - pre_commit_hooks/gherkin-languages.json
+          - --strict
+          - --verbose
+        stages: [pre-commit, pre-push]
 
   ##############################
   # TYPE CHECKING
@@ -268,7 +292,7 @@ repos:
 
   # Commit messages and automated versioning.
   - repo: https://github.com/commitizen-tools/commitizen
-    rev: v4.13.8
+    rev: v4.13.9
     hooks:
       - id: commitizen
         stages: [commit-msg]

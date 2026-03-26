@@ -199,7 +199,7 @@ repos:
     rev: v3.8.1
     hooks:
       - id: prettier
-        types_or: [css, gherkin, json]
+        types_or: [css, gherkin]
         args: [--prose-wrap=always]
 
   # Check Python code with regex hooks.

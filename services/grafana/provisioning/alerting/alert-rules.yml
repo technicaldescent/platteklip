@@ -1,0 +1,16 @@
+# SPDX-FileCopyrightText: 2025 technical descent
+# SPDX-License-Identifier: Apache-2.0
+
+---
+groups:
+  - name: device
+    rules:
+      - alert: overheating
+        expr: temperature{environment="development"} > 80
+        for: 1m
+        labels:
+          severity: warning
+          category: device
+        annotations:
+          summary: "Device overheating"
+          description: "{{ $labels.device_id }} temperature at {{ $value }}°C"

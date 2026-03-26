@@ -1,0 +1,456 @@
+{
+  "uid": "vehicle-kinematics",
+  "title": "Vehicle Kinematics",
+  "tags": [
+    "vehicle",
+    "edge",
+    "kinematics"
+  ],
+  "timezone": "utc",
+  "editable": true,
+  "graphTooltip": 2,
+  "refresh": "10s",
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "templating": {
+    "list": [
+      {
+        "name": "ds_prometheus",
+        "label": "Prometheus",
+        "type": "datasource",
+        "query": "prometheus",
+        "current": {},
+        "hide": 2
+      },
+      {
+        "name": "ds_loki",
+        "label": "Loki",
+        "type": "datasource",
+        "query": "loki",
+        "current": {},
+        "hide": 2
+      },
+      {
+        "name": "vehicle",
+        "label": "Vehicle",
+        "type": "query",
+        "query": "label_values(platteklip_edge_pump_running, edge_vehicle_id)",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${ds_prometheus}"
+        },
+        "refresh": 2,
+        "multi": false,
+        "includeAll": true,
+        "allValue": ".*",
+        "current": {
+          "text": "All",
+          "value": "$__all"
+        }
+      }
+    ]
+  },
+  "panels": [
+    {
+      "type": "row",
+      "title": "Speed & Control Response",
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 1
+      },
+      "collapsed": false,
+      "panels": []
+    },
+    {
+      "type": "stat",
+      "title": "Current Speed",
+      "description": "Raw PLC value (MPH \u00d7 10). Divide by 10 to get MPH. Currently anomalous: values are 0 or 1 only. Fix planned for next release.",
+      "gridPos": {
+        "x": 0,
+        "y": 1,
+        "w": 4,
+        "h": 6
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${ds_prometheus}"
+      },
+      "targets": [
+        {
+          "expr": "platteklip_edge_vehicle_speed{edge_vehicle_id=~\"${vehicle}\"}",
+          "legendFormat": "{{edge_vehicle_id}}",
+          "refId": "A",
+          "instant": true
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "text",
+                "value": null
+              }
+            ]
+          }
+        }
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        }
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Speed vs Pedal vs Torque",
+      "description": "Composite view correlating vehicle speed (left axis) with tram pedal position and torque reference (right axis, %). Use this to identify control response lag \u2014 pedal changes should produce corresponding speed changes within 1\u20132 seconds.",
+      "gridPos": {
+        "x": 4,
+        "y": 1,
+        "w": 20,
+        "h": 8
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${ds_prometheus}"
+      },
+      "targets": [
+        {
+          "expr": "platteklip_edge_vehicle_speed{edge_vehicle_id=~\"${vehicle}\"}",
+          "legendFormat": "Speed {{edge_vehicle_id}}",
+          "refId": "A"
+        },
+        {
+          "expr": "platteklip_edge_controls_tram_pedal_position_percent{edge_vehicle_id=~\"${vehicle}\"}",
+          "legendFormat": "Pedal % {{edge_vehicle_id}}",
+          "refId": "B"
+        },
+        {
+          "expr": "platteklip_edge_controls_tram_torque_reference{edge_vehicle_id=~\"${vehicle}\"}",
+          "legendFormat": "Torque Ref {{edge_vehicle_id}}",
+          "refId": "C"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 10,
+            "spanNulls": true,
+            "drawStyle": "line",
+            "lineInterpolation": "smooth",
+            "showPoints": "never"
+          },
+          "color": {
+            "mode": "palette-classic"
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "Pedal.*"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              },
+              {
+                "id": "custom.axisLabel",
+                "value": "%"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "Torque.*"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "short"
+              },
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "mean",
+            "max"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    },
+    {
+      "type": "row",
+      "title": "Orientation & Steering",
+      "gridPos": {
+        "x": 0,
+        "y": 9,
+        "w": 24,
+        "h": 1
+      },
+      "collapsed": false,
+      "panels": []
+    },
+    {
+      "type": "stat",
+      "title": "Current Heading",
+      "description": "Vehicle heading in degrees. Currently arbitrary \u2014 zeroing procedure is in development. The edge_signal_status label will show in_development.",
+      "gridPos": {
+        "x": 0,
+        "y": 10,
+        "w": 4,
+        "h": 6
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${ds_prometheus}"
+      },
+      "targets": [
+        {
+          "expr": "platteklip_edge_vehicle_orientation_degrees{edge_vehicle_id=~\"${vehicle}\"}",
+          "legendFormat": "{{edge_vehicle_id}}",
+          "refId": "A",
+          "instant": true
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "degree",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          }
+        }
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        }
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Steering Angle & Orientation",
+      "description": "Steering angle (calculated from left/right traction motor speed difference) and vehicle heading overlaid. Steering is mechanical \u2014 not through differential current.",
+      "gridPos": {
+        "x": 4,
+        "y": 10,
+        "w": 20,
+        "h": 8
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${ds_prometheus}"
+      },
+      "targets": [
+        {
+          "expr": "platteklip_edge_vehicle_steering_angle_degrees{edge_vehicle_id=~\"${vehicle}\"}",
+          "legendFormat": "Steering {{edge_vehicle_id}}",
+          "refId": "A"
+        },
+        {
+          "expr": "platteklip_edge_vehicle_orientation_degrees{edge_vehicle_id=~\"${vehicle}\"}",
+          "legendFormat": "Heading {{edge_vehicle_id}}",
+          "refId": "B"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "degree",
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 10,
+            "spanNulls": true,
+            "drawStyle": "line",
+            "lineInterpolation": "smooth",
+            "showPoints": "never"
+          },
+          "color": {
+            "mode": "palette-classic"
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "Heading.*"
+            },
+            "properties": [
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              },
+              {
+                "id": "custom.axisLabel",
+                "value": "Heading \u00b0"
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "mean",
+            "max"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    },
+    {
+      "type": "row",
+      "title": "Drive Frequency Correlation",
+      "gridPos": {
+        "x": 0,
+        "y": 18,
+        "w": 24,
+        "h": 1
+      },
+      "collapsed": false,
+      "panels": []
+    },
+    {
+      "type": "timeseries",
+      "title": "Left / Right Traction Frequency vs Steering Angle",
+      "description": "Overlays left and right traction motor drive frequencies with the computed steering angle. When both frequencies are equal, the steering angle should be near zero. Divergence between L/R frequencies should correlate linearly with steering angle \u2014 deviations indicate mechanical play or encoder drift.",
+      "gridPos": {
+        "x": 0,
+        "y": 19,
+        "w": 24,
+        "h": 8
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${ds_prometheus}"
+      },
+      "targets": [
+        {
+          "expr": "platteklip_edge_traction_left_frequency_hertz{edge_vehicle_id=~\"${vehicle}\"}",
+          "legendFormat": "L Freq {{edge_vehicle_id}}",
+          "refId": "A"
+        },
+        {
+          "expr": "platteklip_edge_traction_right_frequency_hertz{edge_vehicle_id=~\"${vehicle}\"}",
+          "legendFormat": "R Freq {{edge_vehicle_id}}",
+          "refId": "B"
+        },
+        {
+          "expr": "platteklip_edge_vehicle_steering_angle_degrees{edge_vehicle_id=~\"${vehicle}\"}",
+          "legendFormat": "Steering \u00b0 {{edge_vehicle_id}}",
+          "refId": "C"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "hertz",
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 10,
+            "spanNulls": true,
+            "drawStyle": "line",
+            "lineInterpolation": "smooth",
+            "showPoints": "never"
+          },
+          "color": {
+            "mode": "palette-classic"
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "Steering.*"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "degree"
+              },
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              },
+              {
+                "id": "custom.axisLabel",
+                "value": "Steering \u00b0"
+              },
+              {
+                "id": "custom.lineStyle",
+                "value": {
+                  "fill": "dash",
+                  "dash": [
+                    10,
+                    5
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "mean",
+            "max"
+          ]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    }
+  ],
+  "schemaVersion": 39,
+  "version": 1
+}

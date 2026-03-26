@@ -1,11 +1,13 @@
-# SPDX-FileCopyrightText: 2025 system-under-test contributors
+# SPDX-FileCopyrightText: 2025 technical descent
 # SPDX-License-Identifier: Apache-2.0
 
 ---
+apiVersion: 1
+
 providers:
   - name: 'Operations'
     orgId: 1
-    folder: 'operations'
+    folder: 'Operations'
     type: file
     disableDeletion: true
     editable: false

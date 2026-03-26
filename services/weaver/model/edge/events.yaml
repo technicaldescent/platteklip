@@ -1,0 +1,97 @@
+# SPDX-FileCopyrightText: 2025 technical descent
+# SPDX-License-Identifier: Apache-2.0
+
+# Event definitions for edge telemetry.
+# Events represent discrete state changes or fault conditions on the vehicle.
+# They are emitted as OTel log records with event.name set.
+
+---
+groups:
+
+  - id: event.edge.motor.state_change
+    type: event
+    name: edge.motor.state_change
+    brief: >
+      Emitted when a motor transitions between running, stopped, and
+      faulted states.  Applies to pump, left traction, right traction,
+      and conveyor motors.
+    attributes:
+      - ref: edge.vehicle.id
+        requirement_level: required
+      - ref: edge.source.id
+        requirement_level: required
+      - ref: edge.source.type
+        requirement_level: required
+      - ref: edge.motor.previous_state
+        requirement_level: required
+      - ref: edge.motor.current_state
+        requirement_level: required
+    stability: development
+
+  - id: event.edge.signal.anomaly
+    type: event
+    name: edge.signal.anomaly
+    brief: >
+      Emitted when a signal value falls outside its expected range.
+      Applies to ConvSw_pos (10–72 vs 0–100), Conv_Freq (-5 to 5 vs 0–50),
+      and Car_MPHx10 (0/1 values only).
+    attributes:
+      - ref: edge.vehicle.id
+        requirement_level: required
+      - id: edge.anomaly.signal_id
+        type: string
+        brief: "Identifier of the signal that produced the anomalous value."
+        examples: ["edge.conveyor.frequency", "edge.vehicle.speed"]
+        requirement_level: required
+        stability: development
+      - id: edge.anomaly.observed_value
+        type: double
+        brief: "The anomalous value that was observed."
+        requirement_level: required
+        stability: development
+      - id: edge.anomaly.expected_min
+        type: double
+        brief: "Minimum value of the expected range for this signal."
+        requirement_level: recommended
+        stability: development
+      - id: edge.anomaly.expected_max
+        type: double
+        brief: "Maximum value of the expected range for this signal."
+        requirement_level: recommended
+        stability: development
+    stability: development
+
+  - id: event.edge.plc.poll_failure
+    type: event
+    name: edge.plc.poll_failure
+    brief: >
+      Emitted when the PLC4X processor fails to complete a poll cycle,
+      either due to a connection error or a timeout.
+    attributes:
+      - ref: edge.vehicle.id
+        requirement_level: required
+      - ref: edge.vehicle.plc.id
+        requirement_level: required
+      - id: edge.plc.poll.error_type
+        type:
+          allow_custom_values: true
+          members:
+            - id: connection_refused
+              value: "connection_refused"
+              stability: development
+            - id: timeout
+              value: "timeout"
+              stability: development
+            - id: protocol_error
+              value: "protocol_error"
+              stability: development
+        brief: "Category of error that caused the poll failure."
+        requirement_level: required
+        stability: development
+      - id: edge.plc.poll.error_message
+        type: string
+        brief: "Human-readable error message from the PLC driver."
+        examples: ["Connection refused", "Read timeout after 5000ms"]
+        requirement_level: recommended
+        stability: development
+    stability: development

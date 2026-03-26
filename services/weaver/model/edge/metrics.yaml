@@ -1,0 +1,425 @@
+# SPDX-FileCopyrightText: 2025 technical descent
+# SPDX-License-Identifier: Apache-2.0
+
+# Metric definitions for edge telemetry.
+# Each metric maps directly to one or more PLC tags from the tag registry.
+# Instruments follow OTel Semantic Conventions:
+#   - gauge:     current value with no meaningful cumulative sum
+#   - counter:   monotonically increasing cumulative value
+#   - updowncounter: value that can increase or decrease
+
+---
+groups:
+
+  # ---------------------------------------------------------------------------
+  # HYDRAULIC PUMP
+  # ---------------------------------------------------------------------------
+  - id: metric.edge.pump.running
+    type: metric
+    metric_name: edge.pump.running
+    brief: "Is the hydraulic pump motor running (1 = running, 0 = stopped)."
+    instrument: gauge
+    unit: "1"
+    stability: development
+    attributes:
+      - ref: edge.vehicle.id
+      - ref: edge.source.type
+      - ref: edge.source.id
+
+  - id: metric.edge.pump.motor.current
+    type: metric
+    metric_name: edge.pump.motor.current
+    brief: "Hydraulic pump motor current."
+    instrument: gauge
+    unit: "A"
+    stability: development
+    attributes:
+      - ref: edge.vehicle.id
+      - ref: edge.source.type
+      - ref: edge.source.id
+
+  - id: metric.edge.pump.motor.voltage
+    type: metric
+    metric_name: edge.pump.motor.voltage
+    brief: "Hydraulic pump motor voltage."
+    instrument: gauge
+    unit: "V"
+    stability: development
+    attributes:
+      - ref: edge.vehicle.id
+      - ref: edge.source.type
+      - ref: edge.source.id
+
+  - id: metric.edge.pump.temperature
+    type: metric
+    metric_name: edge.pump.temperature
+    brief: >
+      Hydraulic pump temperature. Currently reads all zeros —
+      under investigation.
+    instrument: gauge
+    unit: "Cel"
+    stability: development
+    attributes:
+      - ref: edge.vehicle.id
+      - ref: edge.source.type
+      - ref: edge.source.id
+      - ref: edge.signal.status
+
+  - id: metric.edge.pump.dcbus.voltage
+    type: metric
+    metric_name: edge.pump.dcbus.voltage
+    brief: "DC bus voltage shared across all VFD drives."
+    instrument: gauge
+    unit: "V"
+    stability: development
+    attributes:
+      - ref: edge.vehicle.id
+      - ref: edge.source.type
+      - ref: edge.source.id
+
+  # ---------------------------------------------------------------------------
+  # LEFT TRACTION MOTOR
+  # ---------------------------------------------------------------------------
+  - id: metric.edge.traction.left.running
+    type: metric
+    metric_name: edge.traction.left.running
+    brief: "Is the left traction motor running (1 = running, 0 = stopped)."
+    instrument: gauge
+    unit: "1"
+    stability: development
+    attributes:
+      - ref: edge.vehicle.id
+      - ref: edge.source.type
+      - ref: edge.source.id
+
+  - id: metric.edge.traction.left.motor.current
+    type: metric
+    metric_name: edge.traction.left.motor.current
+    brief: "Left traction motor current."
+    instrument: gauge
+    unit: "A"
+    stability: development
+    attributes:
+      - ref: edge.vehicle.id
+      - ref: edge.source.type
+      - ref: edge.source.id
+
+  - id: metric.edge.traction.left.motor.voltage
+    type: metric
+    metric_name: edge.traction.left.motor.voltage
+    brief: "Left traction motor voltage."
+    instrument: gauge
+    unit: "V"
+    stability: development
+    attributes:
+      - ref: edge.vehicle.id
+      - ref: edge.source.type
+      - ref: edge.source.id
+
+  - id: metric.edge.traction.left.frequency
+    type: metric
+    metric_name: edge.traction.left.frequency
+    brief: "Left traction motor drive frequency."
+    instrument: gauge
+    unit: "Hz"
+    stability: development
+    attributes:
+      - ref: edge.vehicle.id
+      - ref: edge.source.type
+      - ref: edge.source.id
+
+  - id: metric.edge.traction.left.temperature
+    type: metric
+    metric_name: edge.traction.left.temperature
+    brief: "Left traction motor temperature."
+    instrument: gauge
+    unit: "Cel"
+    stability: development
+    attributes:
+      - ref: edge.vehicle.id
+      - ref: edge.source.type
+      - ref: edge.source.id
+
+  # ---------------------------------------------------------------------------
+  # RIGHT TRACTION MOTOR
+  # ---------------------------------------------------------------------------
+  - id: metric.edge.traction.right.running
+    type: metric
+    metric_name: edge.traction.right.running
+    brief: "Is the right traction motor running (1 = running, 0 = stopped)."
+    instrument: gauge
+    unit: "1"
+    stability: development
+    attributes:
+      - ref: edge.vehicle.id
+      - ref: edge.source.type
+      - ref: edge.source.id
+
+  - id: metric.edge.traction.right.motor.current
+    type: metric
+    metric_name: edge.traction.right.motor.current
+    brief: "Right traction motor current."
+    instrument: gauge
+    unit: "A"
+    stability: development
+    attributes:
+      - ref: edge.vehicle.id
+      - ref: edge.source.type
+      - ref: edge.source.id
+
+  - id: metric.edge.traction.right.motor.voltage
+    type: metric
+    metric_name: edge.traction.right.motor.voltage
+    brief: "Right traction motor voltage."
+    instrument: gauge
+    unit: "V"
+    stability: development
+    attributes:
+      - ref: edge.vehicle.id
+      - ref: edge.source.type
+      - ref: edge.source.id
+
+  - id: metric.edge.traction.right.frequency
+    type: metric
+    metric_name: edge.traction.right.frequency
+    brief: "Right traction motor drive frequency."
+    instrument: gauge
+    unit: "Hz"
+    stability: development
+    attributes:
+      - ref: edge.vehicle.id
+      - ref: edge.source.type
+      - ref: edge.source.id
+
+  - id: metric.edge.traction.right.temperature
+    type: metric
+    metric_name: edge.traction.right.temperature
+    brief: "Right traction motor temperature."
+    instrument: gauge
+    unit: "Cel"
+    stability: development
+    attributes:
+      - ref: edge.vehicle.id
+      - ref: edge.source.type
+      - ref: edge.source.id
+
+  # ---------------------------------------------------------------------------
+  # CONVEYOR SYSTEM
+  # ---------------------------------------------------------------------------
+  - id: metric.edge.conveyor.running
+    type: metric
+    metric_name: edge.conveyor.running
+    brief: "Is the conveyor motor running (1 = running, 0 = stopped)."
+    instrument: gauge
+    unit: "1"
+    stability: development
+    attributes:
+      - ref: edge.vehicle.id
+      - ref: edge.source.type
+      - ref: edge.source.id
+
+  - id: metric.edge.conveyor.motor.current
+    type: metric
+    metric_name: edge.conveyor.motor.current
+    brief: "Conveyor motor current."
+    instrument: gauge
+    unit: "A"
+    stability: development
+    attributes:
+      - ref: edge.vehicle.id
+      - ref: edge.source.type
+      - ref: edge.source.id
+
+  - id: metric.edge.conveyor.motor.voltage
+    type: metric
+    metric_name: edge.conveyor.motor.voltage
+    brief: "Conveyor motor voltage."
+    instrument: gauge
+    unit: "V"
+    stability: development
+    attributes:
+      - ref: edge.vehicle.id
+      - ref: edge.source.type
+      - ref: edge.source.id
+
+  - id: metric.edge.conveyor.frequency
+    type: metric
+    metric_name: edge.conveyor.frequency
+    brief: >
+      Conveyor drive frequency. Expected range: 0–50 Hz. Currently anomalous:
+      values observed in range -5 to 5.
+    instrument: gauge
+    unit: "Hz"
+    stability: development
+    attributes:
+      - ref: edge.vehicle.id
+      - ref: edge.source.type
+      - ref: edge.source.id
+      - ref: edge.signal.status
+
+  - id: metric.edge.conveyor.temperature
+    type: metric
+    metric_name: edge.conveyor.temperature
+    brief: >
+      Conveyor motor temperature. Currently reads all zeros —
+      under investigation.
+    instrument: gauge
+    unit: "Cel"
+    stability: development
+    attributes:
+      - ref: edge.vehicle.id
+      - ref: edge.source.type
+      - ref: edge.source.id
+      - ref: edge.signal.status
+
+  - id: metric.edge.conveyor.frequency.reference
+    type: metric
+    metric_name: edge.conveyor.frequency.reference
+    brief: "Conveyor frequency reference setpoint."
+    instrument: gauge
+    unit: "Hz"
+    stability: development
+    attributes:
+      - ref: edge.vehicle.id
+
+  # ---------------------------------------------------------------------------
+  # OPERATOR CONTROLS
+  # ---------------------------------------------------------------------------
+  - id: metric.edge.controls.tram.pedal.position
+    type: metric
+    metric_name: edge.controls.tram.pedal.position
+    brief: "Tram foot pedal position (0–100%)."
+    instrument: gauge
+    unit: "%"
+    stability: development
+    attributes:
+      - ref: edge.vehicle.id
+
+  - id: metric.edge.controls.tram.pedal.reverse
+    type: metric
+    metric_name: edge.controls.tram.pedal.reverse
+    brief: "Tram pedal reverse (1 = reverse active, 0 = inactive)."
+    instrument: gauge
+    unit: "1"
+    stability: development
+    attributes:
+      - ref: edge.vehicle.id
+
+  - id: metric.edge.controls.conveyor.switch.position
+    type: metric
+    metric_name: edge.controls.conveyor.switch.position
+    brief: >
+      Conveyor switch position (0–100%). Currently anomalous: values
+      observed in range 10–72.
+    instrument: gauge
+    unit: "%"
+    stability: development
+    attributes:
+      - ref: edge.vehicle.id
+      - ref: edge.signal.status
+
+  - id: metric.edge.controls.conveyor.switch.reverse
+    type: metric
+    metric_name: edge.controls.conveyor.switch.reverse
+    brief: "Conveyor switch reverse (1 = reverse active, 0 = inactive)."
+    instrument: gauge
+    unit: "1"
+    stability: development
+    attributes:
+      - ref: edge.vehicle.id
+
+  - id: metric.edge.controls.tram.torque.reference
+    type: metric
+    metric_name: edge.controls.tram.torque.reference
+    brief: >
+      Tram torque reference setpoint.  The PLC stores this as
+      a 32-bit float converted to a 16-bit integer with no
+      documented physical unit.  Recorded as dimensionless
+      until the VFD commissioning data confirms the native
+      unit.
+    instrument: gauge
+    unit: "1"
+    stability: development
+    attributes:
+      - ref: edge.vehicle.id
+
+  # ---------------------------------------------------------------------------
+  # VEHICLE KINEMATICS
+  # ---------------------------------------------------------------------------
+  - id: metric.edge.vehicle.speed
+    type: metric
+    metric_name: edge.vehicle.speed
+    brief: >
+      Vehicle speed as a dimensionless scaled integer.  The raw
+      PLC value is MPH multiplied by 10 (e.g. 15 represents
+      1.5 MPH).  A proper UCUM unit is not used because the
+      source encoding is a fixed-point artefact, not a true
+      physical quantity.  Currently anomalous: values are 0 or
+      1 only.  Fix planned for next release.
+    instrument: gauge
+    unit: "1"
+    stability: development
+    attributes:
+      - ref: edge.vehicle.id
+      - ref: edge.signal.status
+
+  - id: metric.edge.vehicle.steering.angle
+    type: metric
+    metric_name: edge.vehicle.steering.angle
+    brief: >
+      Steering angle in degrees, calculated from the difference in left and
+      right traction motor speeds.
+    instrument: gauge
+    unit: "deg"
+    stability: development
+    attributes:
+      - ref: edge.vehicle.id
+
+  - id: metric.edge.vehicle.orientation
+    type: metric
+    metric_name: edge.vehicle.orientation
+    brief: >
+      Vehicle heading in degrees. Currently arbitrary — zeroing procedure
+      is in development.
+    instrument: gauge
+    unit: "deg"
+    stability: development
+    attributes:
+      - ref: edge.vehicle.id
+      - ref: edge.signal.status
+
+  # ---------------------------------------------------------------------------
+  # PLC STATUS
+  # ---------------------------------------------------------------------------
+  - id: metric.edge.plc.input.status
+    type: metric
+    metric_name: edge.plc.input.status
+    brief: "PLC digital input status bitmask."
+    instrument: gauge
+    unit: "1"
+    stability: development
+    attributes:
+      - ref: edge.vehicle.id
+      - ref: edge.vehicle.plc.id
+
+  - id: metric.edge.plc.output.status
+    type: metric
+    metric_name: edge.plc.output.status
+    brief: "PLC digital output status bitmask."
+    instrument: gauge
+    unit: "1"
+    stability: development
+    attributes:
+      - ref: edge.vehicle.id
+      - ref: edge.vehicle.plc.id
+
+  - id: metric.edge.plc.operational.status
+    type: metric
+    metric_name: edge.plc.operational.status
+    brief: "PLC operational status composed from multiple boolean flags."
+    instrument: gauge
+    unit: "1"
+    stability: development
+    attributes:
+      - ref: edge.vehicle.id
+      - ref: edge.vehicle.plc.id

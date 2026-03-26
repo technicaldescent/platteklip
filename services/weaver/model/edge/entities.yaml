@@ -1,0 +1,75 @@
+# SPDX-FileCopyrightText: 2025 technical descent
+# SPDX-License-Identifier: Apache-2.0
+
+# Entity definitions for edge telemetry.
+# Entities represent the physical hardware components that produce telemetry.
+# They map to OTel resource attributes attached to every signal.
+
+---
+groups:
+
+  - id: entity.edge.vehicle
+    type: entity
+    brief: "A mining vehicle (tram) equipped with PLC-based telemetry."
+    attributes:
+      - ref: edge.vehicle.id
+        requirement_level: required
+      - ref: edge.vehicle.location
+        requirement_level: recommended
+      - ref: edge.vehicle.plc.id
+        requirement_level: recommended
+    stability: development
+
+  - id: entity.edge.vfd
+    type: entity
+    brief: >
+      A Variable Frequency Drive unit attached to a vehicle motor. Four VFD
+      drives are present per vehicle: Drive 1 (pump), Drive 2 (left
+      traction), Drive 3 (conveyor), Drive 4 (right traction).
+    attributes:
+      - ref: edge.vehicle.id
+        requirement_level: required
+      - ref: edge.source.id
+        requirement_level: required
+      - ref: edge.source.type
+        requirement_level: required
+    stability: development
+
+  - id: entity.edge.plc
+    type: entity
+    brief: "The Programmable Logic Controller managing vehicle operations."
+    attributes:
+      - ref: edge.vehicle.id
+        requirement_level: required
+      - ref: edge.vehicle.plc.id
+        requirement_level: required
+    stability: development
+
+  - id: entity.edge.can_switch
+    type: entity
+    brief: >
+      A CAN bus switch or pedal providing operator control inputs.
+      Includes the tram foot pedal and conveyor direction switch.
+    attributes:
+      - ref: edge.vehicle.id
+        requirement_level: required
+      - ref: edge.source.id
+        requirement_level: required
+      - ref: edge.source.type
+        requirement_level: required
+    stability: development
+
+  - id: entity.edge.conveyor
+    type: entity
+    brief: >
+      The conveyor subsystem driven by VFD Drive 3. Tracked as a
+      separate entity because several of its signals are under
+      active anomaly investigation.
+    attributes:
+      - ref: edge.vehicle.id
+        requirement_level: required
+      - ref: edge.source.id
+        requirement_level: required
+      - ref: edge.source.type
+        requirement_level: required
+    stability: development

@@ -1,0 +1,22 @@
+# SPDX-FileCopyrightText: 2025 technical descent
+# SPDX-License-Identifier: Apache-2.0
+
+# Weaver template configuration for the collector target.
+# Controls whitespace, filtering, and output file naming.
+
+---
+whitespace_control:
+  trim_blocks: true
+  lstrip_blocks: true
+
+templates:
+  - template: collector.j2
+    filter: >
+      semconv_grouped_metrics
+      | map(select(.root_namespace | startswith("edge")))
+      | map({
+          root_namespace: .root_namespace,
+          metrics: .metrics
+        })
+    application_mode: single
+    file_name: "transform_processor.yaml"

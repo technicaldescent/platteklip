@@ -1,0 +1,158 @@
+# SPDX-FileCopyrightText: 2025 technical descent
+# SPDX-License-Identifier: Apache-2.0
+
+# Common attribute groups shared across all edge telemetry signals.
+# Imported by attributes.yaml, metrics.yaml, spans.yaml, and events.yaml.
+
+---
+groups:
+
+  # ---------------------------------------------------------------------------
+  # Vehicle identity — attached to every signal as resource attributes.
+  # ---------------------------------------------------------------------------
+  - id: edge.vehicle
+    type: attribute_group
+    brief: "Attributes identifying the mining vehicle."
+    attributes:
+      - id: edge.vehicle.id
+        type: string
+        brief: "Unique identifier for the mining vehicle or tram."
+        examples: ["tram-01", "tram-02"]
+        requirement_level: required
+        stability: development
+
+      - id: edge.vehicle.location
+        type: string
+        brief: >
+          Physical location or section of the mine where the vehicle is
+          operating.
+        examples: ["section-4a", "conveyor-drive-heading"]
+        requirement_level: recommended
+        stability: development
+
+      - id: edge.vehicle.plc.id
+        type: string
+        brief: "Identifier of the PLC controlling this vehicle."
+        examples: ["plc-001"]
+        requirement_level: recommended
+        stability: development
+
+  # ---------------------------------------------------------------------------
+  # Data source — identifies the hardware source of a measurement.
+  # ---------------------------------------------------------------------------
+  - id: edge.source
+    type: attribute_group
+    brief: "Attributes describing the hardware source of a telemetry value."
+    attributes:
+      - id: edge.source.type
+        type:
+          allow_custom_values: false
+          members:
+            - id: vfd
+              value: "vfd"
+              brief: "Variable Frequency Drive"
+              stability: development
+            - id: plc
+              value: "plc"
+              brief: "Programmable Logic Controller"
+              stability: development
+            - id: can_switch
+              value: "can_switch"
+              brief: "CAN bus switch or pedal"
+              stability: development
+        brief: "Type of hardware device that produced the measurement."
+        requirement_level: required
+        stability: development
+
+      - id: edge.source.id
+        type: string
+        brief: >
+          Identifier of the specific hardware unit (e.g. drive number).
+        examples: ["vfd-1", "vfd-2", "vfd-3", "vfd-4"]
+        requirement_level: recommended
+        stability: development
+
+  # ---------------------------------------------------------------------------
+  # Signal quality — annotates anomalous or under-investigation readings.
+  # ---------------------------------------------------------------------------
+  - id: edge.signal.quality
+    type: attribute_group
+    brief: "Attributes annotating the quality or validity of a signal value."
+    attributes:
+      - id: edge.signal.status
+        type:
+          allow_custom_values: false
+          members:
+            - id: ok
+              value: "ok"
+              brief: "Value is within expected range and considered valid."
+              stability: development
+            - id: anomalous
+              value: "anomalous"
+              brief: >
+                Value is outside the expected range. Known anomaly —
+                see signal documentation.
+              stability: development
+            - id: under_investigation
+              value: "under_investigation"
+              brief: >
+                Value behaviour is not yet understood. Do not use for
+                control decisions.
+              stability: development
+            - id: in_development
+              value: "in_development"
+              brief: >
+                Signal is being developed and may not be reliable.
+              stability: development
+        brief: "Quality status of the telemetry signal."
+        requirement_level: recommended
+        stability: development
+
+  # ---------------------------------------------------------------------------
+  # Motor state — used by state-change events.
+  # Defined here so that events.yaml can ref them without
+  # duplicating the enum.
+  # ---------------------------------------------------------------------------
+  - id: edge.motor.state
+    type: attribute_group
+    brief: "Motor operational state attributes."
+    attributes:
+      - id: edge.motor.previous_state
+        type:
+          allow_custom_values: false
+          members:
+            - id: running
+              value: "running"
+              brief: "Motor is energised and rotating."
+              stability: development
+            - id: stopped
+              value: "stopped"
+              brief: "Motor is de-energised."
+              stability: development
+            - id: faulted
+              value: "faulted"
+              brief: "Motor has tripped on a VFD fault."
+              stability: development
+        brief: "Motor state before a transition."
+        requirement_level: required
+        stability: development
+
+      - id: edge.motor.current_state
+        type:
+          allow_custom_values: false
+          members:
+            - id: running
+              value: "running"
+              brief: "Motor is energised and rotating."
+              stability: development
+            - id: stopped
+              value: "stopped"
+              brief: "Motor is de-energised."
+              stability: development
+            - id: faulted
+              value: "faulted"
+              brief: "Motor has tripped on a VFD fault."
+              stability: development
+        brief: "Motor state after a transition."
+        requirement_level: required
+        stability: development

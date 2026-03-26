@@ -1,0 +1,316 @@
+# SPDX-FileCopyrightText: 2025 technical descent
+# SPDX-License-Identifier: Apache-2.0
+
+# Custom attribute definitions for edge telemetry.
+# Attributes are grouped by subsystem: vehicle, pump, traction (left/right),
+# conveyor, controls, and PLC status.
+#
+# Naming convention: edge.<subsystem>.<signal>
+# Units follow the Unified Code for Units of Measure (UCUM).
+
+---
+groups:
+
+  # ---------------------------------------------------------------------------
+  # HYDRAULIC PUMP (VFD Drive 1)
+  # ---------------------------------------------------------------------------
+  - id: edge.pump
+    type: attribute_group
+    brief: "Attributes for the hydraulic pump driven by VFD Drive 1."
+    attributes:
+      - id: edge.pump.running
+        type: boolean
+        brief: "Whether the hydraulic pump motor is running."
+        requirement_level: required
+        stability: development
+
+      - id: edge.pump.motor.current.amperes
+        type: int
+        brief: >
+          Hydraulic pump motor current in amperes. Source: VFD Drive 1
+          16-bit unsigned integer.
+        requirement_level: required
+        stability: development
+
+      - id: edge.pump.motor.voltage.volts
+        type: int
+        brief: >
+          Hydraulic pump motor voltage in volts. Source: VFD Drive 1
+          16-bit unsigned integer.
+        requirement_level: recommended
+        stability: development
+
+      - id: edge.pump.temperature.celsius
+        type: int
+        brief: >
+          Hydraulic pump temperature in degrees Celsius. Source: VFD Drive 1
+          8-bit unsigned integer stored as 16-bit. Currently reads all zeros —
+          under investigation.
+        requirement_level: recommended
+        stability: development
+
+      - id: edge.pump.dcbus.voltage.volts
+        type: int
+        brief: >
+          DC bus voltage in volts, shared across all VFD drives.
+          Source: VFD Drive 1 16-bit unsigned integer.
+        requirement_level: required
+        stability: development
+
+  # ---------------------------------------------------------------------------
+  # LEFT TRACTION MOTOR (VFD Drive 2)
+  # ---------------------------------------------------------------------------
+  - id: edge.traction.left
+    type: attribute_group
+    brief: "Attributes for the left traction motor driven by VFD Drive 2."
+    attributes:
+      - id: edge.traction.left.running
+        type: boolean
+        brief: "Whether the left traction motor is running."
+        requirement_level: required
+        stability: development
+
+      - id: edge.traction.left.motor.current.amperes
+        type: int
+        brief: >
+          Left traction motor current in amperes. Source: VFD Drive 2
+          16-bit unsigned integer.
+        requirement_level: required
+        stability: development
+
+      - id: edge.traction.left.motor.voltage.volts
+        type: int
+        brief: >
+          Left traction motor voltage in volts. Source: VFD Drive 2
+          16-bit unsigned integer.
+        requirement_level: recommended
+        stability: development
+
+      - id: edge.traction.left.frequency.hertz
+        type: int
+        brief: >
+          Left traction motor drive frequency in Hz. Source: VFD Drive 2
+          8-bit unsigned integer.
+        requirement_level: recommended
+        stability: development
+
+      - id: edge.traction.left.temperature.celsius
+        type: int
+        brief: >
+          Left traction motor temperature in degrees Celsius. Source: VFD
+          Drive 2 8-bit unsigned integer stored as 16-bit.
+        requirement_level: recommended
+        stability: development
+
+  # ---------------------------------------------------------------------------
+  # RIGHT TRACTION MOTOR (VFD Drive 4)
+  # ---------------------------------------------------------------------------
+  - id: edge.traction.right
+    type: attribute_group
+    brief: "Attributes for the right traction motor driven by VFD Drive 4."
+    attributes:
+      - id: edge.traction.right.running
+        type: boolean
+        brief: "Whether the right traction motor is running."
+        requirement_level: required
+        stability: development
+
+      - id: edge.traction.right.motor.current.amperes
+        type: int
+        brief: >
+          Right traction motor current in amperes. Source: VFD Drive 4
+          16-bit unsigned integer.
+        requirement_level: required
+        stability: development
+
+      - id: edge.traction.right.motor.voltage.volts
+        type: int
+        brief: >
+          Right traction motor voltage in volts. Source: VFD Drive 4
+          16-bit unsigned integer.
+        requirement_level: recommended
+        stability: development
+
+      - id: edge.traction.right.frequency.hertz
+        type: int
+        brief: >
+          Right traction motor drive frequency in Hz. Source: VFD Drive 4
+          8-bit unsigned integer.
+        requirement_level: recommended
+        stability: development
+
+      - id: edge.traction.right.temperature.celsius
+        type: int
+        brief: >
+          Right traction motor temperature in degrees Celsius. Source: VFD
+          Drive 4 8-bit unsigned integer stored as 16-bit.
+        requirement_level: recommended
+        stability: development
+
+  # ---------------------------------------------------------------------------
+  # CONVEYOR SYSTEM (VFD Drive 3)
+  # ---------------------------------------------------------------------------
+  - id: edge.conveyor
+    type: attribute_group
+    brief: "Attributes for the conveyor motor driven by VFD Drive 3."
+    attributes:
+      - id: edge.conveyor.running
+        type: boolean
+        brief: "Whether the conveyor motor is running."
+        requirement_level: required
+        stability: development
+
+      - id: edge.conveyor.motor.current.amperes
+        type: int
+        brief: >
+          Conveyor motor current in amperes. Source: VFD Drive 3 16-bit
+          unsigned integer.
+        requirement_level: required
+        stability: development
+
+      - id: edge.conveyor.motor.voltage.volts
+        type: int
+        brief: >
+          Conveyor motor voltage in volts. Source: VFD Drive 3 16-bit
+          unsigned integer.
+        requirement_level: recommended
+        stability: development
+
+      - id: edge.conveyor.frequency.hertz
+        type: int
+        brief: >
+          Conveyor drive frequency in Hz. Source: VFD Drive 3 8-bit unsigned
+          integer stored as 32-bit float in PLC. Expected range: 0–50 Hz.
+          Currently anomalous: values observed in range -5 to 5.
+        requirement_level: recommended
+        stability: development
+
+      - id: edge.conveyor.temperature.celsius
+        type: int
+        brief: >
+          Conveyor motor temperature in degrees Celsius. Source: VFD Drive 3
+          8-bit unsigned integer stored as 16-bit. Currently reads all zeros
+          — under investigation.
+        requirement_level: recommended
+        stability: development
+
+      - id: edge.conveyor.frequency.reference.hertz
+        type: int
+        brief: >
+          Conveyor frequency reference setpoint in Hz. Source: PLC 32-bit
+          float stored as 8-bit integer.
+        requirement_level: recommended
+        stability: development
+
+  # ---------------------------------------------------------------------------
+  # OPERATOR CONTROLS
+  # ---------------------------------------------------------------------------
+  - id: edge.controls
+    type: attribute_group
+    brief: "Attributes for operator control inputs."
+    attributes:
+      - id: edge.controls.tram.pedal.position.percent
+        type: int
+        brief: >
+          Tram foot pedal position as a percentage (0–100%). Source: CAN
+          switch 10-bit integer converted to 8-bit for transmission.
+        requirement_level: required
+        stability: development
+
+      - id: edge.controls.tram.pedal.reverse
+        type: boolean
+        brief: >
+          Whether the tram pedal reverse indicator is active. Source: CAN
+          switch 2-bit integer.
+        requirement_level: recommended
+        stability: development
+
+      - id: edge.controls.conveyor.switch.position.percent
+        type: int
+        brief: >
+          Conveyor switch position as a percentage (0–100%). Source: CAN
+          switch 10-bit integer converted to 8-bit. Expected range: 0–100.
+          Currently anomalous: values observed in range 10–72.
+        requirement_level: recommended
+        stability: development
+
+      - id: edge.controls.conveyor.switch.reverse
+        type: boolean
+        brief: >
+          Whether the conveyor switch reverse indicator is active. Source:
+          CAN switch 2-bit integer.
+        requirement_level: recommended
+        stability: development
+
+      - id: edge.controls.tram.torque.reference
+        type: int
+        brief: >
+          Tram torque reference setpoint. Source: PLC 32-bit float stored as
+          16-bit integer.
+        requirement_level: recommended
+        stability: development
+
+  # ---------------------------------------------------------------------------
+  # VEHICLE KINEMATICS
+  # ---------------------------------------------------------------------------
+  - id: edge.kinematics
+    type: attribute_group
+    brief: "Attributes for vehicle motion and orientation."
+    attributes:
+      - id: edge.vehicle.speed.mph_x10
+        type: int
+        brief: >
+          Vehicle speed in MPH multiplied by 10 (i.e., a value of 15
+          represents 1.5 MPH). Source: PLC 32-bit float stored as 8-bit
+          integer. Currently anomalous: values are 0 or 1 only. Fix
+          planned for next release.
+        requirement_level: recommended
+        stability: development
+
+      - id: edge.vehicle.steering.angle.degrees
+        type: int
+        brief: >
+          Steering angle in degrees, calculated from the difference in left
+          and right traction motor speeds. Steering is mechanical, not
+          through differential current.
+        requirement_level: recommended
+        stability: development
+
+      - id: edge.vehicle.orientation.degrees
+        type: int
+        brief: >
+          Vehicle heading in degrees. Currently arbitrary — zeroing procedure
+          is in development.
+        requirement_level: recommended
+        stability: development
+
+  # ---------------------------------------------------------------------------
+  # PLC STATUS
+  # ---------------------------------------------------------------------------
+  - id: edge.plc
+    type: attribute_group
+    brief: "Attributes for PLC operational status and I/O."
+    attributes:
+      - id: edge.plc.input.status
+        type: int
+        brief: >
+          PLC digital input status as a 16-bit bitmask. Each bit corresponds
+          to a physical input channel.
+        requirement_level: recommended
+        stability: development
+
+      - id: edge.plc.output.status
+        type: int
+        brief: >
+          PLC digital output status as a 16-bit bitmask. Each bit corresponds
+          to a physical output channel.
+        requirement_level: recommended
+        stability: development
+
+      - id: edge.plc.operational.status
+        type: int
+        brief: >
+          PLC operational status as a 32-bit integer, composed from multiple
+          boolean flags within the PLC.
+        requirement_level: required
+        stability: development

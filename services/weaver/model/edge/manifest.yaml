@@ -1,0 +1,18 @@
+# SPDX-FileCopyrightText: 2025 technical descent
+# SPDX-License-Identifier: Apache-2.0
+
+---
+name: platteklip.edge
+version: "0.1.0-alpha.1"
+schema_url: "https://opentelemetry.io/schemas/1.9.0"
+repository_url: "https://github.com/technicaldescent/platteklip"
+description: >
+  Custom semantic convention registry for underground
+  mining vehicle (tram) telemetry.  Covers hydraulic
+  pump, traction motors (left and right), conveyor
+  system, PLC status, and operator controls acquired
+  via PLC4X from VFD drives and CAN switches.
+
+dependencies:
+  - name: semconv
+    registry_path: /etc/weaver/semconv

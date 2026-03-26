@@ -1,0 +1,56 @@
+# SPDX-FileCopyrightText: 2025 technical descent
+# SPDX-License-Identifier: Apache-2.0
+
+# Span definitions for edge telemetry.
+# Spans represent discrete operations in the data acquisition pipeline.
+# State is captured as metrics.
+
+---
+groups:
+
+  - id: span.edge.plc.poll
+    type: span
+    span_kind: internal
+    brief: >
+      A single PLC tag poll cycle executed by the NiFi PLC4X processor.
+      Covers the full round-trip from poll initiation to tag value receipt.
+    attributes:
+      - ref: edge.vehicle.id
+        requirement_level: required
+      - ref: edge.vehicle.plc.id
+        requirement_level: required
+      - ref: edge.source.type
+        requirement_level: required
+      - id: edge.plc.poll.tag_count
+        type: int
+        brief: "Number of tags polled in this cycle."
+        requirement_level: recommended
+        stability: development
+      - id: edge.plc.poll.duration.ms
+        type: int
+        brief: "Duration of the poll cycle in milliseconds."
+        requirement_level: recommended
+        stability: development
+    stability: development
+
+  - id: span.edge.kafka.publish
+    type: span
+    span_kind: producer
+    brief: >
+      Publication of a batch of PLC tag values to a Kafka topic by the
+      NiFi PublishKafka processor.
+    attributes:
+      - ref: edge.vehicle.id
+        requirement_level: required
+      - id: edge.kafka.topic
+        type: string
+        brief: "Kafka topic to which the batch was published."
+        examples: ["plc.simulation", "otel.metrics"]
+        requirement_level: required
+        stability: development
+      - id: edge.kafka.batch.size
+        type: int
+        brief: "Number of records in the published batch."
+        requirement_level: recommended
+        stability: development
+    stability: development

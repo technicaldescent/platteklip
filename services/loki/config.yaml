@@ -1,15 +1,15 @@
-# SPDX-FileCopyrightText: 2025 Platteklip contributors
+# SPDX-FileCopyrightText: 2025 technical descent
 # SPDX-License-Identifier: Apache-2.0
 
 ---
 target: all
 auth_enabled: false
 
-# 1. Disable "Phone Home" analytics
+# Disable "Phone Home" analytics
 analytics:
   reporting_enabled: false
 
-# 2. Internal Tracing
+# Internal Tracing
 tracing:
   enabled: true
 
@@ -30,14 +30,14 @@ server:
   grpc_listen_address: "::"
   grpc_listen_port: 9095
 
-# 3. IPv6 Clustering
+# IPv6 Clustering
 # Forces memberlist to bind to IPv6
 memberlist:
   bind_addr: ["::"]
   bind_port: 7946
 
 common:
-  # 4. IPv6 Identity
+  # IPv6 Identity
   # Tells Loki that "myself" is the IPv6 localhost address
   instance_addr: "::1"
   path_prefix: /loki
@@ -103,6 +103,6 @@ limits_config:
   unordered_writes: true
   retention_period: 2h
 
-  # 5. OpenTelemetry Support
+  # OpenTelemetry Support
   # Allows ingestion of OTel resource attributes (service.name, etc.)
   allow_structured_metadata: true

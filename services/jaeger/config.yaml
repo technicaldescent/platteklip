@@ -1,71 +1,64 @@
-# SPDX-FileCopyrightText: 2025 system-under-test contributors
+# SPDX-FileCopyrightText: 2025 technical descent
 # SPDX-License-Identifier: Apache-2.0
 
-# Security Standards Applied:
-# - CIS Docker Benchmark v1.7
-# - NIST SP 800-190 Container Security Guidelines
-# - ISO/IEC 27001:2022
-# - OWASP Container Security Verification Standard
-
 ---
-
-# Jaeger configuration (all-in-one mode)
-metrics:
-  http-route: /metrics
-  backend: prometheus
-  prometheus:
-    host-port: 0.0.0.0:${JAEGER_METRICS_PORT}
-
-sampling:
-  strategies-store:
-    type: adaptive
-    adaptive:
-      metrics_backend: prometheus
-
-processor:
-  jaeger-compact:
-    server_host_port: 0.0.0.0:${JAEGER_AGENT_PORT}
+receivers:
   otlp:
     protocols:
       grpc:
-        endpoint: 0.0.0.0:${JAEGER_OTLP_GRPC_PORT}
-      http:
-        endpoint: 0.0.0.0:${JAEGER_OTLP_HTTP_PORT}
+        endpoint: "[::]:4317"
+        tls:
+          cert_file: /run/secrets/tls_certificate.crt
+          key_file:  /run/tls/tls_private_key.key
+          client_ca_file: /run/secrets/ca.crt
+          reload_interval: 15m
 
-query:
-  port: ${JAEGER_UI_PORT}
-  base-path: /jaeger
-  static-assets: /jaeger-ui/build
-  metrics:
-    http-route: /metrics
+processors:
+  memory_limiter:
+    check_interval: 1s
+    limit_percentage: 60
+    spike_limit_percentage: 10
+  batch:
+    timeout: 1s
+    send_batch_size: 1024
+    send_batch_max_size: 2048
 
-admin:
-  http:
-    port: ${JAEGER_ADMIN_PORT}
-  metrics:
-    http-route: /metrics
+exporters:
+  jaeger_storage_exporter:
+    trace_storage: local
 
-storage:
-  type: memory
-  options:
-    memory:
-      max-traces: 50000  # Reduce memory footprint (CIS 5.3)
+extensions:
+  healthcheckv2:
+    endpoint: "[::1]:13133"
 
-agent:
-  http-server:
-    port: ${JAEGER_HTTP_API_PORT}
+  jaeger_query:
+    http:
+      endpoint: "[::]:16686"
+      tls:
+        cert_file: /run/secrets/tls_certificate.crt
+        key_file:  /run/tls/tls_private_key.key
+        client_ca_file: /run/secrets/ca.crt
+        reload_interval: 15m
+    grpc:
+      endpoint: "[::]:16685"
+      tls:
+        cert_file: /run/secrets/tls_certificate.crt
+        key_file:  /run/tls/tls_private_key.key
+        client_ca_file: /run/secrets/ca.crt
+        reload_interval: 15m
+    storage:
+      traces: local
 
-ingester:
-  deadlockInterval: 0s  # Disable for memory storage
+  jaeger_storage:
+    backends:
+      local:
+        memory:
+          max_traces: 50000
 
-# Security hardening
-admin.http.host-port: 0.0.0.0:${JAEGER_ADMIN_PORT}
-query.host-port: 0.0.0.0:${JAEGER_UI_PORT}
-health-check:
-  http-route: /  # Health check endpoint
-
-# TLS Configuration (enable in production)
-tls:
-  enabled: false
-  cert: /etc/jaeger/certs/tls.crt
-  key: /etc/jaeger/certs/tls.key
+service:
+  extensions: [healthcheckv2, jaeger_query, jaeger_storage]
+  pipelines:
+    traces:
+      receivers:  [otlp]
+      processors: [memory_limiter, batch]
+      exporters:  [jaeger_storage_exporter]

@@ -1,53 +1,94 @@
-# SPDX-FileCopyrightText: 2025 system-under-test contributors
+# SPDX-FileCopyrightText: 2025 technical descent
 # SPDX-License-Identifier: Apache-2.0
 
----
 global:
-  scrape_interval: 15s
-  evaluation_interval: 15s
+  scrape_interval: 10s
+  evaluation_interval: 10s
   body_size_limit: 512KB
   scrape_timeout: 10s
-
   external_labels:
-    environment: 'development'
-    cluster: 'system-under-test'
+    cluster: "platteklip"
 
-  metric_name_validation_scheme: "utf8"
-  label_limit: 128
-  label_name_length_limit: 512         # bytes
-  label_value_length_limit: 2048       # bytes
+# ---------------------------------------------------------------------------
+# Storage
+# Retention settings are version-controlled here alongside scrape
+# configuration and reloadable without a process restart.
+# ---------------------------------------------------------------------------
+storage:
+  tsdb:
+    retention:
+      time: 2h
+      size: 512MB
 
 scrape_configs:
-  # ##########################################################################
-  # OBSERVABILITY INFRASTRUCTURE
-  # ##########################################################################
 
-  #  - job_name: 'alloy'
-  #    metrics_path: /metrics
-  #    static_configs:
-  #      - targets: ['alloy:12345']
+  # ==========================================================================
+  # CORE OBSERVABILITY INFRASTRUCTURE
+  # ==========================================================================
 
-  - job_name: 'grafana'
-    metrics_path: /metrics
+  # 1. Prometheus (Self-Monitoring) — Secured: HTTPS + mTLS
+  #    Prometheus serves TLS via web-config.yml with
+  #    client_auth_type: RequireAndVerifyClientCert, so the self-scrape
+  #    must present a valid client certificate.
+  - job_name: prometheus
+    scheme: https
+    metrics_path: /prometheus/metrics
+    tls_config:
+      ca_file: /run/secrets/ca.crt
+      cert_file: /run/secrets/tls_certificate.crt
+      key_file: /run/secrets/tls_private_key.key
+      insecure_skip_verify: false
     static_configs:
-      - targets: ['grafana:3000']
+      - targets: ["[::1]:9090"]
 
-  - job_name: 'jaeger'
+  # 2. Loki (Logs) — Secured: HTTPS + mTLS
+  - job_name: loki
+    scheme: https
     metrics_path: /metrics
+    tls_config:
+      ca_file: /run/secrets/ca.crt
+      cert_file: /run/secrets/tls_certificate.crt
+      key_file: /run/secrets/tls_private_key.key
+      insecure_skip_verify: false
     static_configs:
-      - targets: ['jaeger:8888']
+      - targets: ["loki:3100"]
 
-  - job_name: 'loki'
+  # 3. OTel Collector — Pipeline metrics exporter (port 8889).
+  #    Secured: HTTPS + mTLS. This is the prometheus exporter defined in
+  #    the collector's exporters section.  Exposes platteklip_* metrics
+  #    that flow through the collector's metrics pipeline.
+  - job_name: otel-collector
+    scheme: https
     metrics_path: /metrics
+    tls_config:
+      ca_file: /run/secrets/ca.crt
+      cert_file: /run/secrets/tls_certificate.crt
+      key_file: /run/secrets/tls_private_key.key
+      insecure_skip_verify: false
     static_configs:
-      - targets: ['loki:3100']
+      - targets: ["otel-collector:8889"]
 
-  - job_name: 'otel-collector'
+  # 4. OTel Collector — Internal telemetry (port 8890).
+  #    Secured: HTTPS + mTLS.  The collector self-scrapes its
+  #    internal metrics on localhost:8888 (plain HTTP, never
+  #    network-exposed), routes them through the
+  #    metrics/internal pipeline, and re-exports them on port
+  #    8890 with mTLS.  Exposes otelcol_receiver_*,
+  #    otelcol_exporter_*, otelcol_processor_*, and
+  #    otelcol_exporter_queue_size metrics.
+  - job_name: otel-collector-internal
+    scheme: https
     metrics_path: /metrics
+    tls_config:
+      ca_file: /run/secrets/ca.crt
+      cert_file: /run/secrets/tls_certificate.crt
+      key_file: /run/secrets/tls_private_key.key
+      insecure_skip_verify: false
     static_configs:
-      - targets: ['otel-collector:8889']
+      - targets: ["otel-collector:8890"]
 
-  - job_name: 'prometheus'
-    metrics_path: /metrics
-    static_configs:
-      - targets: ['localhost:9090']
+  # Jaeger internal telemetry (port 8888) uses the OTel Collector telemetry
+  # framework's Prometheus reader, which does not support TLS. Scraping it
+  # would require unencrypted HTTP on net-storage. Since no unencrypted
+  # traffic is permitted, Jaeger is not scraped directly. Jaeger pipeline
+  # health is observable via OTel Collector metrics and trace throughput.

@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: 2025 system-under-test contributors
+# SPDX-FileCopyrightText: 2025 technical descent
 # SPDX-License-Identifier: Apache-2.0
 
 """Initialisation of the Python package.
@@ -18,7 +18,7 @@ __all__ = [
 
 try:
     # The distribution name is defined in pyproject.toml
-    __version__ = version("system-under-test")
+    __version__ = version("platteklip")
 except PackageNotFoundError:
     # The package is not installed, so we don't know the version
     __version__ = "0.0.0"

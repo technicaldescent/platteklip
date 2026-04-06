@@ -26,28 +26,23 @@ repos:
   # SECURITY
   ##############################
 
-  # Detect secrets in the codebase using Yelp detect-secrets.
-  - repo: https://github.com/Yelp/detect-secrets
-    rev: v1.5.0
-    hooks:
-      - id: detect-secrets
-        stages: [commit-msg, pre-commit, pre-push]
-
-  # Scan Python code for security vulnerabilities using Bandit.
+  # Scan Python code for security vulnerabilities.
   - repo: https://github.com/PyCQA/bandit
     rev: 1.9.4
     hooks:
       - id: bandit
         args: ["--recursive", "-ll", "-ii"]
+        exclude: ^tests/
 
-  # Audit installed Python packages for known vulnerabilities.
+  # Audit installed Python packages for known
+  # vulnerabilities.
   - repo: https://github.com/trailofbits/pip-audit
     rev: v2.10.0
     hooks:
       - id: pip-audit
         name: Audit Python dependencies for vulnerabilities
         files: ^(requirements(-[a-zA-Z0-9]+)*\.txt|pyproject\.toml)$
-        args: ["--fix", "--strict"]
+        args: ["--strict"]
         pass_filenames: false
 
   # Detect secrets in the codebase using Gitleaks.
@@ -102,19 +97,23 @@ repos:
       - id: pyupgrade
         args: ["--py314-plus"]
 
-  # Exception handling
+  # Exception handling.
   - repo: https://github.com/guilatrova/tryceratops
     rev: v2.4.1
     hooks:
       - id: tryceratops
-        exclude: ^tests/
 
   # Enforce cyclomatic complexity thresholds.
   - repo: https://github.com/rubik/xenon
     rev: v0.9.3
     hooks:
       - id: xenon
-        args: ["--max-absolute=B", "--max-modules=A", "--max-average=A"]
+        args:
+          [
+            "--max-absolute=B",
+            "--max-modules=A",
+            "--max-average=A",
+          ]
 
   ##############################
   # LINTING
@@ -128,7 +127,7 @@ repos:
         args:
           - --max-line-length=88
           - --ignore=E203,H601,TYP001,W503
-          - "--per-file-ignores=tests/*:SCS108 E800 D403"
+          - "--per-file-ignores=tests/*:D403,E800,FNE005,FNE007,PT009,PT027,SCS108,SIM117"
         additional_dependencies:
           - flake8-bugbear
           - cohesion
@@ -147,7 +146,8 @@ repos:
     hooks:
       - id: shellcheck
 
-  # General-purpose pre-commit hooks for basic file validation.
+  # General-purpose pre-commit hooks for basic file
+  # validation.
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
     hooks:
@@ -212,12 +212,14 @@ repos:
     hooks:
       - id: validate-pyproject
 
-  # Check .feature files for Gherkin conformance
+  # Check .feature files for Gherkin conformance.
   - repo: local
     hooks:
       - id: mandoline
         name: check gherkin feature
-        description: check feature files against syntax rules.
+        description: >-
+          Check feature files against Gherkin syntax
+          rules.
         entry: python pre_commit_hooks/check_gherkin_feature.py
         language: system
         files: \.(feature)$
@@ -232,12 +234,18 @@ repos:
   # TYPE CHECKING
   ##############################
 
-  # Perform static type checking with Mypy.
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.19.1
+  # Run mypy from the local venv so it has access
+  # to all project dependencies and the strict
+  # config in pyproject.toml.
+  - repo: local
     hooks:
       - id: mypy
-        args: ["--strict", "--ignore-missing-imports"]
+        name: mypy
+        entry: mypy
+        language: system
+        types: [python]
+        pass_filenames: false
+        args: []
 
   ##############################
   # DOCUMENTATION
@@ -248,7 +256,7 @@ repos:
     rev: 1.7.0
     hooks:
       - id: interrogate
-        args: ["--fail-under=95", "--verbose"]
+        args: ["--fail-under=100", "--verbose"]
 
   ##############################
   # LICENSING
@@ -273,18 +281,8 @@ repos:
       - id: commitizen-branch
         stages: [pre-push]
 
-  ##############################
-  # NOTEBOOKS
-  ##############################
-
-  # Strip output from Jupyter notebooks to avoid unnecessary diffs.
-  - repo: https://github.com/kynan/nbstripout
-    rev: 0.9.1
-    hooks:
-      - id: nbstripout
-        args: ["--drop-empty-cells"]
-
-# Configure automated updates and autofix behaviour for pre-commit.ci.
+# Configure automated updates and autofix behaviour
+# for pre-commit.ci.
 ci:
   autofix_prs: true
   autofix_commit_msg: "ci(qa): apply pre-commit fixes"

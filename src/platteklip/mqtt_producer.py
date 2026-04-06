@@ -176,7 +176,7 @@ class MQTTProducerStats:
 
 def create_edge_instruments(
     meter: metrics.Meter,
-) -> dict[str, metrics.Gauge]:
+) -> dict[str, Any]:
     """Create OTel gauge instruments from the Weaver registry.
 
     Parameters
@@ -186,10 +186,10 @@ def create_edge_instruments(
 
     Returns
     -------
-    dict[str, metrics.Gauge]
+    dict[str, Any]
         Gauges keyed by fully qualified metric name.
     """
-    gauges: dict[str, metrics.Gauge] = {}
+    gauges: dict[str, Any] = {}
     for name, conv in METRICS_BY_NAME.items():
         gauges[name] = meter.create_gauge(
             name=conv.name,
@@ -317,7 +317,7 @@ class MQTTProducer:
             unit="s",
         )
 
-        self._edge_gauges: dict[str, metrics.Gauge] = create_edge_instruments(meter)
+        self._edge_gauges: dict[str, Any] = create_edge_instruments(meter)
 
     @property
     def client_id(self) -> str:

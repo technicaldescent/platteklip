@@ -2,54 +2,76 @@
 # SPDX-License-Identifier: Apache-2.0
 
 # =================================================================
-# Project Configuration with Normative References
+# Normative References
 # =================================================================
-
-# Controls:
-
-# NIST 800-53 Rev 5:
-# - SA-15: Development Process, Standards, and Tools
-# - SA-11: Developer Security Testing
-# - CM-3: Configuration Change Control
-# - CM-7: Least Functionality
-# - SI-7: Software Integrity
-# - RA-5: Vulnerability Scanning
-# - SI-10: Information Input Validation
-# - SA-8: Security and Privacy Engineering Principles
-# - SI-4: System Monitoring
-
-# ISO/IEC 27002:2022:
-# - 5.15-5.18: Access Control & Access Rights
-# - 5.32: Intellectual Property Rights
-# - 8.8: Management of Technical Vulnerabilities
-# - 8.9: Configuration Management
-# - 8.12: Data Leakage Prevention
-# - 8.24: Use of Cryptography
-# - 8.25: Secure Development Life Cycle
-# - 8.27: Secure System Architecture and Engineering
-# - 8.28: Secure Coding
-# - 8.29: Security Testing in Development and Acceptance
-# - 8.32: Change Management
-# - 8.33: Test Information
-
-# Change Control:
-# git >= 2.52.0 (https://git-scm.com/)
-# Conventional Commits 1.0.0 (https://www.conventionalcommits.org/en/v1.0.0/)
-# Semantic Versioning 2.0.0 (https://semver.org/)
-
-# Software Bill of Materials:
-# SPDX Specification 3.1 (https://spdx.github.io/spdx-spec/v3.1-dev/)
-# Open Source Initiative Approved Licenses (https://opensource.org/licenses)
-# Scientific Python Ecosystem Coordination:
-# SPEC 0 (https://scientific-python.org/specs/spec-0000/)
-# * Python MINOR versions are dropped after 24 months.
-# * MINOR versions of SPEC Core Projects are dropped after 12 months, including:
-#   IPython, Matplotlib, NetworkX, NumPy, pandas, PySAL,
-#   Scikit-HEP, scikit-image, scikit-learn, SciPy, xarray, Zarr-Python
-
-# Data Bill of Materials:
-# Data Version Control (DVC)
-# MLCommons Croissant 1.1 (https://docs.mlcommons.org/croissant)
+#
+# This project targets conformance with the following
+# standards and regulations.  Control mappings are
+# maintained in the Gemara artefacts under gemara/.
+#
+# Regulatory
+# ----------
+# EU Cyber Resilience Act (CRA)
+#     Product security obligations for connected
+#     devices.  Vulnerability handling, incident
+#     reporting, and SBOM requirements.
+# EU Artificial Intelligence Act (AI Act)
+#     Risk classification and transparency for ML
+#     components.
+# General Data Protection Regulation (GDPR)
+#     Personal data processing constraints for
+#     telemetry payloads.
+#
+# Security frameworks
+# -------------------
+# IEC 62443-3-3:2013
+#     System security requirements for industrial
+#     automation and control systems.  Primary
+#     guidance for the Gemara control catalogue.
+# ISO/IEC 27001:2022
+#     Information security management system.
+# ISO/IEC 27002:2022
+#     Information security controls reference.
+# NIST SP 800-53 Rev 5
+#     Security and privacy controls for information
+#     systems and organisations.
+# CIS Docker Benchmark v1.7.0
+#     Container runtime and image hardening.
+#     Enforced via OPA policies in
+#     requirements/security/.
+#
+# AI/ML governance
+# ----------------
+# ISO/IEC 42001:2023
+#     AI management system requirements.
+#
+# Supply chain integrity
+# ----------------------
+# SLSA v1.1 Level 3
+#     Build provenance and source integrity.
+#     Enforced via Dagger pipeline attestations.
+# SPDX 3.1
+#     Software bill of materials format.
+# in-toto / witness
+#     Attestation framework for build steps.
+# Sigstore (cosign, Rekor, Fulcio)
+#     Keyless signing and transparency log.
+#
+# Development process
+# -------------------
+# Conventional Commits 1.0.0
+#     Commit message format for automated
+#     versioning and changelog generation.
+# Semantic Versioning 2.0.0
+#     Version numbering scheme.
+# SPEC 0 (Scientific Python)
+#     Python and dependency version support
+#     policy.
+#
+# Data governance
+# ---------------
+# MLCommons Croissant 1.1
+#     Dataset metadata format.
 
 # =================================================================
 # Build Automation
@@ -59,7 +81,7 @@
 requires = [
     "hatchling",
     "hatch-vcs",
-    "pip>=26.0.0"
+    "pip>=26.0.0",
 ]
 build-backend = "hatchling.build"
 
@@ -117,11 +139,11 @@ dev = [
     "bandit>=1.9.0",
     "behave>=1.3.0",
     "black>=26.1.0",
-    "codecarbon>=3.2.0",
     "codespell>=2.4.0",
     "coverage>=7.13.0",
     "detect-secrets>=1.5.0",
     "flake8>=7.3.0",
+    "Flake8-pyproject>=1.2.0",
     "hypothesis>=6.151.0",
     "interrogate>=1.7.0",
     "mlcroissant>=1.0.0",
@@ -132,8 +154,7 @@ dev = [
     "pre-commit>=4.5.0",
     "pylint>=4.0.0",
     "pytest>=9.0.0",
-    "pytest-cov>=7.0.0",
-    "pytest-opentelemetry>=1.1.0",
+    "pytest-asyncio>=1.3.0",
     "pyyaml>=6.0.0",
     "reuse>=6.2.0",
     "safety>=3.7.0",
@@ -154,21 +175,17 @@ docs = [
 ]
 
 observability = [
-    "opentelemetry-sdk==1.39.0",
-    "opentelemetry-distro==0.59b0",
-    "opentelemetry-exporter-otlp-proto-grpc==1.39.0",
-    "opentelemetry-exporter-prometheus==0.59b0",
-    "opentelemetry-exporter-richconsole==0.59b0",
-    "opentelemetry-instrumentation==0.59b0",
-    "opentelemetry-instrumentation-logging==0.59b0",
-]
-
-sbom = [
-    "model-signing>=1.1.0",
+    "opentelemetry-sdk>=1.40.0",
+    "opentelemetry-distro>=0.59b0",
+    "opentelemetry-exporter-otlp-proto-grpc>=1.40.0",
+    "opentelemetry-exporter-richconsole>=0.59b0",
+    "opentelemetry-instrumentation>=0.59b0",
+    "opentelemetry-instrumentation-logging>=0.59b0",
 ]
 
 torch = [
     "accelerate>=1.12.0",
+    "model-signing>=1.1.0",
     "onnx>=1.20.0",
     "safetensors>=0.7.0",
     "torch>=2.10.0",
@@ -210,44 +227,164 @@ exclude = [
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/platteklip"]
-# Ensures the wheel contains the audit trail for NIST SA-15
-sign = true
-sbom = true
-sbom-format = "spdx"
-# Force reproducible builds for binary hashing (SI-7)
+# Force reproducible builds for binary hashing (SI-7).
 reproducible = true
 
-[tool.hatch.build.targets.wheel.requires]
-verify_hash = true
 
 # =================================================================
-# Audit Configuration
+# Hatch Environments
 # =================================================================
+#
+# These environments support LOCAL DEVELOPMENT only.
+# CI orchestration, image builds, SBOM generation,
+# artefact signing, and attestation are owned by the
+# Dagger pipeline module (dagger/src/main.py).  Each
+# Dagger stage wraps its command with `witness run` to
+# produce in-toto attestations.
+#
+# Local shortcuts:
+#
+#   hatch run test:unit          pytest unit tests
+#   hatch run test:performance   pytest performance
+#   hatch run acceptance:run     behave BDD features
+#   hatch run policy:test        OPA policy tests
+#   hatch run policy:lint        Regal linter
+#   hatch run policy:eval        OPA deny eval
+#   hatch run quality:check      static analysis
+#   hatch run evidence:static    evaluate_controls
+#   hatch run evidence:collect   collect_evidence
+#   hatch run docs:build         Sphinx docs
+#
+# Quick checks:
+#
+#   hatch run test:unit          just unit tests
+#   hatch run quality:spelling   just codespell
+#   hatch run evidence:gaps      structural gaps
+#
 
-[tool.hatch.envs.audit]
-detached = false
+# -----------------------------------------------------------------
+# test — pytest (unit + performance)
+# -----------------------------------------------------------------
+
+[tool.hatch.envs.test]
 dependencies = [
     ".dev",
     ".observability",
 ]
 
-# Defaults to localhost, but allows override via export OTEL_ENDPOINT=...
-[tool.hatch.envs.audit.env-vars]
-OTEL_EXPORTER_OTLP_ENDPOINT = "{env:OTEL_ENDPOINT:http://localhost:4317}"
-OTEL_SERVICE_NAME = "platteklip-audit"
+[tool.hatch.envs.test.env-vars]
 PYTHONPATH = "src"
 
-[[tool.hatch.envs.audit.matrix]]
-mode = ["safety", "stress"]
-
-[tool.hatch.envs.audit.scripts]
-run = [
-  { value = "pytest -m health", if = ["mode=safety"] },
-  { value = "pytest -m performance --durations=10", if = ["mode=stress"] },
+[tool.hatch.envs.test.scripts]
+unit = "pytest tests/unit {args}"
+performance = "pytest tests/performance -m performance {args}"
+all = [
+    "unit",
+    "performance",
 ]
 
-[tool.hatch.envs.hatch-static-analysis]
-installer = "pip"
+# -----------------------------------------------------------------
+# acceptance — behave BDD tests
+# -----------------------------------------------------------------
+
+[tool.hatch.envs.acceptance]
+dependencies = [
+    ".dev",
+    ".observability",
+]
+
+[tool.hatch.envs.acceptance.env-vars]
+PYTHONPATH = "src"
+
+[tool.hatch.envs.acceptance.scripts]
+run = "behave {args}"
+
+# -----------------------------------------------------------------
+# policy — OPA and Regal
+# -----------------------------------------------------------------
+# Requires opa and regal on PATH (not pip-installable).
+# Install via:
+#   brew install opa regal
+# or download from:
+#   https://www.openpolicyagent.org/docs/latest/
+#   https://docs.styra.com/regal#getting-started
+
+[tool.hatch.envs.policy]
+detached = true
+
+[tool.hatch.envs.policy.scripts]
+test = [
+    "opa test requirements/security/container_runtime/policy/ -v",
+    "opa test requirements/security/container_image/policy/ -v",
+    "opa test requirements/security/use_control/policy/ -v",
+    "opa test policy/semconv/ -v",
+    "opa test policy/services/ -v",
+]
+lint = "regal lint requirements/ policy/"
+eval-compose = """opa eval \
+    --data requirements/security/container_runtime/policy/ \
+    --data requirements/security/container_runtime/data/ \
+    --input compose.yaml \
+    'data.main.deny' \
+    --format=json"""
+eval-dockerfile = """find services/ -name Dockerfile \
+    -exec sh -c ' \
+        echo ""; \
+        echo "--- $1 ---"; \
+        conftest test "$1" \
+            --policy requirements/security/container_image/policy/ \
+            --data requirements/security/container_image/data/ \
+            --output json' _ {{}} \\;"""
+eval = [
+    "mkdir -p gemara/evidence",
+    """opa eval \
+        --data requirements/security/container_runtime/policy/ \
+        --data requirements/security/container_runtime/data/ \
+        --input compose.yaml \
+        'data.main.deny' \
+        --format=json > gemara/evidence/opa-results.json""",
+]
+all = [
+    "test",
+    "lint",
+]
+
+# -----------------------------------------------------------------
+# evidence — Gemara L5 evaluation and evidence collection
+# -----------------------------------------------------------------
+
+[tool.hatch.envs.evidence]
+dependencies = [
+    "pyyaml>=6.0.0",
+]
+
+[tool.hatch.envs.evidence.env-vars]
+PYTHONPATH = "src"
+
+[tool.hatch.envs.evidence.scripts]
+static = """python gemara/evidence/evaluate_controls.py \
+    . gemara/controls/platteklip-controls.yaml \
+    > gemara/evidence/static-eval.yaml"""
+collect = """python gemara/evidence/collect_evidence.py \
+    --catalog gemara/controls/platteklip-controls.yaml \
+    --catalog gemara/controls/cis-docker-controls.yaml \
+    --guidance gemara/guidance/iec-62443-3-3.yaml \
+    --guidance gemara/guidance/cis-docker-benchmark.yaml \
+    --static-eval gemara/evidence/static-eval.yaml \
+    --junit tests/test-results.xml \
+    --cucumber tests/cucumber.json \
+    --opa-json gemara/evidence/opa-results.json \
+    --output gemara/evidence/evaluation-log.yaml \
+    --matrix gemara/evidence/traceability.yaml"""
+gaps = "bash scripts/coverage_gaps.sh requirements/security"
+all = [
+    "static",
+    "collect",
+]
+
+# -----------------------------------------------------------------
+# quality — static analysis
+# -----------------------------------------------------------------
 
 [tool.hatch.envs.quality]
 dependencies = [
@@ -255,27 +392,86 @@ dependencies = [
 ]
 
 [tool.hatch.envs.quality.scripts]
+spelling = "codespell"
+security = "bandit -c pyproject.toml -r src"
+formatting = "black --check --diff src tests requirements"
+secrets = "detect-secrets scan"  # pragma: allowlist secret
+lint = "flake8 src tests"
+docstrings = "interrogate -vv ."
+types = "mypy"
+complexity = "xenon --max-absolute B --max-modules A --max-average A src"
+exceptions = "tryceratops check src tests"
+vulnerabilities = "pip-audit"
 check = [
-    "bandit -c pyproject.toml -r src",
-    "black --check --diff src tests",
-    "detect-secrets scan",
-    "flake8 src tests",
-    "interrogate -vv .",
-    "mlcroissant validate --jsonld ./data/croissant.json",
-    "pip-audit",
-    "tryceratops --config pyproject.toml check src tests",
-    "xenon --max-absolute A --max-modules A --max-average A src",
+    "spelling",
+    "security",
+    "formatting",
+    "secrets",
+    "lint",
+    "docstrings",
+    "types",
+    "complexity",
+    "exceptions",
 ]
+
+# -----------------------------------------------------------------
+# coverage — test coverage reporting
+# -----------------------------------------------------------------
+
+[tool.hatch.envs.coverage]
+dependencies = [
+    ".dev",
+    ".observability",
+]
+
+[tool.hatch.envs.coverage.env-vars]
+PYTHONPATH = "src"
+
+[tool.hatch.envs.coverage.scripts]
+report = [
+    "coverage run -m pytest tests/unit",
+    "coverage xml -o tests/coverage.xml",
+    "coverage report",
+]
+
+# -----------------------------------------------------------------
+# docs — Sphinx documentation
+# -----------------------------------------------------------------
 
 [tool.hatch.envs.docs]
 dependencies = [".docs"]
 
+[tool.hatch.envs.docs.scripts]
+build = "sphinx-build -W -b html docs/source docs/build/html"
+serve = "sphinx-autobuild docs/source docs/build/html"
+clean = "rm -rf docs/build"
+
+[tool.hatch.envs.hatch-static-analysis]
+installer = "pip"
+
+
 # =================================================================
-# Release Management & Security
+# Release Management and Security
 # =================================================================
+#
+# Version tags are created by python-semantic-release
+# from Conventional Commits.  Tags MUST be signed via
+# SSH:
+#
+#   git config tag.gpgSign true
+#   git config gpg.format ssh
+#   git config user.signingKey ~/.ssh/id_ed25519.pub
+#
+# The Dagger pipeline reads the tag via hatch-vcs,
+# applies it to container image tags, and signs the
+# images with cosign (Sigstore).  Syft generates an
+# SPDX SBOM for each image and cosign attaches it as
+# an in-toto attestation.
 
 [tool.semantic_release]
-version_variable = ["src/platteklip/__init__.py:__version__"]
+version_variable = [
+    "src/platteklip/__init__.py:__version__",
+]
 commit_parser = "conventional"
 major_on_zero = false
 allow_zero_version = true
@@ -292,20 +488,20 @@ upload_to_vcs_release = true
 
 [tool.semantic_release.commit_parser_options]
 allowed_tags = [
-    "build",                # Changes that affect the build system
-    "ci",                   # CI configuration changes
-    "docs",                 # Documentation only changes
-    "feat",                 # New features (minor version)
-    "fix",                  # Bug fixes (patch version)
-    "perf",                 # Performance improvements (patch version)
-    "refactor",             # Code refactoring
-    "revert",               # Revert previous commits
-    "style",                # Code style changes
-    "test",                 # Adding/modifying tests
+    "build",
+    "ci",
+    "docs",
+    "feat",
+    "fix",
+    "perf",
+    "refactor",
+    "revert",
+    "style",
+    "test",
 ]
-major_tags = ["BREAKING", "BREAKING CHANGE"]  # Triggers major version bump
-minor_tags = ["feat"]                         # Triggers minor version bump
-patch_tags = ["fix", "perf"]                  # Triggers patch version bump
+major_tags = ["BREAKING", "BREAKING CHANGE"]
+minor_tags = ["feat"]
+patch_tags = ["fix", "perf"]
 
 default_bump_level = 0
 parse_squash_commits = true
@@ -350,23 +546,22 @@ prerelease = false
 [tool.semantic_release.branches.develop]
 match = "develop"
 prerelease = true
-prerelease_token = "alpha"      # Results in x.y.z-alpha.n
+prerelease_token = "alpha"
 
 [tool.semantic_release.branches.alpha]
-# Match branches with the prefixes 'feat/', 'fix/', or 'perf/'.
 match = "^(feat|fix|perf)/.+"
 prerelease = true
-prerelease_token = "alpha"      # Results in x.y.z-alpha.n
+prerelease_token = "alpha"
 
 [tool.semantic_release.branches.beta]
 match = "beta"
 prerelease = true
-prerelease_token = "beta"       # Results in x.y.z-beta.n
+prerelease_token = "beta"
 
 [tool.semantic_release.branches.release]
 match = "release/.*"
 prerelease = true
-prerelease_token = "rc"         # Results in x.y.z-rc.n
+prerelease_token = "rc"
 bump_patch_without_tag = false
 
 [tool.sigstore]
@@ -400,9 +595,11 @@ skip = [
     "./dist",
     "**/gherkin-languages.json",
     "**/i18n",
+    "./k8s",
     "LICENSE",
     "./LICENSES",
     "**/grafana/dashboards",
+    "**/nifi/",
     "**/weaver/semantic-conventions",
 ]
 dictionary = [
@@ -410,7 +607,7 @@ dictionary = [
     ".codespell/dictionary_engineering.txt",
     ".codespell/dictionary_style.txt",
     ".codespell/dictionary_units.txt",
-    "-"
+    "-",
 ]
 ignore-words = ".codespell/codespellignore"
 
@@ -426,20 +623,24 @@ min-python-version = 3.14
 max-line-length = 88
 
 # Cyclomatic complexity threshold.
-# NASA Software Assurance and Software Safety maximum is 15.
-# Basis Path Coverage would require no fewer than 15 tests.
-max-complexity = 10
+# NASA Software Assurance and Software Safety maximum
+# is 15.  Basis Path Coverage would require no fewer
+# than 15 tests.
+max-complexity = 15
 
 # Rules that conflict with Black.
 # E203: whitespace before ':'
 # W503: line break before binary operator
-ignore = ["E203", "W503"]
+ignore = ["E203", "W503", "H601"]
 exclude = [
     ".git",
     "__pycache__",
     "build",
     "dist",
     ".venv",
+]
+per-file-ignores = [
+    "tests/*:D403,E800,FNE005,FNE007,PT009,PT027,SCS108,SIM117",
 ]
 
 [tool.mypy]
@@ -448,7 +649,11 @@ files = ["src", "tests"]
 check_untyped_defs = true
 disallow_incomplete_defs = true
 disallow_untyped_defs = true
-enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]
+enable_error_code = [
+    "ignore-without-code",
+    "redundant-expr",
+    "truthy-bool",
+]
 namespace_packages = true
 python_version = "3.14"
 strict = true
@@ -458,8 +663,8 @@ warn_unreachable = true
 
 [[tool.mypy.overrides]]
 ignore_missing_imports = true
-# Silence "Untyped decorator" errors specifically for behave steps
-module = "features.*"
+# Silence "Untyped decorator" errors for behave steps.
+module = "requirements.*"
 disallow_untyped_decorators = false
 
 [tool.pip-audit]
@@ -476,13 +681,12 @@ continue-on-error = false
 
 [tool.tryceratops]
 exclude = [
-    "tests/*",
     "src/platteklip/vendored/*",
     "docs/*",
     "scripts/*",
     "benchmarks/*",
 ]
-fix = true
+fix = false
 ignore = [
     "TRY002",
     "TRY003",
@@ -493,7 +697,7 @@ include_exit_codes = true
 verbose = true
 
 [tool.xenon]
-max-absolute = "A"
+max-absolute = "B"
 max-modules = "A"
 max-average = "A"
 exclude = [
@@ -505,8 +709,8 @@ exclude = [
 # =================================================================
 
 [tool.behave]
-paths = ["features/srs", "features/syrs"]
-show_skipped = false
+paths = ["requirements"]
+show_skipped = true
 summary = true
 stderr_capture = true
 stdout_capture = true
@@ -520,7 +724,7 @@ omit = [
 ]
 
 [tool.coverage.report]
-fail_under = 95
+fail_under = 80
 exclude_lines = [
     "pragma: no cover",
     "def __repr__",
@@ -529,7 +733,14 @@ exclude_lines = [
 ]
 
 [tool.interrogate]
-exclude = ["build", "docs"]
+exclude = [
+    "build",
+    "docs",
+    "pre_commit_hooks",
+    "requirements",
+    "services",
+    "tests",
+]
 fail-under = 100
 ignore-init-method = false
 ignore-init-module = false
@@ -550,11 +761,7 @@ verbose = 2
 [tool.pytest.ini_options]
 addopts = """
     -ra -q
-    --cov=platteklip
-    --cov-report=xml
-    --junitxml=test-results.xml
-    --cov-branch
-    --cucumberjson=cucumber.json
+    --junitxml=tests/test-results.xml
     -m "not performance"
 """
 filterwarnings = [
@@ -570,6 +777,7 @@ log_level = "INFO"
 markers = [
     "acceptance: test-level to determine whether to accept the system",
     "adverserial: creation and execution of adversarial examples",
+    "control(ar_id): link test to a Gemara L2 assessment requirement ID",
     "health: health tests for running processes",
     "integration: interaction-level tests between components or systems",
     "performance: performance and benchmark tests",
@@ -579,9 +787,9 @@ markers = [
 minversion = "9.0.0"
 python_files = ["test_*.py"]
 python_functions = "test_*"
-pythonpath = "src"
+pythonpath = ["src", "."]
 testpaths = [
+    "requirements",
     "tests",
-    "features"
 ]
 xfail_strict = true

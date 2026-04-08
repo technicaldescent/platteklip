@@ -1,0 +1,48 @@
+# SPDX-FileCopyrightText: 2025 technical descent
+# SPDX-License-Identifier: Apache-2.0
+
+# Regal linter configuration.
+#
+# Rules disabled here are structurally unfixable given
+# the project layout and OPA/conftest conventions:
+#
+# directory-package-mismatch
+#   Policies use package semconv and package main by
+#   convention.  Renaming to match directory paths
+#   would break all cross-file imports and conftest
+#   evaluation.
+#
+# no-defined-entrypoint
+#   Library policies evaluated by Weaver and conftest.
+#   Not standalone programs.
+#
+# test-outside-test-package
+#   Conftest convention: tests share package main to
+#   access deny and warn rules directly.
+#
+# unresolved-import
+#   Regal lints per-directory.  Cross-directory imports
+#   (data.semconv, data.cis_docker_controls) resolve at
+#   OPA evaluation time.
+#
+# constant-condition
+#   Intentional if-false stubs in exception rules for
+#   override extension points.
+
+rules:
+  idiomatic:
+    directory-package-mismatch:
+      level: ignore
+    no-defined-entrypoint:
+      level: ignore
+  imports:
+    unresolved-import:
+      level: ignore
+    unresolved-reference:
+      level: ignore
+  testing:
+    test-outside-test-package:
+      level: ignore
+  bugs:
+    constant-condition:
+      level: ignore

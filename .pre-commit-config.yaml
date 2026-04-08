@@ -137,7 +137,6 @@ repos:
           - flake8-fixme
           - flake8-functions-names
           - flake8-markdown
-          - flake8-secure-coding-standard
           - flake8-tergeo
 
   # Lint shell scripts for common issues.

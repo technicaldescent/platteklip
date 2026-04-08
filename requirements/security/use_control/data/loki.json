@@ -1,0 +1,104 @@
+{
+  "meta": {
+    "spdx": {
+      "SPDX-FileCopyrightText": "2025 technical descent",
+      "SPDX-License-Identifier": "Apache-2.0"
+    },
+    "schema_version": 1,
+    "service": "loki"
+  },
+  "expected": {
+    "analytics_reporting_enabled": false,
+    "tracing_enabled": true,
+    "auth_enabled": false,
+    "server": {
+      "http_listen_address": "::",
+      "http_listen_port": 3100,
+      "http_mtls": {
+        "required": true,
+        "client_auth_type": "RequireAndVerifyClientCert",
+        "secrets_prefix": "/run/secrets/"
+      },
+      "grpc_listen_address": "::",
+      "grpc_listen_port": 9095
+    },
+    "ipv6": {
+      "memberlist_bind_addr_must_include": "::",
+      "instance_addr": "::1"
+    },
+    "single_node_rings": {
+      "required_kvstore": "inmemory",
+      "paths": [
+        "common.ring.kvstore.store",
+        "ingester.lifecycler.ring.kvstore.store",
+        "distributor.ring.kvstore.store",
+        "ruler.ring.kvstore.store"
+      ]
+    },
+    "storage": {
+      "chunks_directory": "/loki/chunks",
+      "rules_directory": "/loki/rules"
+    },
+    "otlp": {
+      "allow_structured_metadata": true
+    },
+    "schema": {
+      "must_include": {
+        "store": "tsdb",
+        "object_store": "filesystem",
+        "schema": "v13",
+        "index_period": "24h"
+      }
+    }
+  },
+  "environments": {
+    "development": {
+      "limits": {
+        "retention_period_max": "2h",
+        "reject_old_samples_max_age_max": "24h",
+        "reject_old_samples_required": true,
+        "unordered_writes_required": true
+      },
+      "compactor": {
+        "retention_enabled_required": true,
+        "delete_request_store_required": "filesystem"
+      }
+    },
+    "testing": {
+      "limits": {
+        "retention_period_max": "8h",
+        "reject_old_samples_max_age_max": "168h",
+        "reject_old_samples_required": true,
+        "unordered_writes_required": true
+      },
+      "compactor": {
+        "retention_enabled_required": true,
+        "delete_request_store_required": "filesystem"
+      }
+    },
+    "staging": {
+      "limits": {
+        "retention_period_max": "24h",
+        "reject_old_samples_max_age_max": "168h",
+        "reject_old_samples_required": true,
+        "unordered_writes_required": true
+      },
+      "compactor": {
+        "retention_enabled_required": true,
+        "delete_request_store_required": "filesystem"
+      }
+    },
+    "production": {
+      "limits": {
+        "retention_period_max": "168h",
+        "reject_old_samples_max_age_max": "336h",
+        "reject_old_samples_required": true,
+        "unordered_writes_required": true
+      },
+      "compactor": {
+        "retention_enabled_required": true,
+        "delete_request_store_required": "filesystem"
+      }
+    }
+  }
+}

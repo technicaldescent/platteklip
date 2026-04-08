@@ -317,8 +317,7 @@ test = [
     "opa test requirements/security/container_runtime/policy/ -v",
     "opa test requirements/security/container_image/policy/ -v",
     "opa test requirements/security/use_control/policy/ -v",
-    "opa test policy/semconv/ -v",
-    "opa test policy/services/ -v",
+    "opa test requirements/development/semconv/policy/ -v",
 ]
 lint = "regal lint requirements/ policy/"
 eval-compose = """opa eval \
@@ -770,8 +769,6 @@ filterwarnings = [
     "error::ImportWarning",
     "error::PendingDeprecationWarning",
     "error::ResourceWarning",
-
-    "ignore:'maxsplit' is passed as positional argument:DeprecationWarning",
 ]
 log_level = "INFO"
 markers = [

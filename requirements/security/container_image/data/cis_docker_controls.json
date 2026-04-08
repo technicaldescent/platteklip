@@ -1,0 +1,536 @@
+{
+  "benchmark": {
+    "title": "CIS Docker Benchmark v1.8.0",
+    "version": "1.8.0",
+    "gemara-catalog": "CIS.DOCKER"
+  },
+  "controls": {
+    "CIS-CTL-4.1": {
+      "title": "Non-root container user",
+      "family": "CIS.IMG",
+      "objective": "Dockerfiles MUST specify a non-root USER to limit the impact of container breakout.",
+      "state": "Active"
+    },
+    "CIS-CTL-4.1.01": {
+      "title": "Non-root container user",
+      "text": "The Dockerfile MUST contain at least one USER instruction.",
+      "applicability": [
+        "dockerfile"
+      ],
+      "state": "Active",
+      "remediation": "See CIS-CTL-4.1 in cis-docker-controls.yaml"
+    },
+    "CIS-CTL-4.1.02": {
+      "title": "Non-root container user",
+      "text": "The last USER instruction MUST NOT specify root or UID 0.",
+      "applicability": [
+        "dockerfile"
+      ],
+      "state": "Active",
+      "remediation": "See CIS-CTL-4.1 in cis-docker-controls.yaml"
+    },
+    "CIS-4.1": {
+      "title": "Non-root container user",
+      "remediation": "Replaced by CIS-CTL-4.1. See cis-docker-controls.yaml",
+      "alias-for": "CIS-CTL-4.1"
+    },
+    "CIS-CTL-4.3": {
+      "title": "Minimal base image",
+      "family": "CIS.IMG",
+      "objective": "Dockerfiles SHOULD use minimal base image variants (alpine, slim, distroless, scratch) to reduce attack surface.",
+      "state": "Active"
+    },
+    "CIS-CTL-4.3.01": {
+      "title": "Minimal base image",
+      "text": "The FROM instruction SHOULD reference an alpine, slim, distroless, or scratch base image variant.  Full distribution images produce a warning.",
+      "applicability": [
+        "dockerfile"
+      ],
+      "state": "Active",
+      "remediation": "See CIS-CTL-4.3 in cis-docker-controls.yaml"
+    },
+    "CIS-4.3": {
+      "title": "Minimal base image",
+      "remediation": "Replaced by CIS-CTL-4.3. See cis-docker-controls.yaml",
+      "alias-for": "CIS-CTL-4.3"
+    },
+    "CIS-CTL-4.6": {
+      "title": "Dockerfile HEALTHCHECK",
+      "family": "CIS.IMG",
+      "objective": "Dockerfiles MUST include a HEALTHCHECK instruction for container liveness detection.",
+      "state": "Active"
+    },
+    "CIS-CTL-4.6.01": {
+      "title": "Dockerfile HEALTHCHECK",
+      "text": "The Dockerfile MUST contain at least one HEALTHCHECK instruction.",
+      "applicability": [
+        "dockerfile"
+      ],
+      "state": "Active",
+      "remediation": "See CIS-CTL-4.6 in cis-docker-controls.yaml"
+    },
+    "CIS-4.6": {
+      "title": "Dockerfile HEALTHCHECK",
+      "remediation": "Replaced by CIS-CTL-4.6. See cis-docker-controls.yaml",
+      "alias-for": "CIS-CTL-4.6"
+    },
+    "CIS-CTL-4.7": {
+      "title": "No standalone update instructions",
+      "family": "CIS.IMG",
+      "objective": "Package manager update commands MUST NOT appear without a corresponding install command.",
+      "state": "Active"
+    },
+    "CIS-CTL-4.7.01": {
+      "title": "No standalone update instructions",
+      "text": "RUN instructions containing apt-get update, apk update, or yum update MUST also contain an install or add command.",
+      "applicability": [
+        "dockerfile"
+      ],
+      "state": "Active",
+      "remediation": "See CIS-CTL-4.7 in cis-docker-controls.yaml"
+    },
+    "CIS-4.7": {
+      "title": "No standalone update instructions",
+      "remediation": "Replaced by CIS-CTL-4.7. See cis-docker-controls.yaml",
+      "alias-for": "CIS-CTL-4.7"
+    },
+    "CIS-CTL-4.8": {
+      "title": "SUID/SGID bit removal",
+      "family": "CIS.IMG",
+      "objective": "Dockerfiles SHOULD include a step that strips SUID and SGID bits from all binaries.",
+      "state": "Active"
+    },
+    "CIS-CTL-4.8.01": {
+      "title": "SUID/SGID bit removal",
+      "text": "The Dockerfile SHOULD contain a RUN instruction that executes chmod to remove SUID/SGID bits.  Absence produces a warning.",
+      "applicability": [
+        "dockerfile"
+      ],
+      "state": "Active",
+      "remediation": "See CIS-CTL-4.8 in cis-docker-controls.yaml"
+    },
+    "CIS-4.8": {
+      "title": "SUID/SGID bit removal",
+      "remediation": "Replaced by CIS-CTL-4.8. See cis-docker-controls.yaml",
+      "alias-for": "CIS-CTL-4.8"
+    },
+    "CIS-CTL-4.9": {
+      "title": "COPY instead of ADD",
+      "family": "CIS.IMG",
+      "objective": "Dockerfiles MUST use COPY rather than ADD to avoid unintended remote URL fetching and archive extraction.",
+      "state": "Active"
+    },
+    "CIS-CTL-4.9.01": {
+      "title": "COPY instead of ADD",
+      "text": "The Dockerfile MUST NOT contain any ADD instructions.",
+      "applicability": [
+        "dockerfile"
+      ],
+      "state": "Active",
+      "remediation": "See CIS-CTL-4.9 in cis-docker-controls.yaml"
+    },
+    "CIS-4.9": {
+      "title": "COPY instead of ADD",
+      "remediation": "Replaced by CIS-CTL-4.9. See cis-docker-controls.yaml",
+      "alias-for": "CIS-CTL-4.9"
+    },
+    "CIS-CTL-4.10": {
+      "title": "No secrets in Dockerfiles",
+      "family": "CIS.IMG",
+      "objective": "Dockerfiles MUST NOT embed secrets as ENV instructions.",
+      "state": "Active"
+    },
+    "CIS-CTL-4.10.01": {
+      "title": "No secrets in Dockerfiles",
+      "text": "ENV instruction keys MUST NOT match patterns indicating credentials (password, secret, key, token, auth).",
+      "applicability": [
+        "dockerfile"
+      ],
+      "state": "Active",
+      "remediation": "See CIS-CTL-4.10 in cis-docker-controls.yaml"
+    },
+    "CIS-4.10": {
+      "title": "No secrets in Dockerfiles",
+      "remediation": "Replaced by CIS-CTL-4.10. See cis-docker-controls.yaml",
+      "alias-for": "CIS-CTL-4.10"
+    },
+    "CIS-CTL-4.11": {
+      "title": "No unverified package installation",
+      "family": "CIS.IMG",
+      "objective": "Dockerfiles MUST NOT pipe downloaded content directly to a shell interpreter.",
+      "state": "Active"
+    },
+    "CIS-CTL-4.11.01": {
+      "title": "No unverified package installation",
+      "text": "RUN instructions MUST NOT contain curl|sh, wget|bash, or equivalent pipe-to- shell patterns.",
+      "applicability": [
+        "dockerfile"
+      ],
+      "state": "Active",
+      "remediation": "See CIS-CTL-4.11 in cis-docker-controls.yaml"
+    },
+    "CIS-4.11": {
+      "title": "No unverified package installation",
+      "remediation": "Replaced by CIS-CTL-4.11. See cis-docker-controls.yaml",
+      "alias-for": "CIS-CTL-4.11"
+    },
+    "CIS-CTL-5.7-DF": {
+      "title": "No SSH in Dockerfiles",
+      "family": "CIS.IMG",
+      "objective": "Dockerfiles MUST NOT install SSH daemons or expose port 22.",
+      "state": "Active"
+    },
+    "CIS-CTL-5.7-DF.01": {
+      "title": "No SSH in Dockerfiles",
+      "text": "RUN instructions MUST NOT install openssh-server, dropbear, or sshd.",
+      "applicability": [
+        "dockerfile"
+      ],
+      "state": "Active",
+      "remediation": "See CIS-CTL-5.7-DF in cis-docker-controls.yaml"
+    },
+    "CIS-CTL-5.7-DF.02": {
+      "title": "No SSH in Dockerfiles",
+      "text": "EXPOSE instructions MUST NOT include port 22.",
+      "applicability": [
+        "dockerfile"
+      ],
+      "state": "Active",
+      "remediation": "See CIS-CTL-5.7-DF in cis-docker-controls.yaml"
+    },
+    "CIS-5.7": {
+      "title": "No SSH in Dockerfiles",
+      "remediation": "Replaced by CIS-CTL-5.7-DF. See cis-docker-controls.yaml",
+      "alias-for": "CIS-CTL-5.7-DF"
+    },
+    "CIS-CTL-5.28-DF": {
+      "title": "Specific image version tags",
+      "family": "CIS.IMG",
+      "objective": "FROM instructions MUST specify a version tag and MUST NOT use the latest tag.",
+      "state": "Active"
+    },
+    "CIS-CTL-5.28-DF.01": {
+      "title": "Specific image version tags",
+      "text": "Every FROM instruction MUST include an explicit tag (not implicit latest).",
+      "applicability": [
+        "dockerfile"
+      ],
+      "state": "Active",
+      "remediation": "See CIS-CTL-5.28-DF in cis-docker-controls.yaml"
+    },
+    "CIS-CTL-5.28-DF.02": {
+      "title": "Specific image version tags",
+      "text": "The tag MUST NOT be the literal string latest.",
+      "applicability": [
+        "dockerfile"
+      ],
+      "state": "Active",
+      "remediation": "See CIS-CTL-5.28-DF in cis-docker-controls.yaml"
+    },
+    "CIS-5.28": {
+      "title": "Specific image version tags",
+      "remediation": "Replaced by CIS-CTL-5.28-DF. See cis-docker-controls.yaml",
+      "alias-for": "CIS-CTL-5.28-DF"
+    },
+    "CIS-CTL-5.5": {
+      "title": "No privileged containers",
+      "family": "CIS.RT",
+      "objective": "No service in compose.yaml MUST use privileged: true.",
+      "state": "Active"
+    },
+    "CIS-CTL-5.5.01": {
+      "title": "No privileged containers",
+      "text": "No service MUST have privileged set to true.",
+      "applicability": [
+        "compose"
+      ],
+      "state": "Active",
+      "remediation": "See CIS-CTL-5.5 in cis-docker-controls.yaml"
+    },
+    "CIS-5.5": {
+      "title": "No privileged containers",
+      "remediation": "Replaced by CIS-CTL-5.5. See cis-docker-controls.yaml",
+      "alias-for": "CIS-CTL-5.5"
+    },
+    "CIS-CTL-5.6": {
+      "title": "No sensitive host directory mounts",
+      "family": "CIS.RT",
+      "objective": "Services MUST NOT bind-mount sensitive host directories (/boot, /dev, /etc, /lib, /proc, /sys, /usr).",
+      "state": "Active"
+    },
+    "CIS-CTL-5.6.01": {
+      "title": "No sensitive host directory mounts",
+      "text": "No service volume MUST have a host source path starting with /boot, /dev, /etc, /lib, /proc, /sys, or /usr.",
+      "applicability": [
+        "compose"
+      ],
+      "state": "Active",
+      "remediation": "See CIS-CTL-5.6 in cis-docker-controls.yaml"
+    },
+    "CIS-5.6": {
+      "title": "No sensitive host directory mounts",
+      "remediation": "Replaced by CIS-CTL-5.6. See cis-docker-controls.yaml",
+      "alias-for": "CIS-CTL-5.6"
+    },
+    "CIS-CTL-5.10": {
+      "title": "No host network namespace sharing",
+      "family": "CIS.RT",
+      "objective": "Services MUST NOT use network_mode: host unless explicitly exempted.",
+      "state": "Active"
+    },
+    "CIS-CTL-5.10.01": {
+      "title": "No host network namespace sharing",
+      "text": "No service MUST have network_mode set to host unless listed in exceptions.rego.",
+      "applicability": [
+        "compose"
+      ],
+      "state": "Active",
+      "remediation": "See CIS-CTL-5.10 in cis-docker-controls.yaml"
+    },
+    "CIS-5.10": {
+      "title": "No host network namespace sharing",
+      "remediation": "Replaced by CIS-CTL-5.10. See cis-docker-controls.yaml",
+      "alias-for": "CIS-CTL-5.10"
+    },
+    "CIS-CTL-5.11": {
+      "title": "Container memory limits",
+      "family": "CIS.RT",
+      "objective": "Every service MUST have an explicit memory limit configured.",
+      "state": "Active"
+    },
+    "CIS-CTL-5.11.01": {
+      "title": "Container memory limits",
+      "text": "Every service MUST define deploy.resources.limits.memory.",
+      "applicability": [
+        "compose"
+      ],
+      "state": "Active",
+      "remediation": "See CIS-CTL-5.11 in cis-docker-controls.yaml"
+    },
+    "CIS-5.11": {
+      "title": "Container memory limits",
+      "remediation": "Replaced by CIS-CTL-5.11. See cis-docker-controls.yaml",
+      "alias-for": "CIS-CTL-5.11"
+    },
+    "CIS-CTL-5.12": {
+      "title": "Container CPU limits",
+      "family": "CIS.RT",
+      "objective": "Every service MUST have an explicit CPU limit configured.",
+      "state": "Active"
+    },
+    "CIS-CTL-5.12.01": {
+      "title": "Container CPU limits",
+      "text": "Every service MUST define deploy.resources.limits.cpus.",
+      "applicability": [
+        "compose"
+      ],
+      "state": "Active",
+      "remediation": "See CIS-CTL-5.12 in cis-docker-controls.yaml"
+    },
+    "CIS-5.12": {
+      "title": "Container CPU limits",
+      "remediation": "Replaced by CIS-CTL-5.12. See cis-docker-controls.yaml",
+      "alias-for": "CIS-CTL-5.12"
+    },
+    "CIS-CTL-5.13": {
+      "title": "Read-only root filesystem",
+      "family": "CIS.RT",
+      "objective": "Services MUST mount the root filesystem as read-only unless explicitly exempted.",
+      "state": "Active"
+    },
+    "CIS-CTL-5.13.01": {
+      "title": "Read-only root filesystem",
+      "text": "Every service MUST have read_only set to true unless listed in exceptions.rego.",
+      "applicability": [
+        "compose"
+      ],
+      "state": "Active",
+      "remediation": "See CIS-CTL-5.13 in cis-docker-controls.yaml"
+    },
+    "CIS-5.13": {
+      "title": "Read-only root filesystem",
+      "remediation": "Replaced by CIS-CTL-5.13. See cis-docker-controls.yaml",
+      "alias-for": "CIS-CTL-5.13"
+    },
+    "CIS-CTL-5.14": {
+      "title": "Specific host interface binding",
+      "family": "CIS.RT",
+      "objective": "Published ports SHOULD bind to a specific host interface rather than 0.0.0.0.",
+      "state": "Active"
+    },
+    "CIS-CTL-5.14.01": {
+      "title": "Specific host interface binding",
+      "text": "Published ports SHOULD NOT use bare numeric format (e.g. 80:80) which implies 0.0.0.0 binding.  Violations produce a warning.",
+      "applicability": [
+        "compose"
+      ],
+      "state": "Active",
+      "remediation": "See CIS-CTL-5.14 in cis-docker-controls.yaml"
+    },
+    "CIS-5.14": {
+      "title": "Specific host interface binding",
+      "remediation": "Replaced by CIS-CTL-5.14. See cis-docker-controls.yaml",
+      "alias-for": "CIS-CTL-5.14"
+    },
+    "CIS-CTL-5.16": {
+      "title": "No host PID namespace sharing",
+      "family": "CIS.RT",
+      "objective": "Services MUST NOT share the host PID namespace.",
+      "state": "Active"
+    },
+    "CIS-CTL-5.16.01": {
+      "title": "No host PID namespace sharing",
+      "text": "No service MUST have pid set to host.",
+      "applicability": [
+        "compose"
+      ],
+      "state": "Active",
+      "remediation": "See CIS-CTL-5.16 in cis-docker-controls.yaml"
+    },
+    "CIS-5.16": {
+      "title": "No host PID namespace sharing",
+      "remediation": "Replaced by CIS-CTL-5.16. See cis-docker-controls.yaml",
+      "alias-for": "CIS-CTL-5.16"
+    },
+    "CIS-CTL-5.17": {
+      "title": "No host IPC namespace sharing",
+      "family": "CIS.RT",
+      "objective": "Services MUST NOT share the host IPC namespace.",
+      "state": "Active"
+    },
+    "CIS-CTL-5.17.01": {
+      "title": "No host IPC namespace sharing",
+      "text": "No service MUST have ipc set to host.",
+      "applicability": [
+        "compose"
+      ],
+      "state": "Active",
+      "remediation": "See CIS-CTL-5.17 in cis-docker-controls.yaml"
+    },
+    "CIS-5.17": {
+      "title": "No host IPC namespace sharing",
+      "remediation": "Replaced by CIS-CTL-5.17. See cis-docker-controls.yaml",
+      "alias-for": "CIS-CTL-5.17"
+    },
+    "CIS-CTL-5.21": {
+      "title": "No host UTS namespace sharing",
+      "family": "CIS.RT",
+      "objective": "Services MUST NOT share the host UTS namespace.",
+      "state": "Active"
+    },
+    "CIS-CTL-5.21.01": {
+      "title": "No host UTS namespace sharing",
+      "text": "No service MUST have uts set to host.",
+      "applicability": [
+        "compose"
+      ],
+      "state": "Active",
+      "remediation": "See CIS-CTL-5.21 in cis-docker-controls.yaml"
+    },
+    "CIS-5.21": {
+      "title": "No host UTS namespace sharing",
+      "remediation": "Replaced by CIS-CTL-5.21. See cis-docker-controls.yaml",
+      "alias-for": "CIS-CTL-5.21"
+    },
+    "CIS-CTL-5.26": {
+      "title": "No new privileges restriction",
+      "family": "CIS.RT",
+      "objective": "Every service MUST set the no-new-privileges security option.",
+      "state": "Active"
+    },
+    "CIS-CTL-5.26.01": {
+      "title": "No new privileges restriction",
+      "text": "Every service MUST include no-new-privileges in its security_opt list.",
+      "applicability": [
+        "compose"
+      ],
+      "state": "Active",
+      "remediation": "See CIS-CTL-5.26 in cis-docker-controls.yaml"
+    },
+    "CIS-5.26": {
+      "title": "No new privileges restriction",
+      "remediation": "Replaced by CIS-CTL-5.26. See cis-docker-controls.yaml",
+      "alias-for": "CIS-CTL-5.26"
+    },
+    "CIS-CTL-5.27": {
+      "title": "Runtime health check",
+      "family": "CIS.RT",
+      "objective": "Every service MUST have a healthcheck configuration in compose.yaml.",
+      "state": "Active"
+    },
+    "CIS-CTL-5.27.01": {
+      "title": "Runtime health check",
+      "text": "Every service MUST define a healthcheck block in compose.yaml.",
+      "applicability": [
+        "compose"
+      ],
+      "state": "Active",
+      "remediation": "See CIS-CTL-5.27 in cis-docker-controls.yaml"
+    },
+    "CIS-5.27": {
+      "title": "Runtime health check",
+      "remediation": "Replaced by CIS-CTL-5.27. See cis-docker-controls.yaml",
+      "alias-for": "CIS-CTL-5.27"
+    },
+    "CIS-CTL-5.29": {
+      "title": "PID cgroup limits",
+      "family": "CIS.RT",
+      "objective": "Every service MUST have an explicit PID limit configured.",
+      "state": "Active"
+    },
+    "CIS-CTL-5.29.01": {
+      "title": "PID cgroup limits",
+      "text": "Every service MUST define deploy.resources.limits.pids.",
+      "applicability": [
+        "compose"
+      ],
+      "state": "Active",
+      "remediation": "See CIS-CTL-5.29 in cis-docker-controls.yaml"
+    },
+    "CIS-5.29": {
+      "title": "PID cgroup limits",
+      "remediation": "Replaced by CIS-CTL-5.29. See cis-docker-controls.yaml",
+      "alias-for": "CIS-CTL-5.29"
+    },
+    "CIS-CTL-5.31": {
+      "title": "No host user namespace sharing",
+      "family": "CIS.RT",
+      "objective": "Services MUST NOT share the host user namespace.",
+      "state": "Active"
+    },
+    "CIS-CTL-5.31.01": {
+      "title": "No host user namespace sharing",
+      "text": "No service MUST have userns_mode set to host.",
+      "applicability": [
+        "compose"
+      ],
+      "state": "Active",
+      "remediation": "See CIS-CTL-5.31 in cis-docker-controls.yaml"
+    },
+    "CIS-5.31": {
+      "title": "No host user namespace sharing",
+      "remediation": "Replaced by CIS-CTL-5.31. See cis-docker-controls.yaml",
+      "alias-for": "CIS-CTL-5.31"
+    },
+    "CIS-CTL-5.32": {
+      "title": "No Docker socket mount",
+      "family": "CIS.RT",
+      "objective": "Services MUST NOT mount the Docker socket.",
+      "state": "Active"
+    },
+    "CIS-CTL-5.32.01": {
+      "title": "No Docker socket mount",
+      "text": "No service volume source MUST contain docker.sock.",
+      "applicability": [
+        "compose"
+      ],
+      "state": "Active",
+      "remediation": "See CIS-CTL-5.32 in cis-docker-controls.yaml"
+    },
+    "CIS-5.32": {
+      "title": "No Docker socket mount",
+      "remediation": "Replaced by CIS-CTL-5.32. See cis-docker-controls.yaml",
+      "alias-for": "CIS-CTL-5.32"
+    }
+  }
+}

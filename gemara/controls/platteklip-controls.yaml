@@ -1,0 +1,827 @@
+# SPDX-FileCopyrightText: 2025 technical descent
+# SPDX-License-Identifier: Apache-2.0
+#
+# Gemara Layer 2 Control Catalog: Platteklip Edge Telemetry
+#
+# Technology-specific controls for the platteklip OT/IT
+# convergence platform.  Each control maps to IEC 62443-3-3
+# guidelines via the guidelines field.
+#
+# Validate:
+#   cue vet -c -d '#ControlCatalog' \
+#       github.com/gemaraproj/gemara@latest \
+#       platteklip-controls.yaml
+
+title: "Platteklip Edge Telemetry Security Controls"
+
+metadata:
+  id: PK.EDGE
+  type: ControlCatalog
+  gemara-version: "0.20.0"
+  description: >-
+    Technology-specific security controls for the platteklip
+    edge telemetry platform.  Controls are informed by
+    IEC 62443-3-3 system security requirements and address
+    the Docker Compose, MQTT, OTel, Kafka, and NiFi
+    components of the deployment.
+  version: "1.0.0"
+  date: "2026-03-18T00:00:00Z"
+  author:
+    id: technical-descent
+    name: technical descent
+    type: Human
+    contact:
+      name: Raymond Ellis
+      email: raymond.ellis@gmail.com
+  mapping-references:
+    - id: IEC-62443-3-3
+      title: "IEC 62443-3-3"
+      version: "1.0"
+      description: >-
+        Layer 1 guidance catalog expressing IEC 62443-3-3
+        system security requirements.
+      url: "file://iec-62443-3-3.yaml"
+    - id: CIS-DOCKER-1.8
+      title: "CIS Docker Benchmark v1.8.0"
+      version: "1.8.0"
+      description: >-
+        Layer 1 guidance catalog for CIS Docker
+        Benchmark v1.8.0.
+      url: "file://cis-docker-benchmark.yaml"
+  applicability-categories:
+    - id: all-services
+      title: "All Services"
+      description: >-
+        Controls that apply to every service in the
+        compose deployment.
+    - id: ingest-zone
+      title: "Ingest Zone (Z3)"
+      description: >-
+        Controls specific to the ingest zone: NiFi,
+        MQTT broker, MQTT producer, Kafka.
+    - id: observability-zone
+      title: "Observability Zone (Z4)"
+      description: >-
+        Controls specific to the observability zone:
+        OTel Collector, Prometheus, Loki, Grafana,
+        Jaeger.
+    - id: build-pipeline
+      title: "Build Pipeline"
+      description: >-
+        Controls that apply to the CI/CD pipeline,
+        image builds, and code generation.
+
+# ================================================================
+# FAMILIES
+# ================================================================
+
+families:
+  - id: PK.IA
+    title: "Identification and Authentication"
+    description: >-
+      Controls governing mTLS certificate management,
+      keystore lifecycle, and service identity for all
+      inter-service communication.
+
+  - id: PK.UC
+    title: "Use Control"
+    description: >-
+      Controls governing authorisation, mobile code
+      execution, audit event generation, and log
+      retention.
+
+  - id: PK.SI
+    title: "System Integrity"
+    description: >-
+      Controls governing communication integrity,
+      software artefact integrity, code generation
+      verification, and input validation.
+
+  - id: PK.DC
+    title: "Data Confidentiality"
+    description: >-
+      Controls governing encryption in transit and
+      at rest, credential redaction, and cryptographic
+      configuration.
+
+  - id: PK.DF
+    title: "Restricted Data Flow"
+    description: >-
+      Controls governing Docker network segmentation,
+      zone boundary enforcement, and conduit
+      restrictions.
+
+  - id: PK.TR
+    title: "Timely Response"
+    description: >-
+      Controls governing log accessibility, continuous
+      monitoring, alerting, and anomaly detection.
+
+  - id: PK.RA
+    title: "Resource Availability"
+    description: >-
+      Controls governing resource limits, backpressure,
+      least functionality, and volume ownership.
+
+# ================================================================
+# CONTROLS — PK.IA: Identification and Authentication
+# ================================================================
+
+controls:
+  # ---------------------------------------------------------------
+  # PK-IA-01: mTLS on all inter-service communication
+  # ---------------------------------------------------------------
+  - id: PK-IA-01
+    title: "mTLS on all inter-service communication"
+    family: PK.IA
+    state: Active
+    objective: >-
+      All inter-service communication MUST use mutual
+      TLS with certificates issued by the platform's
+      private CA to ensure both authentication and
+      integrity of every connection.
+    guidelines:
+      - reference-id: IEC-62443-3-3
+        entries:
+          - reference-id: SR-1.2
+          - reference-id: SR-3.1
+          - reference-id: SR-4.1
+    assessment-requirements:
+      - id: PK-IA-01.01
+        text: >-
+          Every service-to-service connection MUST
+          present a client certificate signed by the
+          platform CA.
+        applicability:
+          - all-services
+        state: Active
+      - id: PK-IA-01.02
+        text: >-
+          The nginx reverse proxy MUST have
+          proxy_ssl_verify set to on and
+          proxy_ssl_trusted_certificate pointing to
+          the platform CA for all upstream connections.
+        applicability:
+          - all-services
+        state: Active
+      - id: PK-IA-01.03
+        text: >-
+          The MQTT broker MUST require client
+          certificates (require_certificate true) and
+          reject connections without valid mTLS.
+        applicability:
+          - ingest-zone
+        state: Active
+
+  # ---------------------------------------------------------------
+  # PK-IA-02: Certificate leaf lifetime
+  # ---------------------------------------------------------------
+  - id: PK-IA-02
+    title: "Certificate leaf lifetime"
+    family: PK.IA
+    state: Active
+    objective: >-
+      Certificate leaf lifetime MUST be short enough
+      to limit the window of compromise, with
+      rotation completed before expiry.
+    guidelines:
+      - reference-id: IEC-62443-3-3
+        entries:
+          - reference-id: SR-1.5
+    assessment-requirements:
+      - id: PK-IA-02.01
+        text: >-
+          Leaf certificate validity MUST NOT exceed
+          11 days.
+        applicability:
+          - all-services
+        state: Active
+      - id: PK-IA-02.02
+        text: >-
+          Certificate rotation MUST be completed at
+          least 3 days before expiry to allow for
+          operational delays.
+        applicability:
+          - all-services
+        state: Active
+
+  # ---------------------------------------------------------------
+  # PK-IA-03: NiFi keystore lifecycle
+  # ---------------------------------------------------------------
+  - id: PK-IA-03
+    title: "NiFi PKCS12 keystore lifecycle"
+    family: PK.IA
+    state: Active
+    objective: >-
+      NiFi PKCS12 keystores MUST contain CA-signed
+      certificates and MUST be regenerated by the
+      deployment script after every image rebuild to
+      prevent start.sh from overwriting them with
+      self-signed certificates.
+    guidelines:
+      - reference-id: IEC-62443-3-3
+        entries:
+          - reference-id: SR-1.5
+          - reference-id: SR-1.2
+    assessment-requirements:
+      - id: PK-IA-03.01
+        text: >-
+          The NiFi keystore.p12 MUST contain a
+          certificate whose issuer CN matches the
+          platform CA, not CN=localhost.
+        applicability:
+          - ingest-zone
+        state: Active
+      - id: PK-IA-03.02
+        text: >-
+          The deployment script MUST regenerate NiFi
+          keystores after every image rebuild.
+        applicability:
+          - build-pipeline
+        state: Active
+
+  # ================================================================
+  # CONTROLS — PK.UC: Use Control
+  # ================================================================
+
+  # ---------------------------------------------------------------
+  # PK-UC-01: NiFi processor allowlist
+  # ---------------------------------------------------------------
+  - id: PK-UC-01
+    title: "NiFi processor allowlist"
+    family: PK.UC
+    state: Active
+    objective: >-
+      NiFi MUST deploy only the NiFi Archive (NAR)
+      files required by the active flow to minimise
+      the executable code surface.
+    guidelines:
+      - reference-id: IEC-62443-3-3
+        entries:
+          - reference-id: SR-2.4
+          - reference-id: SR-7.7
+    assessment-requirements:
+      - id: PK-UC-01.01
+        text: >-
+          The NiFi Dockerfile MUST use a whitelist
+          approach that keeps only the NARs required
+          by the active flow and removes all others.
+        applicability:
+          - build-pipeline
+        state: Active
+      - id: PK-UC-01.02
+        text: >-
+          The count of deployed NARs MUST NOT exceed
+          20 without documented justification.
+        applicability:
+          - ingest-zone
+        state: Active
+
+  # ---------------------------------------------------------------
+  # PK-UC-02: Structured audit logging
+  # ---------------------------------------------------------------
+  - id: PK-UC-02
+    title: "Structured audit logging with trace context"
+    family: PK.UC
+    state: Active
+    objective: >-
+      All services MUST emit structured log records
+      with OTel trace context correlation to support
+      cross-service event reconstruction.
+    guidelines:
+      - reference-id: IEC-62443-3-3
+        entries:
+          - reference-id: SR-2.8
+    assessment-requirements:
+      - id: PK-UC-02.01
+        text: >-
+          Every log record emitted by Python services
+          MUST include otelTraceID and otelSpanID
+          fields injected by the LoggingInstrumentor.
+        applicability:
+          - all-services
+        state: Active
+      - id: PK-UC-02.02
+        text: >-
+          The nginx access log format MUST conform to
+          the OTel Semantic Conventions log format
+          with client.address, http.request.method,
+          url.path, and http.response.status_code
+          attributes.
+        applicability:
+          - all-services
+        state: Active
+
+  # ---------------------------------------------------------------
+  # PK-UC-03: Log retention
+  # ---------------------------------------------------------------
+  - id: PK-UC-03
+    title: "Log retention period"
+    family: PK.UC
+    state: Active
+    objective: >-
+      Loki MUST retain log data for a minimum period
+      appropriate to the operational and compliance
+      requirements of the deployment.
+    guidelines:
+      - reference-id: IEC-62443-3-3
+        entries:
+          - reference-id: SR-2.9
+    assessment-requirements:
+      - id: PK-UC-03.01
+        text: >-
+          Loki retention_period MUST be explicitly
+          configured and MUST NOT be left at the
+          default.
+        applicability:
+          - observability-zone
+        state: Active
+
+  # ================================================================
+  # CONTROLS — PK.SI: System Integrity
+  # ================================================================
+
+  # ---------------------------------------------------------------
+  # PK-SI-01: Container image digest pinning
+  # ---------------------------------------------------------------
+  - id: PK-SI-01
+    title: "Container image digest pinning"
+    family: PK.SI
+    state: Active
+    objective: >-
+      All container images in compose.yaml MUST be
+      referenced by content-addressable digest to
+      prevent tag mutation and ensure reproducible
+      deployments.
+    guidelines:
+      - reference-id: IEC-62443-3-3
+        entries:
+          - reference-id: SR-3.4
+      - reference-id: CIS-DOCKER-1.8
+        entries:
+          - reference-id: CIS-5.28
+            remarks: "Specific image version tags"
+    assessment-requirements:
+      - id: PK-SI-01.01
+        text: >-
+          Every image reference in compose.yaml MUST
+          include a @sha256: digest.
+        applicability:
+          - all-services
+        state: Active
+      - id: PK-SI-01.02
+        text: >-
+          A tag comment MUST accompany each digest
+          to indicate the human-readable version.
+        applicability:
+          - all-services
+        state: Active
+
+  # ---------------------------------------------------------------
+  # PK-SI-02: Weaver generation verification
+  # ---------------------------------------------------------------
+  - id: PK-SI-02
+    title: "Weaver code generation verification"
+    family: PK.SI
+    state: Active
+    objective: >-
+      The Weaver code generation pipeline MUST verify
+      that generated artefacts exist and have non-zero
+      size after every generation run to detect silent
+      failures.
+    guidelines:
+      - reference-id: IEC-62443-3-3
+        entries:
+          - reference-id: SR-3.4
+    assessment-requirements:
+      - id: PK-SI-02.01
+        text: >-
+          The build pipeline MUST verify that
+          edge_semconv.py exists and is non-empty
+          after the Weaver py-semconv target runs.
+        applicability:
+          - build-pipeline
+        state: Active
+      - id: PK-SI-02.02
+        text: >-
+          The build pipeline MUST verify that
+          transform_processor.yaml exists and is
+          non-empty after the Weaver otel-collector
+          target runs.
+        applicability:
+          - build-pipeline
+        state: Active
+
+  # ---------------------------------------------------------------
+  # PK-SI-03: OTel attribute sanitisation
+  # ---------------------------------------------------------------
+  - id: PK-SI-03
+    title: "OTel attribute sanitisation on all pipelines"
+    family: PK.SI
+    state: Active
+    objective: >-
+      The OTel Collector attributes/sanitize processor
+      MUST be present in all signal pipelines (traces,
+      metrics, logs) to redact credentials and hash
+      PII before export.
+    guidelines:
+      - reference-id: IEC-62443-3-3
+        entries:
+          - reference-id: SR-3.8
+          - reference-id: SR-4.1
+    assessment-requirements:
+      - id: PK-SI-03.01
+        text: >-
+          The attributes/sanitize processor MUST be
+          included in the metrics and logs pipelines
+          of the OTel Collector configuration.
+        applicability:
+          - observability-zone
+        state: Active
+      - id: PK-SI-03.02
+        text: >-
+          The attributes/sanitize processor MUST be
+          included in the traces pipeline of the OTel
+          Collector configuration.
+        applicability:
+          - observability-zone
+        state: Active
+
+  # ================================================================
+  # CONTROLS — PK.DC: Data Confidentiality
+  # ================================================================
+
+  # ---------------------------------------------------------------
+  # PK-DC-01: TLS 1.3 only
+  # ---------------------------------------------------------------
+  - id: PK-DC-01
+    title: "TLS 1.3 on all encrypted channels"
+    family: PK.DC
+    state: Active
+    objective: >-
+      All TLS connections MUST use TLS 1.3 exclusively
+      with no fallback to earlier protocol versions.
+    guidelines:
+      - reference-id: IEC-62443-3-3
+        entries:
+          - reference-id: SR-4.3
+          - reference-id: SR-4.1
+    assessment-requirements:
+      - id: PK-DC-01.01
+        text: >-
+          The nginx ssl_protocols directive MUST
+          specify TLSv1.3 only.
+        applicability:
+          - all-services
+        state: Active
+      - id: PK-DC-01.02
+        text: >-
+          The MQTTConnectionConfig tls_min_version
+          and tls_max_version MUST both be set to
+          TLSv1_3.
+        applicability:
+          - ingest-zone
+        state: Active
+      - id: PK-DC-01.03
+        text: >-
+          The Mosquitto broker tls_version directive
+          MUST be set to tlsv1.3.
+        applicability:
+          - ingest-zone
+        state: Active
+
+  # ---------------------------------------------------------------
+  # PK-DC-02: ECDSA P-384 certificates
+  # ---------------------------------------------------------------
+  - id: PK-DC-02
+    title: "ECDSA P-384 certificate key pairs"
+    family: PK.DC
+    state: Active
+    objective: >-
+      All certificates MUST use ECDSA P-384 key pairs
+      with SHA-384 signatures to meet the cryptographic
+      strength requirements for the target security
+      level.
+    guidelines:
+      - reference-id: IEC-62443-3-3
+        entries:
+          - reference-id: SR-4.3
+    assessment-requirements:
+      - id: PK-DC-02.01
+        text: >-
+          The deployment script MUST generate all
+          leaf and CA certificates using ECDSA P-384
+          key pairs.
+        applicability:
+          - all-services
+        state: Active
+
+  # ================================================================
+  # CONTROLS — PK.DF: Restricted Data Flow
+  # ================================================================
+
+  # ---------------------------------------------------------------
+  # PK-DF-01: IPv6-only internal networks
+  # ---------------------------------------------------------------
+  - id: PK-DF-01
+    title: "IPv6-only internal networks"
+    family: PK.DF
+    state: Active
+    objective: >-
+      All internal Docker networks MUST be IPv6-only.
+      IPv4 MUST be restricted to the DMZ (net-edge)
+      for external ingress.
+    guidelines:
+      - reference-id: IEC-62443-3-3
+        entries:
+          - reference-id: SR-5.1
+    assessment-requirements:
+      - id: PK-DF-01.01
+        text: >-
+          The compose.yaml network definitions for
+          net-ingest, net-storage, net-identity, and
+          net-admin MUST enable IPv6 and MUST NOT
+          enable IPv4.
+        applicability:
+          - all-services
+        state: Active
+      - id: PK-DF-01.02
+        text: >-
+          The net-edge network MUST be the only
+          network with dual-stack (IPv4 and IPv6)
+          enabled.
+        applicability:
+          - all-services
+        state: Active
+
+  # ---------------------------------------------------------------
+  # PK-DF-02: Network zone isolation
+  # ---------------------------------------------------------------
+  - id: PK-DF-02
+    title: "Network zone isolation"
+    family: PK.DF
+    state: Active
+    objective: >-
+      Services MUST be attached only to the Docker
+      networks required by their zone membership.
+      No service may be attached to a network outside
+      its designated zone without documented
+      justification as a conduit.
+    guidelines:
+      - reference-id: IEC-62443-3-3
+        entries:
+          - reference-id: SR-5.1
+          - reference-id: SR-5.2
+    assessment-requirements:
+      - id: PK-DF-02.01
+        text: >-
+          The Mosquitto broker MUST NOT be attached
+          to net-storage.
+        applicability:
+          - ingest-zone
+        state: Active
+      - id: PK-DF-02.02
+        text: >-
+          The OTel Collector MUST be the sole service
+          attached to both net-ingest and net-storage,
+          serving as the designated conduit between
+          the ingest and observability zones.
+        applicability:
+          - all-services
+        state: Active
+      - id: PK-DF-02.03
+        text: >-
+          Services with no runtime network requirement
+          (e.g., Weaver) MUST have no network
+          membership.
+        applicability:
+          - all-services
+        state: Active
+
+  # ================================================================
+  # CONTROLS — PK.TR: Timely Response
+  # ================================================================
+
+  # ---------------------------------------------------------------
+  # PK-TR-01: Continuous monitoring dashboards
+  # ---------------------------------------------------------------
+  - id: PK-TR-01
+    title: "Continuous monitoring dashboards"
+    family: PK.TR
+    state: Active
+    objective: >-
+      Grafana dashboards MUST provide visibility into
+      service availability, pipeline throughput, export
+      errors, memory pressure, and signal anomalies
+      to support continuous monitoring.
+    guidelines:
+      - reference-id: IEC-62443-3-3
+        entries:
+          - reference-id: SR-6.2
+          - reference-id: SR-6.1
+    assessment-requirements:
+      - id: PK-TR-01.01
+        text: >-
+          The Platform Infrastructure dashboard MUST
+          display service availability using
+          max by (job) (up) to prevent duplicate rows
+          across container restarts.
+        applicability:
+          - observability-zone
+        state: Active
+      - id: PK-TR-01.02
+        text: >-
+          The OTel Collector memory usage and
+          memory_limiter refused rates MUST be
+          visible on the infrastructure dashboard.
+        applicability:
+          - observability-zone
+        state: Active
+      - id: PK-TR-01.03
+        text: >-
+          All Grafana dashboard Loki queries MUST
+          use valid LogQL syntax.
+        applicability:
+          - observability-zone
+        state: Active
+
+  # ---------------------------------------------------------------
+  # PK-TR-02: Alerting rules
+  # ---------------------------------------------------------------
+  - id: PK-TR-02
+    title: "Alerting rules for critical conditions"
+    family: PK.TR
+    state: Draft
+    objective: >-
+      Prometheus or Grafana alerting rules MUST be
+      configured for at minimum: certificate expiry,
+      pipeline export errors, and anomalous signal
+      detection.
+    guidelines:
+      - reference-id: IEC-62443-3-3
+        entries:
+          - reference-id: SR-6.2
+    assessment-requirements:
+      - id: PK-TR-02.01
+        text: >-
+          An alerting rule MUST fire when any leaf
+          certificate is within 3 days of expiry.
+        applicability:
+          - all-services
+        state: Draft
+      - id: PK-TR-02.02
+        text: >-
+          An alerting rule MUST fire when the OTel
+          Collector export error rate exceeds zero
+          for more than 5 minutes.
+        applicability:
+          - observability-zone
+        state: Draft
+
+  # ================================================================
+  # CONTROLS — PK.RA: Resource Availability
+  # ================================================================
+
+  # ---------------------------------------------------------------
+  # PK-RA-01: Container resource limits
+  # ---------------------------------------------------------------
+  - id: PK-RA-01
+    title: "Container resource limits"
+    family: PK.RA
+    state: Active
+    objective: >-
+      Every service in compose.yaml MUST have explicit
+      memory, CPU, and PID limits to prevent any
+      single service from exhausting shared host
+      resources.
+    guidelines:
+      - reference-id: IEC-62443-3-3
+        entries:
+          - reference-id: SR-7.2
+          - reference-id: SR-7.1
+      - reference-id: CIS-DOCKER-1.8
+        entries:
+          - reference-id: CIS-5.11
+            remarks: "Memory limits"
+          - reference-id: CIS-5.12
+            remarks: "CPU limits"
+          - reference-id: CIS-5.29
+            remarks: "PID limits"
+    assessment-requirements:
+      - id: PK-RA-01.01
+        text: >-
+          Every service in compose.yaml MUST define
+          deploy.resources.limits.memory.
+        applicability:
+          - all-services
+        state: Active
+      - id: PK-RA-01.02
+        text: >-
+          Every service in compose.yaml MUST define
+          deploy.resources.limits.cpus.
+        applicability:
+          - all-services
+        state: Active
+      - id: PK-RA-01.03
+        text: >-
+          Every service in compose.yaml MUST define
+          deploy.resources.limits.pids.
+        applicability:
+          - all-services
+        state: Active
+
+  # ---------------------------------------------------------------
+  # PK-RA-02: OTel Collector memory limiter
+  # ---------------------------------------------------------------
+  - id: PK-RA-02
+    title: "OTel Collector memory limiter"
+    family: PK.RA
+    state: Active
+    objective: >-
+      The OTel Collector memory_limiter processor
+      MUST be the first processor in every pipeline
+      to prevent OOM under sustained load.
+    guidelines:
+      - reference-id: IEC-62443-3-3
+        entries:
+          - reference-id: SR-7.1
+    assessment-requirements:
+      - id: PK-RA-02.01
+        text: >-
+          The memory_limiter processor MUST appear
+          first in the processors list of every
+          pipeline (traces, metrics, logs) in the
+          OTel Collector configuration.
+        applicability:
+          - observability-zone
+        state: Active
+      - id: PK-RA-02.02
+        text: >-
+          The memory_limiter limit_mib MUST be
+          calibrated to 75% of the container memory
+          limit and spike_limit_mib MUST be set to
+          15% of the container memory limit.
+        applicability:
+          - observability-zone
+        state: Active
+
+  # ---------------------------------------------------------------
+  # PK-RA-03: Volume UID alignment
+  # ---------------------------------------------------------------
+  - id: PK-RA-03
+    title: "Volume UID alignment"
+    family: PK.RA
+    state: Active
+    objective: >-
+      The UID configured in .env for each service
+      MUST match the UID used by the container
+      image's built-in user to prevent permission
+      failures on volume recreation.
+    guidelines:
+      - reference-id: IEC-62443-3-3
+        entries:
+          - reference-id: SR-7.2
+    assessment-requirements:
+      - id: PK-RA-03.01
+        text: >-
+          The UID_PROMETHEUS value in .env MUST be
+          65532 to match the distroless image's
+          nonroot user.
+        applicability:
+          - observability-zone
+        state: Active
+      - id: PK-RA-03.02
+        text: >-
+          Each UID_* variable in .env MUST include
+          a comment documenting the source image and
+          the expected UID.
+        applicability:
+          - all-services
+        state: Active
+
+  # ---------------------------------------------------------------
+  # PK-RA-04: Deterministic service identity
+  # ---------------------------------------------------------------
+  - id: PK-RA-04
+    title: "Deterministic OTel service identity"
+    family: PK.RA
+    state: Active
+    objective: >-
+      Every service that emits OTel telemetry MUST
+      have a deterministic service.instance.id that
+      survives container restarts to prevent duplicate
+      time series in Prometheus.
+    guidelines:
+      - reference-id: IEC-62443-3-3
+        entries:
+          - reference-id: SR-6.2
+          - reference-id: SR-7.2
+    assessment-requirements:
+      - id: PK-RA-04.01
+        text: >-
+          The OTel Collector service.telemetry.resource
+          block MUST include a static
+          service.instance.id value.
+        applicability:
+          - observability-zone
+        state: Active

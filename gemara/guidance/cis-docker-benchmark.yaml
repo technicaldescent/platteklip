@@ -1,0 +1,378 @@
+# SPDX-FileCopyrightText: 2025 technical descent
+# SPDX-License-Identifier: Apache-2.0
+#
+# Gemara Layer 1 Guidance Catalog: CIS Docker Benchmark v1.8.0
+#
+# Covers the subset of CIS Docker Benchmark recommendations
+# enforced by the platteklip OPA policies (Sections 4 and 5).
+# Guideline objectives are paraphrased; consult the published
+# benchmark for normative text.
+#
+# Validate:
+#   cue vet -c -d '#GuidanceCatalog' \
+#       github.com/gemaraproj/gemara@latest \
+#       cis-docker-benchmark.yaml
+
+title: "CIS Docker Benchmark v1.8.0"
+
+metadata:
+  id: CIS-DOCKER-1.8
+  type: GuidanceCatalog
+  gemara-version: "0.20.0"
+  description: >-
+    Machine-readable representation of the CIS Docker
+    Benchmark v1.8.0 recommendations enforced by the
+    platteklip OPA policies.  Covers Sections 4
+    (Container Images and Build File Configuration)
+    and 5 (Container Runtime Configuration).
+  version: "1.8.0"
+  date: "2026-03-18T00:00:00Z"
+  author:
+    id: technical-descent
+    name: technical descent
+    type: Human
+    contact:
+      name: Raymond Ellis
+      email: raymond.ellis@gmail.com
+  mapping-references:
+    - id: IEC-62443-3-3
+      title: "IEC 62443-3-3"
+      version: "1.0"
+      description: >-
+        Cross-reference to IEC 62443-3-3 system
+        security requirements where CIS recommendations
+        address the same concern.
+  applicability-categories:
+    - id: dockerfile
+      title: "Dockerfile"
+      description: >-
+        Guidelines that apply to Dockerfile authoring
+        and container image build configuration.
+    - id: compose
+      title: "Docker Compose"
+      description: >-
+        Guidelines that apply to Docker Compose
+        service definitions and container runtime
+        configuration.
+    - id: runtime
+      title: "Container Runtime"
+      description: >-
+        Guidelines that apply to container runtime
+        behaviour regardless of orchestration tool.
+
+type: Standard
+
+front-matter: >-
+  The CIS Docker Benchmark provides prescriptive
+  guidance for establishing a secure configuration
+  posture for Docker containers.  This catalog covers
+  the subset of recommendations from Sections 4 and 5
+  that are enforced by OPA policies in the platteklip
+  deployment.
+
+families:
+  - id: CIS-S4
+    title: "Container Images and Build File Configuration"
+    description: >-
+      Recommendations for secure Dockerfile authoring,
+      base image selection, and build-time security
+      hardening.
+
+  - id: CIS-S5
+    title: "Container Runtime Configuration"
+    description: >-
+      Recommendations for secure container runtime
+      settings including resource limits, namespace
+      isolation, privilege restrictions, and health
+      monitoring.
+
+guidelines:
+  # ============================================================
+  # Section 4: Container Images and Build File Configuration
+  # ============================================================
+
+  - id: CIS-4.1
+    title: "Ensure a user for the container has been created"
+    family: CIS-S4
+    state: Active
+    objective: >-
+      Containers should run as a non-root user to
+      limit the impact of a container breakout.
+    applicability: [dockerfile]
+    recommendations:
+      - >-
+        Include a USER instruction in every Dockerfile
+        specifying a non-root user.
+    see-also:
+      - CIS-5.5
+
+  - id: CIS-4.3
+    title: "Ensure unnecessary packages are not installed"
+    family: CIS-S4
+    state: Active
+    objective: >-
+      Container images should use minimal base images
+      to reduce the attack surface and image size.
+    applicability: [dockerfile]
+    recommendations:
+      - >-
+        Prefer alpine, slim, or distroless base image
+        variants over full distribution images.
+
+  - id: CIS-4.6
+    title: "Ensure HEALTHCHECK instructions have been added"
+    family: CIS-S4
+    state: Active
+    objective: >-
+      Dockerfiles should include a HEALTHCHECK
+      instruction so the container runtime can detect
+      unresponsive applications.
+    applicability: [dockerfile]
+    see-also:
+      - CIS-5.27
+
+  - id: CIS-4.7
+    title: "Ensure update instructions are not used alone"
+    family: CIS-S4
+    state: Active
+    objective: >-
+      Package manager update commands should not appear
+      without a corresponding install to avoid cache
+      invalidation without purpose.
+    applicability: [dockerfile]
+
+  - id: CIS-4.8
+    title: "Ensure SUID and SGID permissions are removed"
+    family: CIS-S4
+    state: Active
+    objective: >-
+      SUID and SGID bits should be stripped from all
+      binaries to prevent privilege escalation within
+      the container.
+    applicability: [dockerfile]
+
+  - id: CIS-4.9
+    title: "Ensure COPY is used instead of ADD"
+    family: CIS-S4
+    state: Active
+    objective: >-
+      Dockerfiles should use COPY rather than ADD to
+      avoid unexpected behaviour with remote URLs and
+      archive auto-extraction.
+    applicability: [dockerfile]
+
+  - id: CIS-4.10
+    title: "Ensure secrets are not stored in Dockerfiles"
+    family: CIS-S4
+    state: Active
+    objective: >-
+      Sensitive values (passwords, tokens, keys) should
+      not appear as ENV instructions in Dockerfiles.
+    applicability: [dockerfile]
+    recommendations:
+      - >-
+        Use Docker secrets or build-time secrets
+        (--secret) instead of ENV for credentials.
+
+  - id: CIS-4.11
+    title: "Ensure only verified packages are installed"
+    family: CIS-S4
+    state: Active
+    objective: >-
+      Dockerfiles should not pipe downloaded content
+      directly to a shell interpreter, as this bypasses
+      integrity verification.
+    applicability: [dockerfile]
+
+  # ============================================================
+  # Section 5: Container Runtime Configuration
+  # ============================================================
+
+  - id: CIS-5.5
+    title: "Ensure privileged containers are not used"
+    family: CIS-S5
+    state: Active
+    objective: >-
+      Containers should not run in privileged mode, as
+      this grants full access to the host kernel and
+      devices.
+    applicability: [compose, runtime]
+    see-also:
+      - CIS-4.1
+
+  - id: CIS-5.6
+    title: "Ensure sensitive host directories are not mounted"
+    family: CIS-S5
+    state: Active
+    objective: >-
+      Containers should not bind-mount sensitive host
+      system directories such as /etc, /proc, or /sys.
+    applicability: [compose, runtime]
+
+  - id: CIS-5.7
+    title: "Ensure sshd is not run within containers"
+    family: CIS-S5
+    state: Active
+    objective: >-
+      Containers should not install or run SSH daemons.
+      Remote access should be provided through the
+      container runtime (exec) or orchestration layer.
+    applicability: [dockerfile, compose, runtime]
+
+  - id: CIS-5.10
+    title: "Ensure the host network namespace is not shared"
+    family: CIS-S5
+    state: Active
+    objective: >-
+      Containers should not use network_mode: host, as
+      this bypasses network isolation and exposes the
+      host network stack.
+    applicability: [compose, runtime]
+
+  - id: CIS-5.11
+    title: "Ensure memory usage for containers is limited"
+    family: CIS-S5
+    state: Active
+    objective: >-
+      Every container should have an explicit memory
+      limit to prevent a single container from
+      exhausting host memory.
+    applicability: [compose, runtime]
+    see-also:
+      - CIS-5.12
+      - CIS-5.29
+
+  - id: CIS-5.12
+    title: "Ensure CPU priority is set appropriately"
+    family: CIS-S5
+    state: Active
+    objective: >-
+      Every container should have an explicit CPU limit
+      to ensure fair scheduling and prevent CPU
+      starvation of other containers.
+    applicability: [compose, runtime]
+    see-also:
+      - CIS-5.11
+      - CIS-5.29
+
+  - id: CIS-5.13
+    title: "Ensure root filesystem is mounted read-only"
+    family: CIS-S5
+    state: Active
+    objective: >-
+      Container root filesystems should be mounted
+      read-only to prevent runtime modification of
+      the container image content.
+    applicability: [compose, runtime]
+    recommendations:
+      - >-
+        Use tmpfs mounts for directories that require
+        write access at runtime.
+
+  - id: CIS-5.14
+    title: "Ensure traffic is bound to a specific host interface"
+    family: CIS-S5
+    state: Active
+    objective: >-
+      Published container ports should bind to a
+      specific host interface rather than 0.0.0.0 to
+      limit network exposure.
+    applicability: [compose, runtime]
+
+  - id: CIS-5.16
+    title: "Ensure host process namespace is not shared"
+    family: CIS-S5
+    state: Active
+    objective: >-
+      Containers should not share the host PID
+      namespace, as this exposes all host processes to
+      the container.
+    applicability: [compose, runtime]
+
+  - id: CIS-5.17
+    title: "Ensure host IPC namespace is not shared"
+    family: CIS-S5
+    state: Active
+    objective: >-
+      Containers should not share the host IPC
+      namespace, as this allows inter-process
+      communication with host processes.
+    applicability: [compose, runtime]
+
+  - id: CIS-5.21
+    title: "Ensure host UTS namespace is not shared"
+    family: CIS-S5
+    state: Active
+    objective: >-
+      Containers should not share the host UTS
+      namespace, as this allows the container to
+      change the host hostname.
+    applicability: [compose, runtime]
+
+  - id: CIS-5.26
+    title: "Ensure container cannot acquire additional privileges"
+    family: CIS-S5
+    state: Active
+    objective: >-
+      Containers should set the no-new-privileges
+      security option to prevent processes from gaining
+      additional privileges via setuid or setgid
+      binaries.
+    applicability: [compose, runtime]
+    see-also:
+      - CIS-4.8
+
+  - id: CIS-5.27
+    title: "Ensure container health is checked at runtime"
+    family: CIS-S5
+    state: Active
+    objective: >-
+      Every container should have a health check
+      configured so the orchestrator can detect and
+      restart unresponsive containers.
+    applicability: [compose, runtime]
+    see-also:
+      - CIS-4.6
+
+  - id: CIS-5.28
+    title: "Ensure images use specific version tags"
+    family: CIS-S5
+    state: Active
+    objective: >-
+      Container images should not use the implicit
+      latest tag or omit the tag entirely, as this
+      makes builds non-reproducible.
+    applicability: [dockerfile, compose]
+
+  - id: CIS-5.29
+    title: "Ensure PID cgroup limit is used"
+    family: CIS-S5
+    state: Active
+    objective: >-
+      Every container should have an explicit PID limit
+      to prevent fork bombs from exhausting the host
+      process table.
+    applicability: [compose, runtime]
+    see-also:
+      - CIS-5.11
+      - CIS-5.12
+
+  - id: CIS-5.31
+    title: "Ensure host user namespaces are not shared"
+    family: CIS-S5
+    state: Active
+    objective: >-
+      Containers should not share the host user
+      namespace, as this negates the isolation provided
+      by user namespace remapping.
+    applicability: [compose, runtime]
+
+  - id: CIS-5.32
+    title: "Ensure Docker socket is not mounted"
+    family: CIS-S5
+    state: Active
+    objective: >-
+      Containers should not mount the Docker socket, as
+      this grants the container full control over the
+      Docker daemon and all other containers.
+    applicability: [compose, runtime]

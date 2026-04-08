@@ -1,0 +1,424 @@
+# SPDX-FileCopyrightText: 2025 technical descent
+# SPDX-License-Identifier: Apache-2.0
+#
+# Gemara Layer 3 Policy: technical descent — IEC 62443
+#
+# Organisation-specific risk-informed policy for the
+# platteklip edge telemetry platform.  Imports the L1
+# guidance and L2 controls, defines accepted risks with
+# justification, and specifies how adherence is evaluated
+# and enforced.
+#
+# Validate:
+#   cue vet -c -d '#Policy' \
+#       github.com/gemaraproj/gemara@latest \
+#       td-iec62443-policy.yaml
+
+title: >-
+  technical descent — IEC 62443 Security Policy
+  for Edge Telemetry
+
+metadata:
+  id: TD.IEC62443
+  type: Policy
+  gemara-version: "0.20.0"
+  description: >-
+    Organisation-specific security policy for the
+    platteklip edge telemetry platform.  Tailors the
+    IEC 62443-3-3 guidance, CIS Docker Benchmark
+    v1.8.0, and platteklip control catalog to the
+    risk appetite and operational constraints of
+    technical descent.
+  version: "1.0.0"
+  date: "2026-03-18T00:00:00Z"
+  author:
+    id: technical-descent
+    name: technical descent
+    type: Human
+    contact:
+      name: Raymond Ellis
+      email: raymond.ellis@gmail.com
+  mapping-references:
+    - id: IEC-62443-3-3
+      title: "IEC 62443-3-3"
+      version: "1.0"
+      description: >-
+        Layer 1 guidance catalog expressing IEC 62443-3-3
+        system security requirements.
+      url: "file://iec-62443-3-3.yaml"
+    - id: PK.EDGE
+      title: "Platteklip Edge Telemetry Security Controls"
+      version: "1.0.0"
+      description: >-
+        Layer 2 control catalog with technology-specific
+        controls for the platteklip platform.
+      url: "file://platteklip-controls.yaml"
+    - id: CIS-DOCKER-1.8
+      title: "CIS Docker Benchmark v1.8.0"
+      version: "1.8.0"
+      description: >-
+        Layer 1 guidance catalog for CIS Docker
+        Benchmark v1.8.0.
+      url: "file://cis-docker-benchmark.yaml"
+    - id: CIS.DOCKER
+      title: "CIS Docker Benchmark Controls"
+      version: "1.0.0"
+      description: >-
+        Layer 2 control catalog for CIS Docker
+        Benchmark v1.8.0 enforcement via OPA.
+      url: "file://cis-docker-controls.yaml"
+    - id: TD.RISKS
+      title: "Platteklip Risk Catalog"
+      version: "1.0.0"
+      description: >-
+        Layer 3 risk catalog documenting identified
+        risks to the platteklip platform.
+      url: "file://td-risk-catalog.yaml"
+
+# ================================================================
+# CONTACTS (RACI)
+# ================================================================
+
+contacts:
+  responsible:
+    - name: Raymond Ellis
+      affiliation: technical descent
+      email: raymond.ellis@gmail.com
+  accountable:
+    - name: Raymond Ellis
+      affiliation: technical descent
+      email: raymond.ellis@gmail.com
+
+# ================================================================
+# SCOPE
+# ================================================================
+
+scope:
+  in:
+    technologies:
+      - "Docker Compose"
+      - "MQTT v5"
+      - "Apache Kafka"
+      - "Apache NiFi"
+      - "OpenTelemetry Collector"
+      - "Prometheus"
+      - "Grafana"
+      - "Loki"
+      - "Jaeger"
+      - "nginx"
+      - "Python 3.14"
+    sensitivity:
+      - "OT telemetry"
+      - "PLC register data"
+      - "Vehicle operational data"
+    groups:
+      - "ingest-zone"
+      - "observability-zone"
+      - "admin-zone"
+      - "identity-zone"
+      - "dmz"
+  out:
+    technologies:
+      - "Kubernetes"
+      - "Public cloud services"
+
+# ================================================================
+# IMPORTS
+# ================================================================
+
+imports:
+  guidance:
+    - reference-id: IEC-62443-3-3
+    - reference-id: CIS-DOCKER-1.8
+  catalogs:
+    - reference-id: PK.EDGE
+      exclusions:
+        - "PK-TR-02"
+      constraints:
+        - id: CON-01
+          target-id: PK-IA-02
+          text: >-
+            Certificate rotation MUST be automated
+            before the platform enters production.
+            Manual rotation is acceptable in the
+            development environment only.
+        - id: CON-02
+          target-id: PK-UC-03
+          text: >-
+            Loki retention MUST be set to a minimum
+            of 90 days for the production environment.
+            The development environment MAY use a
+            shorter retention period.
+      assessment-requirement-modifications:
+        - id: MOD-01
+          target-id: PK-IA-02.02
+          modification-type: Override
+          modification-rationale: >-
+            In the development environment, manual
+            certificate rotation is acceptable.
+            The 3-day pre-expiry requirement applies
+            to production only.
+          applicability:
+            - all-services
+          text: >-
+            In the development environment, certificate
+            rotation SHOULD be completed before expiry.
+            In production, rotation MUST be completed
+            at least 3 days before expiry.
+    - reference-id: CIS.DOCKER
+
+# ================================================================
+# IMPLEMENTATION PLAN
+# ================================================================
+
+implementation-plan:
+  notification-process: >-
+    Policy changes communicated via commit messages
+    in the platteklip repository.  Breaking changes
+    require a pull request with review.
+  evaluation-timeline:
+    start: "2026-03-18T00:00:00Z"
+    end: "2026-06-30T00:00:00Z"
+    notes: >-
+      Initial evaluation phase.  Automated checks
+      rolled out incrementally as controls are
+      annotated and evidence sources connected.
+  enforcement-timeline:
+    start: "2026-07-01T00:00:00Z"
+    notes: >-
+      Enforcement begins after evaluation baseline
+      is established and all Active controls have
+      at least one evidence source.  Draft controls
+      (PK-TR-02) are excluded until promoted.
+
+# ================================================================
+# RISKS
+# ================================================================
+
+risks:
+  mitigated:
+    - id: MIT-01
+      risk:
+        entry-id: RSK-01
+        reference-id: TD.RISKS
+    - id: MIT-02
+      risk:
+        entry-id: RSK-02
+        reference-id: TD.RISKS
+    - id: MIT-03
+      risk:
+        entry-id: RSK-03
+        reference-id: TD.RISKS
+    - id: MIT-04
+      risk:
+        entry-id: RSK-04
+        reference-id: TD.RISKS
+    - id: MIT-05
+      risk:
+        entry-id: RSK-05
+        reference-id: TD.RISKS
+    - id: MIT-06
+      risk:
+        entry-id: RSK-06
+        reference-id: TD.RISKS
+
+  accepted:
+    - id: ACC-01
+      risk:
+        entry-id: RSK-07
+        reference-id: TD.RISKS
+      justification: >-
+        Jaeger v2.16.0 ignores the TLS configuration
+        block, preventing mTLS on the nginx-to-Jaeger
+        conduit.  Compensating controls: Jaeger is on
+        an IPv6-only internal network not reachable
+        from the DMZ; the conduit carries trace data
+        only (no credentials or PII after the
+        attributes/sanitize processor).  This risk is
+        accepted until the upstream TLS defect is
+        resolved or Jaeger is replaced.
+      scope:
+        in:
+          technologies:
+            - "Jaeger"
+          groups:
+            - "observability-zone"
+    - id: ACC-02
+      risk:
+        entry-id: RSK-08
+        reference-id: TD.RISKS
+      justification: >-
+        NiFi executes PLC4X and Kafka processor code
+        that is not digitally signed.  Compensating
+        controls: the NAR whitelist limits deployable
+        code to 14 archives; NiFi is on net-ingest
+        only; the flow definition is version-controlled
+        and changes require deployment script
+        execution.  This risk is accepted for the
+        development environment.  Production
+        deployment requires code signing or an
+        alternative to NiFi.
+      scope:
+        in:
+          technologies:
+            - "Apache NiFi"
+          groups:
+            - "ingest-zone"
+    - id: ACC-03
+      risk:
+        entry-id: RSK-09
+        reference-id: TD.RISKS
+      justification: >-
+        Docker network isolation is not equivalent to
+        a stateful firewall.  All ports between
+        containers on the same network are reachable.
+        Compensating controls: five separate networks
+        with IPv6-only on internal; the OTel Collector
+        is the sole conduit between ingest and
+        storage zones.  Acceptable for development
+        at SL 2.  Production at SL 3 requires network
+        policies or a service mesh.
+      scope:
+        in:
+          technologies:
+            - "Docker Compose"
+
+# ================================================================
+# ADHERENCE
+# ================================================================
+
+adherence:
+  evaluation-methods:
+    - id: EVAL-01
+      type: Automated
+      mode: Continuous
+      required: "true"
+      description: >-
+        Static evaluation script (evaluate_controls.py)
+        runs against project files and produces a
+        Gemara L5 EvaluationLog.
+    - id: EVAL-02
+      type: Automated
+      mode: Continuous
+      required: "true"
+      description: >-
+        pytest with @pytest.mark.control markers
+        produces JUnit XML with control properties.
+    - id: EVAL-03
+      type: Automated
+      mode: Continuous
+      required: "true"
+      description: >-
+        Behave/Gherkin with @PK-* tags produces
+        Cucumber JSON with control tags.
+    - id: EVAL-04
+      type: Automated
+      mode: Continuous
+      required: "true"
+      description: >-
+        OPA policy evaluation against compose.yaml
+        produces JSON with PK-* violation IDs.
+    - id: EVAL-05
+      type: Automated
+      mode: Continuous
+      required: "true"
+      description: >-
+        Evidence collector (collect_evidence.py)
+        merges all sources into a unified L5
+        EvaluationLog and traceability matrix.
+    - id: EVAL-06
+      type: Manual
+      mode: Periodic
+      required: "true"
+      description: >-
+        Quarterly security review of the IEC 62443
+        assessment, risk register, and accepted risk
+        justifications.
+
+  assessment-plans:
+    - id: AP-01
+      requirement-id: PK-SI-01.01
+      frequency: "every push"
+      evaluation-methods:
+        - id: AP-01-M1
+          type: Automated
+          mode: Continuous
+          required: "true"
+          description: >-
+            OPA evaluates compose.yaml for unpinned
+            image references on every push.
+
+    - id: AP-02
+      requirement-id: PK-RA-01.01
+      frequency: "every push"
+      evaluation-methods:
+        - id: AP-02-M1
+          type: Automated
+          mode: Continuous
+          required: "true"
+          description: >-
+            OPA evaluates compose.yaml for missing
+            memory limits on every push.
+
+    - id: AP-03
+      requirement-id: PK-DC-01.02
+      frequency: "every push"
+      evaluation-methods:
+        - id: AP-03-M1
+          type: Automated
+          mode: Continuous
+          required: "true"
+          description: >-
+            pytest verifies MQTTConnectionConfig
+            TLS version constraints.
+
+    - id: AP-04
+      requirement-id: PK-SI-02.01
+      frequency: "every build"
+      evaluation-methods:
+        - id: AP-04-M1
+          type: Automated
+          mode: Continuous
+          required: "true"
+          description: >-
+            Static evaluator verifies edge_semconv.py
+            exists and is non-empty after Weaver
+            generation.
+
+    - id: AP-05
+      requirement-id: PK-IA-03.01
+      frequency: "every deploy"
+      evaluation-methods:
+        - id: AP-05-M1
+          type: Automated
+          mode: Continuous
+          required: "true"
+          description: >-
+            Static evaluator verifies NiFi
+            keystore.p12 exists after deploy.sh.
+
+  enforcement-methods:
+    - id: ENF-01
+      type: Gate
+      mode: Continuous
+      required: "true"
+      description: >-
+        CI pipeline blocks merge when
+        collect_evidence.py returns exit code 1
+        (any AR failed).
+    - id: ENF-02
+      type: Gate
+      mode: Continuous
+      required: "true"
+      description: >-
+        OPA deny rules block compose.yaml changes
+        that violate resource limit, digest pinning,
+        or network isolation controls.
+
+  non-compliance: >-
+    Non-compliance is reported via the traceability
+    matrix and evidence collector summary.  Failed
+    controls block CI merge (ENF-01).  Accepted risks
+    are documented in this policy with justification
+    and compensating controls.  Quarterly review
+    (EVAL-06) re-evaluates accepted risks.

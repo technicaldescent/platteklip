@@ -1,0 +1,575 @@
+# SPDX-FileCopyrightText: 2025 technical descent
+# SPDX-License-Identifier: Apache-2.0
+#
+# Gemara Layer 2 Control Catalog: CIS Docker Benchmark
+#
+# Technology-specific controls derived from the OPA
+# policies in compose.rego and dockerfile.rego.  Each
+# control maps to a CIS guideline via the guidelines
+# field and has assessment requirements matching the
+# OPA deny/warn rules.
+#
+# Validate:
+#   cue vet -c -d '#ControlCatalog' \
+#       github.com/gemaraproj/gemara@latest \
+#       cis-docker-controls.yaml
+
+title: "CIS Docker Benchmark Controls"
+
+metadata:
+  id: CIS.DOCKER
+  type: ControlCatalog
+  gemara-version: "0.20.0"
+  description: >-
+    Controls enforced by OPA policies against Docker
+    Compose and Dockerfile artefacts.  Each control
+    corresponds to a CIS Docker Benchmark v1.8.0
+    recommendation and is backed by a deny or warn
+    rule in compose.rego or dockerfile.rego.
+  version: "1.0.0"
+  date: "2026-03-18T00:00:00Z"
+  author:
+    id: technical-descent
+    name: technical descent
+    type: Human
+    contact:
+      name: Raymond Ellis
+      email: raymond.ellis@gmail.com
+  mapping-references:
+    - id: CIS-DOCKER-1.8
+      title: "CIS Docker Benchmark v1.8.0"
+      version: "1.8.0"
+      description: >-
+        Layer 1 guidance catalog for CIS Docker
+        Benchmark v1.8.0.
+      url: "file://cis-docker-benchmark.yaml"
+  applicability-categories:
+    - id: dockerfile
+      title: "Dockerfile"
+      description: >-
+        Controls enforced by dockerfile.rego against
+        Dockerfile AST.
+    - id: compose
+      title: "Docker Compose"
+      description: >-
+        Controls enforced by compose.rego against
+        compose.yaml.
+
+families:
+  - id: CIS.IMG
+    title: "Container Image Security"
+    description: >-
+      Controls for Dockerfile authoring: non-root
+      users, minimal base images, health checks,
+      build hygiene, and secret management.
+
+  - id: CIS.RT
+    title: "Container Runtime Security"
+    description: >-
+      Controls for container runtime configuration:
+      privilege restriction, namespace isolation,
+      resource limits, filesystem protection, and
+      health monitoring.
+
+controls:
+  # ============================================================
+  # CIS.IMG — Container Image Security (dockerfile.rego)
+  # ============================================================
+
+  - id: CIS-CTL-4.1
+    title: "Non-root container user"
+    family: CIS.IMG
+    state: Active
+    objective: >-
+      Dockerfiles MUST specify a non-root USER to
+      limit the impact of container breakout.
+    guidelines:
+      - reference-id: CIS-DOCKER-1.8
+        entries:
+          - reference-id: CIS-4.1
+    assessment-requirements:
+      - id: CIS-CTL-4.1.01
+        text: >-
+          The Dockerfile MUST contain at least one
+          USER instruction.
+        applicability: [dockerfile]
+        state: Active
+      - id: CIS-CTL-4.1.02
+        text: >-
+          The last USER instruction MUST NOT specify
+          root or UID 0.
+        applicability: [dockerfile]
+        state: Active
+
+  - id: CIS-CTL-4.3
+    title: "Minimal base image"
+    family: CIS.IMG
+    state: Active
+    objective: >-
+      Dockerfiles SHOULD use minimal base image
+      variants (alpine, slim, distroless, scratch)
+      to reduce attack surface.
+    guidelines:
+      - reference-id: CIS-DOCKER-1.8
+        entries:
+          - reference-id: CIS-4.3
+    assessment-requirements:
+      - id: CIS-CTL-4.3.01
+        text: >-
+          The FROM instruction SHOULD reference an
+          alpine, slim, distroless, or scratch base
+          image variant.  Full distribution images
+          produce a warning.
+        applicability: [dockerfile]
+        state: Active
+
+  - id: CIS-CTL-4.6
+    title: "Dockerfile HEALTHCHECK"
+    family: CIS.IMG
+    state: Active
+    objective: >-
+      Dockerfiles MUST include a HEALTHCHECK
+      instruction for container liveness detection.
+    guidelines:
+      - reference-id: CIS-DOCKER-1.8
+        entries:
+          - reference-id: CIS-4.6
+    assessment-requirements:
+      - id: CIS-CTL-4.6.01
+        text: >-
+          The Dockerfile MUST contain at least one
+          HEALTHCHECK instruction.
+        applicability: [dockerfile]
+        state: Active
+
+  - id: CIS-CTL-4.7
+    title: "No standalone update instructions"
+    family: CIS.IMG
+    state: Active
+    objective: >-
+      Package manager update commands MUST NOT appear
+      without a corresponding install command.
+    guidelines:
+      - reference-id: CIS-DOCKER-1.8
+        entries:
+          - reference-id: CIS-4.7
+    assessment-requirements:
+      - id: CIS-CTL-4.7.01
+        text: >-
+          RUN instructions containing apt-get update,
+          apk update, or yum update MUST also contain
+          an install or add command.
+        applicability: [dockerfile]
+        state: Active
+
+  - id: CIS-CTL-4.8
+    title: "SUID/SGID bit removal"
+    family: CIS.IMG
+    state: Active
+    objective: >-
+      Dockerfiles SHOULD include a step that strips
+      SUID and SGID bits from all binaries.
+    guidelines:
+      - reference-id: CIS-DOCKER-1.8
+        entries:
+          - reference-id: CIS-4.8
+    assessment-requirements:
+      - id: CIS-CTL-4.8.01
+        text: >-
+          The Dockerfile SHOULD contain a RUN
+          instruction that executes chmod to remove
+          SUID/SGID bits.  Absence produces a warning.
+        applicability: [dockerfile]
+        state: Active
+
+  - id: CIS-CTL-4.9
+    title: "COPY instead of ADD"
+    family: CIS.IMG
+    state: Active
+    objective: >-
+      Dockerfiles MUST use COPY rather than ADD to
+      avoid unintended remote URL fetching and archive
+      extraction.
+    guidelines:
+      - reference-id: CIS-DOCKER-1.8
+        entries:
+          - reference-id: CIS-4.9
+    assessment-requirements:
+      - id: CIS-CTL-4.9.01
+        text: >-
+          The Dockerfile MUST NOT contain any ADD
+          instructions.
+        applicability: [dockerfile]
+        state: Active
+
+  - id: CIS-CTL-4.10
+    title: "No secrets in Dockerfiles"
+    family: CIS.IMG
+    state: Active
+    objective: >-
+      Dockerfiles MUST NOT embed secrets as ENV
+      instructions.
+    guidelines:
+      - reference-id: CIS-DOCKER-1.8
+        entries:
+          - reference-id: CIS-4.10
+    assessment-requirements:
+      - id: CIS-CTL-4.10.01
+        text: >-
+          ENV instruction keys MUST NOT match
+          patterns indicating credentials (password,
+          secret, key, token, auth).
+        applicability: [dockerfile]
+        state: Active
+
+  - id: CIS-CTL-4.11
+    title: "No unverified package installation"
+    family: CIS.IMG
+    state: Active
+    objective: >-
+      Dockerfiles MUST NOT pipe downloaded content
+      directly to a shell interpreter.
+    guidelines:
+      - reference-id: CIS-DOCKER-1.8
+        entries:
+          - reference-id: CIS-4.11
+    assessment-requirements:
+      - id: CIS-CTL-4.11.01
+        text: >-
+          RUN instructions MUST NOT contain
+          curl|sh, wget|bash, or equivalent pipe-to-
+          shell patterns.
+        applicability: [dockerfile]
+        state: Active
+
+  - id: CIS-CTL-5.7-DF
+    title: "No SSH in Dockerfiles"
+    family: CIS.IMG
+    state: Active
+    objective: >-
+      Dockerfiles MUST NOT install SSH daemons or
+      expose port 22.
+    guidelines:
+      - reference-id: CIS-DOCKER-1.8
+        entries:
+          - reference-id: CIS-5.7
+    assessment-requirements:
+      - id: CIS-CTL-5.7-DF.01
+        text: >-
+          RUN instructions MUST NOT install
+          openssh-server, dropbear, or sshd.
+        applicability: [dockerfile]
+        state: Active
+      - id: CIS-CTL-5.7-DF.02
+        text: >-
+          EXPOSE instructions MUST NOT include
+          port 22.
+        applicability: [dockerfile]
+        state: Active
+
+  - id: CIS-CTL-5.28-DF
+    title: "Specific image version tags"
+    family: CIS.IMG
+    state: Active
+    objective: >-
+      FROM instructions MUST specify a version tag
+      and MUST NOT use the latest tag.
+    guidelines:
+      - reference-id: CIS-DOCKER-1.8
+        entries:
+          - reference-id: CIS-5.28
+    assessment-requirements:
+      - id: CIS-CTL-5.28-DF.01
+        text: >-
+          Every FROM instruction MUST include an
+          explicit tag (not implicit latest).
+        applicability: [dockerfile]
+        state: Active
+      - id: CIS-CTL-5.28-DF.02
+        text: >-
+          The tag MUST NOT be the literal string
+          latest.
+        applicability: [dockerfile]
+        state: Active
+
+  # ============================================================
+  # CIS.RT — Container Runtime Security (compose.rego)
+  # ============================================================
+
+  - id: CIS-CTL-5.5
+    title: "No privileged containers"
+    family: CIS.RT
+    state: Active
+    objective: >-
+      No service in compose.yaml MUST use
+      privileged: true.
+    guidelines:
+      - reference-id: CIS-DOCKER-1.8
+        entries:
+          - reference-id: CIS-5.5
+    assessment-requirements:
+      - id: CIS-CTL-5.5.01
+        text: >-
+          No service MUST have privileged set to true.
+        applicability: [compose]
+        state: Active
+
+  - id: CIS-CTL-5.6
+    title: "No sensitive host directory mounts"
+    family: CIS.RT
+    state: Active
+    objective: >-
+      Services MUST NOT bind-mount sensitive host
+      directories (/boot, /dev, /etc, /lib, /proc,
+      /sys, /usr).
+    guidelines:
+      - reference-id: CIS-DOCKER-1.8
+        entries:
+          - reference-id: CIS-5.6
+    assessment-requirements:
+      - id: CIS-CTL-5.6.01
+        text: >-
+          No service volume MUST have a host source
+          path starting with /boot, /dev, /etc, /lib,
+          /proc, /sys, or /usr.
+        applicability: [compose]
+        state: Active
+
+  - id: CIS-CTL-5.10
+    title: "No host network namespace sharing"
+    family: CIS.RT
+    state: Active
+    objective: >-
+      Services MUST NOT use network_mode: host unless
+      explicitly exempted.
+    guidelines:
+      - reference-id: CIS-DOCKER-1.8
+        entries:
+          - reference-id: CIS-5.10
+    assessment-requirements:
+      - id: CIS-CTL-5.10.01
+        text: >-
+          No service MUST have network_mode set to
+          host unless listed in exceptions.rego.
+        applicability: [compose]
+        state: Active
+
+  - id: CIS-CTL-5.11
+    title: "Container memory limits"
+    family: CIS.RT
+    state: Active
+    objective: >-
+      Every service MUST have an explicit memory
+      limit configured.
+    guidelines:
+      - reference-id: CIS-DOCKER-1.8
+        entries:
+          - reference-id: CIS-5.11
+    assessment-requirements:
+      - id: CIS-CTL-5.11.01
+        text: >-
+          Every service MUST define
+          deploy.resources.limits.memory.
+        applicability: [compose]
+        state: Active
+
+  - id: CIS-CTL-5.12
+    title: "Container CPU limits"
+    family: CIS.RT
+    state: Active
+    objective: >-
+      Every service MUST have an explicit CPU limit
+      configured.
+    guidelines:
+      - reference-id: CIS-DOCKER-1.8
+        entries:
+          - reference-id: CIS-5.12
+    assessment-requirements:
+      - id: CIS-CTL-5.12.01
+        text: >-
+          Every service MUST define
+          deploy.resources.limits.cpus.
+        applicability: [compose]
+        state: Active
+
+  - id: CIS-CTL-5.13
+    title: "Read-only root filesystem"
+    family: CIS.RT
+    state: Active
+    objective: >-
+      Services MUST mount the root filesystem as
+      read-only unless explicitly exempted.
+    guidelines:
+      - reference-id: CIS-DOCKER-1.8
+        entries:
+          - reference-id: CIS-5.13
+    assessment-requirements:
+      - id: CIS-CTL-5.13.01
+        text: >-
+          Every service MUST have read_only set to
+          true unless listed in exceptions.rego.
+        applicability: [compose]
+        state: Active
+
+  - id: CIS-CTL-5.14
+    title: "Specific host interface binding"
+    family: CIS.RT
+    state: Active
+    objective: >-
+      Published ports SHOULD bind to a specific host
+      interface rather than 0.0.0.0.
+    guidelines:
+      - reference-id: CIS-DOCKER-1.8
+        entries:
+          - reference-id: CIS-5.14
+    assessment-requirements:
+      - id: CIS-CTL-5.14.01
+        text: >-
+          Published ports SHOULD NOT use bare numeric
+          format (e.g. 80:80) which implies 0.0.0.0
+          binding.  Violations produce a warning.
+        applicability: [compose]
+        state: Active
+
+  - id: CIS-CTL-5.16
+    title: "No host PID namespace sharing"
+    family: CIS.RT
+    state: Active
+    objective: >-
+      Services MUST NOT share the host PID namespace.
+    guidelines:
+      - reference-id: CIS-DOCKER-1.8
+        entries:
+          - reference-id: CIS-5.16
+    assessment-requirements:
+      - id: CIS-CTL-5.16.01
+        text: >-
+          No service MUST have pid set to host.
+        applicability: [compose]
+        state: Active
+
+  - id: CIS-CTL-5.17
+    title: "No host IPC namespace sharing"
+    family: CIS.RT
+    state: Active
+    objective: >-
+      Services MUST NOT share the host IPC namespace.
+    guidelines:
+      - reference-id: CIS-DOCKER-1.8
+        entries:
+          - reference-id: CIS-5.17
+    assessment-requirements:
+      - id: CIS-CTL-5.17.01
+        text: >-
+          No service MUST have ipc set to host.
+        applicability: [compose]
+        state: Active
+
+  - id: CIS-CTL-5.21
+    title: "No host UTS namespace sharing"
+    family: CIS.RT
+    state: Active
+    objective: >-
+      Services MUST NOT share the host UTS namespace.
+    guidelines:
+      - reference-id: CIS-DOCKER-1.8
+        entries:
+          - reference-id: CIS-5.21
+    assessment-requirements:
+      - id: CIS-CTL-5.21.01
+        text: >-
+          No service MUST have uts set to host.
+        applicability: [compose]
+        state: Active
+
+  - id: CIS-CTL-5.26
+    title: "No new privileges restriction"
+    family: CIS.RT
+    state: Active
+    objective: >-
+      Every service MUST set the no-new-privileges
+      security option.
+    guidelines:
+      - reference-id: CIS-DOCKER-1.8
+        entries:
+          - reference-id: CIS-5.26
+    assessment-requirements:
+      - id: CIS-CTL-5.26.01
+        text: >-
+          Every service MUST include
+          no-new-privileges in its security_opt list.
+        applicability: [compose]
+        state: Active
+
+  - id: CIS-CTL-5.27
+    title: "Runtime health check"
+    family: CIS.RT
+    state: Active
+    objective: >-
+      Every service MUST have a healthcheck
+      configuration in compose.yaml.
+    guidelines:
+      - reference-id: CIS-DOCKER-1.8
+        entries:
+          - reference-id: CIS-5.27
+    assessment-requirements:
+      - id: CIS-CTL-5.27.01
+        text: >-
+          Every service MUST define a healthcheck
+          block in compose.yaml.
+        applicability: [compose]
+        state: Active
+
+  - id: CIS-CTL-5.29
+    title: "PID cgroup limits"
+    family: CIS.RT
+    state: Active
+    objective: >-
+      Every service MUST have an explicit PID limit
+      configured.
+    guidelines:
+      - reference-id: CIS-DOCKER-1.8
+        entries:
+          - reference-id: CIS-5.29
+    assessment-requirements:
+      - id: CIS-CTL-5.29.01
+        text: >-
+          Every service MUST define
+          deploy.resources.limits.pids.
+        applicability: [compose]
+        state: Active
+
+  - id: CIS-CTL-5.31
+    title: "No host user namespace sharing"
+    family: CIS.RT
+    state: Active
+    objective: >-
+      Services MUST NOT share the host user namespace.
+    guidelines:
+      - reference-id: CIS-DOCKER-1.8
+        entries:
+          - reference-id: CIS-5.31
+    assessment-requirements:
+      - id: CIS-CTL-5.31.01
+        text: >-
+          No service MUST have userns_mode set to host.
+        applicability: [compose]
+        state: Active
+
+  - id: CIS-CTL-5.32
+    title: "No Docker socket mount"
+    family: CIS.RT
+    state: Active
+    objective: >-
+      Services MUST NOT mount the Docker socket.
+    guidelines:
+      - reference-id: CIS-DOCKER-1.8
+        entries:
+          - reference-id: CIS-5.32
+    assessment-requirements:
+      - id: CIS-CTL-5.32.01
+        text: >-
+          No service volume source MUST contain
+          docker.sock.
+        applicability: [compose]
+        state: Active

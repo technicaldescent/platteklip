@@ -1,0 +1,211 @@
+# SPDX-FileCopyrightText: 2025 technical descent
+# SPDX-License-Identifier: Apache-2.0
+#
+# Gemara Layer 3 Risk Catalog: Platteklip
+#
+# Risks identified through the IEC 62443 security review
+# and operational findings.  Referenced by the policy
+# document for mitigation and acceptance decisions.
+#
+# Validate:
+#   cue vet -c -d '#RiskCatalog' \
+#       github.com/gemaraproj/gemara@latest \
+#       td-risk-catalog.yaml
+
+title: "Platteklip Edge Telemetry Risk Catalog"
+
+metadata:
+  id: TD.RISKS
+  type: RiskCatalog
+  gemara-version: "0.20.0"
+  description: >-
+    Identified risks to the platteklip edge telemetry
+    platform, derived from IEC 62443 security review
+    findings and operational incidents.
+  version: "1.0.0"
+  date: "2026-03-18T00:00:00Z"
+  author:
+    id: technical-descent
+    name: technical descent
+    type: Human
+    contact:
+      name: Raymond Ellis
+      email: raymond.ellis@gmail.com
+
+# ================================================================
+# RISK CATEGORIES
+# ================================================================
+
+groups:
+  - id: RC-AUTH
+    title: "Authentication and Credential Lifecycle"
+    description: >-
+      Risks relating to certificate management,
+      keystore integrity, and authenticator lifecycle.
+    appetite: Low
+    max-severity: High
+
+  - id: RC-INTEGRITY
+    title: "Software and Configuration Integrity"
+    description: >-
+      Risks relating to supply chain integrity,
+      code generation verification, and artefact
+      provenance.
+    appetite: Low
+    max-severity: High
+
+  - id: RC-AVAILABILITY
+    title: "Service Availability"
+    description: >-
+      Risks relating to resource exhaustion, volume
+      ownership, and cascading failures.
+    appetite: Medium
+    max-severity: Medium
+
+  - id: RC-MONITORING
+    title: "Monitoring and Detection"
+    description: >-
+      Risks relating to the ability to detect,
+      alert on, and investigate security-relevant
+      events.
+    appetite: Medium
+    max-severity: Medium
+
+  - id: RC-BOUNDARY
+    title: "Zone Boundary and Data Flow"
+    description: >-
+      Risks relating to network segmentation
+      effectiveness, conduit protection, and
+      lateral movement.
+    appetite: Low
+    max-severity: High
+
+# ================================================================
+# RISKS — Mitigated
+# ================================================================
+
+risks:
+  # -- Mitigated risks (addressed by active controls) --
+
+  - id: RSK-01
+    title: "Certificate expiry breaks all mTLS"
+    group: RC-AUTH
+    severity: High
+    description: >-
+      A lapsed leaf certificate silently breaks all
+      mTLS communication simultaneously.  The 11-day
+      leaf lifetime creates a narrow rotation window.
+    impact: >-
+      Complete loss of inter-service communication.
+      No graceful degradation; all services become
+      unreachable via mTLS.
+
+  - id: RSK-02
+    title: "NiFi keystore overwrite on rebuild"
+    group: RC-AUTH
+    severity: High
+    description: >-
+      NiFi's start.sh regenerates PKCS12 keystores
+      on image rebuild, replacing CA-signed
+      certificates with self-signed CN=localhost.
+      The failure is silent — NiFi starts, passes
+      health checks, and nginx returns 502.
+    impact: >-
+      Loss of NiFi UI access and API connectivity.
+      The root cause (certificate mismatch) is not
+      visible in standard logs.
+
+  - id: RSK-03
+    title: "Weaver silent generation failure"
+    group: RC-INTEGRITY
+    severity: High
+    description: >-
+      Weaver v0.21.2 silently succeeds without
+      producing output under multiple conditions
+      (--config flag, reserved target names,
+      invalid configuration keys).  Exit code 0
+      and success message are emitted.
+    impact: >-
+      Stale OTel Collector transform rules or
+      Python semconv module deployed without any
+      indication of drift.  Signal annotations
+      (anomalous, under_investigation) stop being
+      applied to new data.
+
+  - id: RSK-04
+    title: "Prometheus volume UID mismatch"
+    group: RC-AVAILABILITY
+    severity: Medium
+    description: >-
+      The distroless Prometheus image uses UID 65532
+      but the compose .env configures UID 65534.
+      Volume recreation causes a permission failure
+      and crash loop.
+    impact: >-
+      Prometheus unavailable after volume recreation.
+      Metrics collection stops for all scrape targets.
+
+  - id: RSK-05
+    title: "OTel Collector identity drift"
+    group: RC-MONITORING
+    severity: Medium
+    description: >-
+      Without a pinned service.instance.id, each
+      collector restart generates a new UUID, causing
+      duplicate Prometheus time series.
+    impact: >-
+      Grafana dashboards show duplicate rows for the
+      same service.  Alerting rules may fire
+      incorrectly due to split series.
+
+  - id: RSK-06
+    title: "No alerting rules configured"
+    group: RC-MONITORING
+    severity: Medium
+    description: >-
+      No Prometheus or Grafana alerting rules are
+      configured for certificate expiry, pipeline
+      export errors, or signal anomalies.
+    impact: >-
+      Security-relevant conditions persist undetected
+      until an operator manually inspects dashboards.
+
+  # -- Accepted risks (documented with justification) --
+
+  - id: RSK-07
+    title: "Jaeger HTTP conduit (no internal TLS)"
+    group: RC-BOUNDARY
+    severity: High
+    description: >-
+      nginx proxies to Jaeger over plain HTTP on the
+      internal leg.  Jaeger v2.16.0 ignores the TLS
+      configuration block (upstream defect).
+    impact: >-
+      Trace data in transit between nginx and Jaeger
+      is unencrypted on the internal network.
+
+  - id: RSK-08
+    title: "NiFi executes unsigned processor code"
+    group: RC-INTEGRITY
+    severity: High
+    description: >-
+      NiFi executes PLC4X, Kafka, and other processor
+      code from NAR archives without code signing or
+      an allowlist enforcement mechanism.
+    impact: >-
+      A compromised NiFi flow definition or malicious
+      NAR could exfiltrate data to Kafka or pivot
+      within the ingest zone.
+
+  - id: RSK-09
+    title: "Docker network isolation only"
+    group: RC-BOUNDARY
+    severity: Medium
+    description: >-
+      Docker network isolation is not equivalent to a
+      stateful firewall.  All ports between containers
+      on the same network are reachable.
+    impact: >-
+      A compromised container on net-ingest can reach
+      all other containers on the same network without
+      port-level restriction.

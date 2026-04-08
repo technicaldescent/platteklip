@@ -1,0 +1,1067 @@
+# SPDX-FileCopyrightText: 2025 technical descent
+# SPDX-License-Identifier: Apache-2.0
+#
+# Gemara Layer 1 Guidance Catalog: IEC 62443-3-3
+#
+# This catalog expresses the intent of IEC 62443-3-3 security
+# requirements in the Gemara schema format for machine-readable
+# governance automation.  The objective text is paraphrased from
+# the standard; for normative wording, consult the published
+# IEC 62443-3-3 standard directly.
+#
+# Validate:
+#   cue vet -c -d '#GuidanceCatalog' \
+#       github.com/gemaraproj/gemara@latest \
+#       iec-62443-3-3.yaml
+
+title: "IEC 62443-3-3 System Security Requirements"
+
+metadata:
+  id: IEC-62443-3-3
+  type: GuidanceCatalog
+  gemara-version: "0.20.0"
+  description: >-
+    Machine-readable representation of the IEC 62443-3-3
+    system security requirements for Industrial Automation
+    and Control Systems (IACS).  Each guideline corresponds
+    to a Foundational Requirement (FR) / System Requirement
+    (SR) from the standard, paraphrased to capture intent
+    without reproducing normative text.
+  version: "1.0.0"
+  date: "2026-03-18T00:00:00Z"
+  author:
+    id: technical-descent
+    name: technical descent
+    type: Human
+    contact:
+      name: Raymond Ellis
+      email: raymond.ellis@technicaldescent.com
+  mapping-references:
+    - id: IEC-62443-3-2
+      title: "IEC 62443-3-2"
+      description: >-
+        Security risk assessment and system design for
+        IACS.  Defines zones, conduits, and target
+        security levels.
+      version: "2.0"
+      url: "https://webstore.iec.ch/en/publication/7033"
+    - id: IEC-62443-4-1
+      title: "IEC 62443-4-1"
+      description: >-
+        Secure product development lifecycle requirements
+        for IACS components.
+      version: "1.0"
+      url: "https://webstore.iec.ch/en/publication/7031"
+    - id: IEC-62443-4-2
+      title: "IEC 62443-4-2"
+      description: >-
+        Technical security requirements for IACS
+        components.
+      version: "1.0"
+      url: "https://webstore.iec.ch/en/publication/7032"
+  applicability-categories:
+    - id: sl-1
+      title: "Security Level 1"
+      description: >-
+        Protection against casual or coincidental
+        violation.
+    - id: sl-2
+      title: "Security Level 2"
+      description: >-
+        Protection against intentional violation using
+        simple means with low resources, generic skills,
+        and low motivation.
+    - id: sl-3
+      title: "Security Level 3"
+      description: >-
+        Protection against intentional violation using
+        sophisticated means with moderate resources,
+        IACS-specific skills, and moderate motivation.
+    - id: sl-4
+      title: "Security Level 4"
+      description: >-
+        Protection against intentional violation using
+        sophisticated means with extended resources,
+        IACS-specific skills, and high motivation.
+
+type: Standard
+
+front-matter: >-
+  IEC 62443-3-3 defines system-level security requirements
+  for Industrial Automation and Control Systems.  The
+  requirements are organised into seven Foundational
+  Requirements (FR), each containing System Requirements
+  (SR) with optional Requirement Enhancements (RE) that
+  apply at progressively higher security levels.  This
+  catalog captures the FR/SR structure; RE enhancements
+  are expressed as statements within each guideline.
+
+# ================================================================
+# FAMILIES
+# ================================================================
+
+families:
+  - id: FR1
+    title: "Identification and Authentication Control"
+    description: >-
+      Requirements governing the identification and
+      authentication of human users, software processes,
+      and devices before granting access to the IACS.
+
+  - id: FR2
+    title: "Use Control"
+    description: >-
+      Requirements governing authorisation enforcement,
+      privilege management, and control of mobile code,
+      audit events, and session management.
+
+  - id: FR3
+    title: "System Integrity"
+    description: >-
+      Requirements governing communication integrity,
+      protection against malicious code, software and
+      information integrity, and input validation.
+
+  - id: FR4
+    title: "Data Confidentiality"
+    description: >-
+      Requirements governing the confidentiality of
+      information in transit and at rest, and the
+      appropriate use of cryptography.
+
+  - id: FR5
+    title: "Restricted Data Flow"
+    description: >-
+      Requirements governing network segmentation,
+      zone boundary protection, and application
+      partitioning to limit data flow to that which
+      is necessary.
+
+  - id: FR6
+    title: "Timely Response to Events"
+    description: >-
+      Requirements governing audit log accessibility,
+      continuous monitoring, and the ability to respond
+      to security-relevant events in a timely manner.
+
+  - id: FR7
+    title: "Resource Availability"
+    description: >-
+      Requirements governing denial-of-service
+      protection, resource management, backup and
+      recovery, and least functionality to ensure
+      the continued availability of the IACS.
+
+# ================================================================
+# GUIDELINES — FR1: Identification and Authentication Control
+# ================================================================
+
+guidelines:
+  # ---------------------------------------------------------------
+  # SR 1.1 — Human user identification and authentication
+  # ---------------------------------------------------------------
+  - id: SR-1.1
+    title: "Human user identification and authentication"
+    family: FR1
+    state: Active
+    objective: >-
+      The control system shall provide the capability to
+      identify and authenticate all human users.
+    applicability:
+      - sl-1
+      - sl-2
+      - sl-3
+      - sl-4
+    rationale:
+      importance: >-
+        Without reliable identification of human users,
+        access control decisions cannot be enforced and
+        audit trails cannot attribute actions to
+        individuals.
+      goals:
+        - >-
+          Ensure every human interaction with the IACS
+          is attributable to a specific, authenticated
+          identity.
+    statements:
+      - id: SR-1.1.RE1
+        title: "Unique identification"
+        text: >-
+          The control system shall uniquely identify
+          every human user, not merely authenticate
+          a shared role or group.
+    recommendations:
+      - >-
+        Integrate with a centralised identity provider
+        to avoid local account sprawl.
+    see-also:
+      - SR-1.2
+      - SR-1.3
+      - SR-1.5
+
+  # ---------------------------------------------------------------
+  # SR 1.2 — Software process and device identification
+  # ---------------------------------------------------------------
+  - id: SR-1.2
+    title: "Software process and device identification"
+    family: FR1
+    state: Active
+    objective: >-
+      The control system shall identify and authenticate
+      all software processes and devices before granting
+      access to system resources.
+    applicability:
+      - sl-1
+      - sl-2
+      - sl-3
+      - sl-4
+    rationale:
+      importance: >-
+        Machine-to-machine communication in IACS must be
+        authenticated to prevent impersonation of trusted
+        processes or devices.
+      goals:
+        - >-
+          Prevent unauthorised software or devices from
+          accessing control system resources.
+    statements:
+      - id: SR-1.2.RE1
+        title: "Unique device identification"
+        text: >-
+          Each device shall be uniquely identifiable,
+          not merely authenticated by network location
+          or shared credential.
+    recommendations:
+      - >-
+        Use mutual TLS with per-device certificates for
+        device-to-device authentication.
+    see-also:
+      - SR-1.1
+      - SR-1.5
+
+  # ---------------------------------------------------------------
+  # SR 1.3 — Account management
+  # ---------------------------------------------------------------
+  - id: SR-1.3
+    title: "Account management"
+    family: FR1
+    state: Active
+    objective: >-
+      The control system shall support the management
+      of accounts, including creation, activation,
+      modification, disabling, and removal of accounts.
+    applicability:
+      - sl-2
+      - sl-3
+      - sl-4
+    rationale:
+      importance: >-
+        Account lifecycle management prevents stale or
+        orphaned credentials from becoming attack vectors.
+      goals:
+        - >-
+          Ensure only authorised accounts exist and are
+          active at any given time.
+    see-also:
+      - SR-1.1
+
+  # ---------------------------------------------------------------
+  # SR 1.5 — Authenticator management
+  # ---------------------------------------------------------------
+  - id: SR-1.5
+    title: "Authenticator management"
+    family: FR1
+    state: Active
+    objective: >-
+      The control system shall support the management
+      of authenticators (passwords, certificates, tokens)
+      including their generation, distribution,
+      storage, retrieval, refresh, revocation, and
+      destruction.
+    applicability:
+      - sl-1
+      - sl-2
+      - sl-3
+      - sl-4
+    rationale:
+      importance: >-
+        Compromised or expired authenticators are a
+        primary attack vector.  Lifecycle management
+        ensures credentials remain valid and
+        trustworthy.
+      goals:
+        - >-
+          Maintain the integrity and freshness of all
+          authenticators used within the IACS.
+    statements:
+      - id: SR-1.5.RE1
+        title: "Hardware security for authenticators"
+        text: >-
+          Authenticators for critical processes should
+          be protected by hardware security modules
+          or equivalent tamper-resistant storage.
+    recommendations:
+      - >-
+        Automate certificate rotation to prevent
+        expiry-induced outages.
+      - >-
+        Store private keys in secrets management
+        infrastructure, not in environment variables
+        or configuration files.
+    see-also:
+      - SR-1.1
+      - SR-1.2
+
+  # ---------------------------------------------------------------
+  # SR 1.7 — Strength of password-based authentication
+  # ---------------------------------------------------------------
+  - id: SR-1.7
+    title: "Strength of password-based authentication"
+    family: FR1
+    state: Active
+    objective: >-
+      Where password-based authentication is used, the
+      control system shall enforce configurable password
+      strength requirements.
+    applicability:
+      - sl-1
+      - sl-2
+      - sl-3
+      - sl-4
+    rationale:
+      importance: >-
+        Weak passwords are trivially compromised.
+        Enforcing strength requirements raises the
+        baseline cost of credential-based attacks.
+      goals:
+        - >-
+          Ensure passwords meet minimum complexity
+          and length thresholds appropriate to the
+          target security level.
+    see-also:
+      - SR-1.5
+
+  # ---------------------------------------------------------------
+  # SR 1.13 — Access via untrusted networks
+  # ---------------------------------------------------------------
+  - id: SR-1.13
+    title: "Access via untrusted networks"
+    family: FR1
+    state: Active
+    objective: >-
+      The control system shall monitor and control all
+      access points where connections from untrusted
+      networks enter the system boundary.
+    applicability:
+      - sl-1
+      - sl-2
+      - sl-3
+      - sl-4
+    rationale:
+      importance: >-
+        Untrusted network boundaries are the primary
+        ingress path for external threats.
+      goals:
+        - >-
+          Ensure all traffic from untrusted networks
+          transits an authenticated, monitored gateway.
+    recommendations:
+      - >-
+        Terminate TLS at a dedicated reverse proxy
+        before forwarding to internal services.
+    see-also:
+      - SR-5.1
+      - SR-5.2
+
+  # ==============================================================
+  # GUIDELINES — FR2: Use Control
+  # ==============================================================
+
+  # ---------------------------------------------------------------
+  # SR 2.1 — Authorisation enforcement
+  # ---------------------------------------------------------------
+  - id: SR-2.1
+    title: "Authorisation enforcement"
+    family: FR2
+    state: Active
+    objective: >-
+      The control system shall enforce assigned
+      privileges for all human users, software
+      processes, and devices accessing protected
+      resources.
+    applicability:
+      - sl-1
+      - sl-2
+      - sl-3
+      - sl-4
+    rationale:
+      importance: >-
+        Without authorisation enforcement,
+        authenticated users can access resources
+        beyond their legitimate need.
+      goals:
+        - >-
+          Ensure every access decision is evaluated
+          against a defined authorisation policy.
+    statements:
+      - id: SR-2.1.RE1
+        title: "Policy-based access control"
+        text: >-
+          Authorisation decisions should be evaluated
+          by a dedicated policy engine to ensure
+          consistent enforcement across all services.
+      - id: SR-2.1.RE2
+        title: "Privilege separation"
+        text: >-
+          Access to safety-critical functions shall be
+          separated from access to non-critical
+          functions.
+    recommendations:
+      - >-
+        Deploy a policy engine (e.g., OPA, Cedar) with
+        a default-deny posture.
+    see-also:
+      - SR-1.1
+      - SR-2.4
+
+  # ---------------------------------------------------------------
+  # SR 2.4 — Mobile code
+  # ---------------------------------------------------------------
+  - id: SR-2.4
+    title: "Mobile code"
+    family: FR2
+    state: Active
+    objective: >-
+      The control system shall enforce controls on
+      mobile code technologies to prevent the
+      execution of unauthorised or malicious code.
+    applicability:
+      - sl-2
+      - sl-3
+      - sl-4
+    rationale:
+      importance: >-
+        Platforms that execute user-supplied code
+        (scripts, plugins, flow definitions) are
+        vulnerable to code injection and privilege
+        escalation.
+      goals:
+        - >-
+          Prevent the execution of unsigned or
+          unauthorised code within the IACS.
+    statements:
+      - id: SR-2.4.RE1
+        title: "Code signing"
+        text: >-
+          Mobile code shall be digitally signed and
+          verified before execution where the
+          security level requires it.
+    recommendations:
+      - >-
+        Maintain an allowlist of permitted processor
+        types or plugin categories.
+      - >-
+        Sandbox execution environments to limit
+        the blast radius of compromised code.
+    see-also:
+      - SR-3.4
+
+  # ---------------------------------------------------------------
+  # SR 2.8 — Auditable events
+  # ---------------------------------------------------------------
+  - id: SR-2.8
+    title: "Auditable events"
+    family: FR2
+    state: Active
+    objective: >-
+      The control system shall generate audit records
+      for events that are relevant to security,
+      including access attempts, configuration changes,
+      and anomalous conditions.
+    applicability:
+      - sl-1
+      - sl-2
+      - sl-3
+      - sl-4
+    rationale:
+      importance: >-
+        Audit records provide the evidentiary basis
+        for incident investigation, compliance
+        verification, and anomaly detection.
+      goals:
+        - >-
+          Ensure every security-relevant event is
+          captured in a structured, queryable format.
+    statements:
+      - id: SR-2.8.RE1
+        title: "Centralised audit collection"
+        text: >-
+          Audit records from all system components
+          should be forwarded to a centralised
+          collection and correlation service.
+    recommendations:
+      - >-
+        Use structured logging with trace context
+        correlation to support cross-service event
+        reconstruction.
+    see-also:
+      - SR-2.9
+      - SR-6.1
+
+  # ---------------------------------------------------------------
+  # SR 2.9 — Audit storage capacity
+  # ---------------------------------------------------------------
+  - id: SR-2.9
+    title: "Audit storage capacity"
+    family: FR2
+    state: Active
+    objective: >-
+      The control system shall allocate sufficient
+      audit storage capacity to retain records for
+      the organisation's required retention period.
+    applicability:
+      - sl-1
+      - sl-2
+      - sl-3
+      - sl-4
+    rationale:
+      importance: >-
+        Insufficient storage causes audit records to
+        be silently dropped, creating blind spots in
+        the security timeline.
+      goals:
+        - >-
+          Prevent loss of audit data due to storage
+          exhaustion.
+    recommendations:
+      - >-
+        Define explicit retention periods and monitor
+        storage utilisation with alerting.
+    see-also:
+      - SR-2.8
+
+  # ==============================================================
+  # GUIDELINES — FR3: System Integrity
+  # ==============================================================
+
+  # ---------------------------------------------------------------
+  # SR 3.1 — Communication integrity
+  # ---------------------------------------------------------------
+  - id: SR-3.1
+    title: "Communication integrity"
+    family: FR3
+    state: Active
+    objective: >-
+      The control system shall protect the integrity
+      of transmitted information to detect and reject
+      modification in transit.
+    applicability:
+      - sl-1
+      - sl-2
+      - sl-3
+      - sl-4
+    rationale:
+      importance: >-
+        Unprotected communications can be tampered
+        with to alter control commands, telemetry
+        values, or configuration data.
+      goals:
+        - >-
+          Ensure all inter-component communication
+          is protected against modification.
+    statements:
+      - id: SR-3.1.RE1
+        title: "Cryptographic integrity protection"
+        text: >-
+          Communication channels shall use
+          cryptographic integrity mechanisms
+          (e.g., TLS, HMAC) to detect tampering.
+    recommendations:
+      - >-
+        Enforce TLS 1.3 on all inter-service
+        communication paths.
+    see-also:
+      - SR-4.1
+      - SR-4.3
+
+  # ---------------------------------------------------------------
+  # SR 3.4 — Software and information integrity
+  # ---------------------------------------------------------------
+  - id: SR-3.4
+    title: "Software and information integrity"
+    family: FR3
+    state: Active
+    objective: >-
+      The control system shall provide mechanisms to
+      verify the integrity of software and information
+      at rest and during deployment.
+    applicability:
+      - sl-1
+      - sl-2
+      - sl-3
+      - sl-4
+    rationale:
+      importance: >-
+        Tampered software or configuration deployed
+        to production can compromise the entire IACS.
+      goals:
+        - >-
+          Detect unauthorised modification of software
+          artefacts and configuration before they are
+          used by the control system.
+    statements:
+      - id: SR-3.4.RE1
+        title: "Build provenance"
+        text: >-
+          Software artefacts should carry verifiable
+          provenance metadata linking them to a
+          specific, auditable build process.
+      - id: SR-3.4.RE2
+        title: "Image integrity"
+        text: >-
+          Container images and other deployable
+          artefacts should be referenced by
+          content-addressable digest to prevent
+          substitution.
+    recommendations:
+      - >-
+        Pin all container images by digest in
+        deployment manifests.
+      - >-
+        Verify generated configuration artefacts
+        are non-empty and match expected checksums
+        before deployment.
+    see-also:
+      - SR-2.4
+
+  # ---------------------------------------------------------------
+  # SR 3.8 — Input validation
+  # ---------------------------------------------------------------
+  - id: SR-3.8
+    title: "Input validation"
+    family: FR3
+    state: Active
+    objective: >-
+      The control system shall validate all inputs
+      from external sources and untrusted interfaces
+      to prevent injection, overflow, or unexpected
+      state transitions.
+    applicability:
+      - sl-2
+      - sl-3
+      - sl-4
+    rationale:
+      importance: >-
+        Malformed or adversarial input is the most
+        common entry point for exploitation.
+      goals:
+        - >-
+          Reject invalid input before it reaches
+          control logic or persistent storage.
+    recommendations:
+      - >-
+        Sanitise and validate telemetry attributes
+        in the ingest pipeline before forwarding to
+        storage or analytics backends.
+    see-also:
+      - SR-3.1
+
+  # ==============================================================
+  # GUIDELINES — FR4: Data Confidentiality
+  # ==============================================================
+
+  # ---------------------------------------------------------------
+  # SR 4.1 — Information confidentiality
+  # ---------------------------------------------------------------
+  - id: SR-4.1
+    title: "Information confidentiality"
+    family: FR4
+    state: Active
+    objective: >-
+      The control system shall protect the
+      confidentiality of information in transit
+      through encrypted communication channels.
+    applicability:
+      - sl-1
+      - sl-2
+      - sl-3
+      - sl-4
+    rationale:
+      importance: >-
+        Unencrypted traffic on internal or external
+        networks exposes control data, credentials,
+        and operational telemetry to passive
+        interception.
+      goals:
+        - >-
+          Ensure all information in transit is
+          protected by encryption appropriate to
+          the classification of the data.
+    statements:
+      - id: SR-4.1.RE1
+        title: "Confidentiality at rest"
+        text: >-
+          Information at rest whose confidentiality
+          classification warrants it shall be
+          protected by encryption or equivalent
+          access controls.
+    recommendations:
+      - >-
+        Use TLS 1.3 for all network communication.
+      - >-
+        Evaluate filesystem encryption for volumes
+        containing operationally sensitive data.
+    see-also:
+      - SR-3.1
+      - SR-4.3
+
+  # ---------------------------------------------------------------
+  # SR 4.3 — Use of cryptography
+  # ---------------------------------------------------------------
+  - id: SR-4.3
+    title: "Use of cryptography"
+    family: FR4
+    state: Active
+    objective: >-
+      The control system shall employ cryptographic
+      mechanisms that conform to recognised standards
+      and use algorithms, key lengths, and
+      configurations appropriate to the target
+      security level.
+    applicability:
+      - sl-1
+      - sl-2
+      - sl-3
+      - sl-4
+    rationale:
+      importance: >-
+        Non-standard or deprecated cryptographic
+        configurations undermine every other
+        security control that depends on them.
+      goals:
+        - >-
+          Ensure all cryptographic usage is
+          standards-compliant and free of
+          deprecated algorithms or key sizes.
+    recommendations:
+      - >-
+        Restrict TLS to version 1.3 only.
+      - >-
+        Use ECDSA P-384 or equivalent for
+        certificate key pairs.
+    see-also:
+      - SR-4.1
+
+  # ==============================================================
+  # GUIDELINES — FR5: Restricted Data Flow
+  # ==============================================================
+
+  # ---------------------------------------------------------------
+  # SR 5.1 — Network segmentation
+  # ---------------------------------------------------------------
+  - id: SR-5.1
+    title: "Network segmentation"
+    family: FR5
+    state: Active
+    objective: >-
+      The control system shall segment the network
+      into distinct zones based on security
+      requirements, and restrict communication
+      between zones to defined conduits.
+    applicability:
+      - sl-2
+      - sl-3
+      - sl-4
+    rationale:
+      importance: >-
+        Flat networks allow lateral movement from a
+        compromised component to all other components.
+        Segmentation limits the blast radius.
+      goals:
+        - >-
+          Ensure each security zone contains only
+          components with common security requirements.
+        - >-
+          Ensure inter-zone communication traverses
+          monitored, authenticated conduits.
+    statements:
+      - id: SR-5.1.RE1
+        title: "Physical or logical separation"
+        text: >-
+          Zones shall be separated by physical
+          network boundaries or logically equivalent
+          isolation mechanisms (e.g., VLANs,
+          container networks, network policies).
+    recommendations:
+      - >-
+        Use separate Docker networks per zone and
+        restrict which services are attached to
+        which networks.
+    see-also:
+      - SR-5.2
+      - SR-1.13
+
+  # ---------------------------------------------------------------
+  # SR 5.2 — Zone boundary protection
+  # ---------------------------------------------------------------
+  - id: SR-5.2
+    title: "Zone boundary protection"
+    family: FR5
+    state: Active
+    objective: >-
+      The control system shall enforce zone boundary
+      protection at every conduit using mechanisms
+      that monitor, filter, or restrict traffic
+      to authorised flows.
+    applicability:
+      - sl-2
+      - sl-3
+      - sl-4
+    rationale:
+      importance: >-
+        Zone segmentation is ineffective without
+        enforcement at the boundary.  Unmonitored
+        conduits are equivalent to no segmentation.
+      goals:
+        - >-
+          Ensure every conduit between zones has
+          a boundary protection mechanism.
+    statements:
+      - id: SR-5.2.RE1
+        title: "Stateful inspection"
+        text: >-
+          Zone boundaries should employ stateful
+          inspection or equivalent filtering to
+          restrict traffic to known, authorised
+          communication patterns.
+    recommendations:
+      - >-
+        For containerised deployments at SL 2,
+        Docker network isolation is acceptable
+        with documented accepted risk.  For
+        SL 3, add network policies or firewall
+        rules.
+    see-also:
+      - SR-5.1
+
+  # ==============================================================
+  # GUIDELINES — FR6: Timely Response to Events
+  # ==============================================================
+
+  # ---------------------------------------------------------------
+  # SR 6.1 — Audit log accessibility
+  # ---------------------------------------------------------------
+  - id: SR-6.1
+    title: "Audit log accessibility"
+    family: FR6
+    state: Active
+    objective: >-
+      The control system shall provide authorised
+      users with read access to audit logs for
+      review, analysis, and incident investigation.
+    applicability:
+      - sl-1
+      - sl-2
+      - sl-3
+      - sl-4
+    rationale:
+      importance: >-
+        Audit logs that cannot be accessed or
+        queried are of no operational value.
+      goals:
+        - >-
+          Ensure audit data is accessible through
+          a query interface with appropriate access
+          controls.
+    recommendations:
+      - >-
+        Provide a log query interface (e.g., Grafana
+        with Loki) with role-based access control.
+    see-also:
+      - SR-2.8
+      - SR-6.2
+
+  # ---------------------------------------------------------------
+  # SR 6.2 — Continuous monitoring
+  # ---------------------------------------------------------------
+  - id: SR-6.2
+    title: "Continuous monitoring"
+    family: FR6
+    state: Active
+    objective: >-
+      The control system shall support continuous
+      monitoring of security-relevant parameters
+      with the capability to generate alerts when
+      anomalous conditions are detected.
+    applicability:
+      - sl-2
+      - sl-3
+      - sl-4
+    rationale:
+      importance: >-
+        Detection without alerting allows threats
+        to persist unnoticed.  Continuous monitoring
+        closes the gap between detection and
+        response.
+      goals:
+        - >-
+          Ensure security-relevant metrics and
+          events are continuously observed.
+        - >-
+          Ensure anomalous conditions trigger
+          timely alerts to responsible personnel.
+    statements:
+      - id: SR-6.2.RE1
+        title: "Automated anomaly detection"
+        text: >-
+          The monitoring system should support
+          automated detection of anomalous values,
+          missing signals, and pipeline failures
+          without requiring manual inspection.
+    recommendations:
+      - >-
+        Configure alerting rules for at minimum:
+        certificate expiry, pipeline errors,
+        consumer lag, and signal anomalies.
+    see-also:
+      - SR-6.1
+      - SR-2.8
+
+  # ==============================================================
+  # GUIDELINES — FR7: Resource Availability
+  # ==============================================================
+
+  # ---------------------------------------------------------------
+  # SR 7.1 — Denial of service protection
+  # ---------------------------------------------------------------
+  - id: SR-7.1
+    title: "Denial of service protection"
+    family: FR7
+    state: Active
+    objective: >-
+      The control system shall provide mechanisms
+      to mitigate the effects of denial-of-service
+      events, including rate limiting, resource
+      throttling, and backpressure controls.
+    applicability:
+      - sl-2
+      - sl-3
+      - sl-4
+    rationale:
+      importance: >-
+        A denial-of-service condition on an IACS
+        component can have safety implications
+        beyond information security.
+      goals:
+        - >-
+          Ensure the control system degrades
+          gracefully under resource exhaustion
+          rather than failing catastrophically.
+    statements:
+      - id: SR-7.1.RE1
+        title: "Backpressure and load shedding"
+        text: >-
+          Processing pipelines shall implement
+          backpressure or load shedding mechanisms
+          (e.g., memory limiters) to prevent
+          cascading failures under sustained load.
+    recommendations:
+      - >-
+        Place a memory limiter as the first
+        processor in every data pipeline.
+    see-also:
+      - SR-7.2
+
+  # ---------------------------------------------------------------
+  # SR 7.2 — Resource management
+  # ---------------------------------------------------------------
+  - id: SR-7.2
+    title: "Resource management"
+    family: FR7
+    state: Active
+    objective: >-
+      The control system shall support the
+      management of system resources (CPU, memory,
+      storage, processes) to prevent any single
+      component from exhausting shared resources.
+    applicability:
+      - sl-2
+      - sl-3
+      - sl-4
+    rationale:
+      importance: >-
+        Without resource limits, a misbehaving
+        component can exhaust shared host resources
+        and affect the availability of all other
+        components.
+      goals:
+        - >-
+          Ensure every component operates within
+          defined resource boundaries.
+    statements:
+      - id: SR-7.2.RE1
+        title: "Explicit resource limits"
+        text: >-
+          Each deployable component shall have
+          explicit memory, CPU, and process limits
+          configured in the deployment manifest.
+    recommendations:
+      - >-
+        Define deploy.resources.limits for all
+        services in the compose or orchestration
+        manifest.
+    see-also:
+      - SR-7.1
+      - SR-7.7
+
+  # ---------------------------------------------------------------
+  # SR 7.7 — Least functionality
+  # ---------------------------------------------------------------
+  - id: SR-7.7
+    title: "Least functionality"
+    family: FR7
+    state: Active
+    objective: >-
+      The control system shall be configured to
+      provide only the capabilities necessary for
+      its intended function, with all unnecessary
+      features, ports, protocols, and services
+      disabled or removed.
+    applicability:
+      - sl-1
+      - sl-2
+      - sl-3
+      - sl-4
+    rationale:
+      importance: >-
+        Every unnecessary capability increases the
+        attack surface.  Reducing functionality to
+        the minimum required limits the number of
+        exploitable entry points.
+      goals:
+        - >-
+          Minimise the attack surface of every
+          deployed component.
+    statements:
+      - id: SR-7.7.RE1
+        title: "Minimal runtime images"
+        text: >-
+          Container images should use distroless or
+          minimal base images, removing shells,
+          package managers, and development tools
+          from production deployments.
+      - id: SR-7.7.RE2
+        title: "Plugin and extension reduction"
+        text: >-
+          Platforms that support plugins or
+          extensions shall deploy only those
+          required by the active workload.
+    recommendations:
+      - >-
+        Use a whitelist approach for plugins: keep
+        only what is needed, remove everything else.
+      - >-
+        Audit the deployed plugin set against the
+        active workload periodically.
+    see-also:
+      - SR-7.2

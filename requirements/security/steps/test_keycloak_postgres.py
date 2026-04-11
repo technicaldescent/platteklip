@@ -22,9 +22,12 @@ def _parse_postgresql_conf(
 ) -> dict[str, str]:
     """Parse postgresql.conf into a key-value dict.
 
-    Strips comments (both full-line and inline) and
-    splits on the first ``=`` sign.  Whitespace around
-    keys and values is removed.
+    Strips comments (both full-line and inline), splits
+    on the first ``=`` sign, and removes surrounding
+    single quotes from values.  PostgreSQL wraps string
+    settings in single quotes (e.g.
+    ``ssl_min_protocol_version = 'TLSv1.3'``), which
+    must be stripped for comparison against bare values.
 
     Parameters
     ----------
@@ -44,7 +47,10 @@ def _parse_postgresql_conf(
         if "=" not in line:
             continue
         key, _, val = line.partition("=")
-        config[key.strip()] = val.strip()
+        stripped = val.strip()
+        if len(stripped) >= 2 and stripped[0] == "'" and stripped[-1] == "'":
+            stripped = stripped[1:-1]
+        config[key.strip()] = stripped
     return config
 
 

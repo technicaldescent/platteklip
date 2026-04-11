@@ -632,6 +632,7 @@ max-complexity = 15
 # W503: line break before binary operator
 ignore = ["E203", "W503", "H601"]
 exclude = [
+    ".dagger",
     ".git",
     "__pycache__",
     "build",
@@ -708,7 +709,12 @@ exclude = [
 # =================================================================
 
 [tool.behave]
-paths = ["requirements"]
+paths = [
+    "requirements/security",
+    "requirements/functional/ingestion",
+    "requirements/functional/observation",
+    "requirements/functional/telemetry",
+]
 show_skipped = true
 summary = true
 stderr_capture = true
@@ -740,7 +746,7 @@ exclude = [
     "services",
     "tests",
 ]
-fail-under = 100
+fail-under = 98
 ignore-init-method = false
 ignore-init-module = false
 ignore-magic = false

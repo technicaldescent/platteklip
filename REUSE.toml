@@ -39,8 +39,8 @@ SPDX-License-Identifier = "CC-BY-4.0"
 # Code and Complex Configuration (Apache-2.0) - Lower precedence
 [[annotations]]
 path = [
+    ".dagger/**",
     "compose*.yaml",
-    "Makefile",
     "policy/**",
     "pyproject.toml",
     "scripts/**",

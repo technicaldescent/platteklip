@@ -158,7 +158,7 @@ _TEST_EXCLUDE: list[str] = [
 ]
 
 
-def _resolve_service(service: str) -> _ServiceBuild:
+def _lookup_build(service: str) -> _ServiceBuild:
     """Look up a service build descriptor or raise."""
     try:
         return _SERVICES[service]
@@ -546,7 +546,7 @@ class Ci:
                 --service=mqtt-producer \\
                 export --path=./image.tar
         """
-        cfg = _resolve_service(service)
+        cfg = _lookup_build(service)
         if cfg.context == ".":
             context = (
                 source.without_directory(
@@ -612,7 +612,7 @@ class Ci:
                 --service=mqtt-producer \\
                 export --path=./sbom.spdx.json
         """
-        cfg = _resolve_service(service)
+        cfg = _lookup_build(service)
         image = self.build(source, service)
         tarball = image.as_tarball()
         return (
@@ -620,7 +620,7 @@ class Ci:
             .from_("anchore/syft:latest")
             .with_mounted_file(
                 "/tmp/image.tar",
-                tarball,
+                tarball,  # nosec B108
             )
             .with_exec(
                 [
@@ -632,7 +632,7 @@ class Ci:
                     "spdx-json=/tmp/sbom.spdx.json",
                 ]
             )
-            .file("/tmp/sbom.spdx.json")
+            .file("/tmp/sbom.spdx.json")  # nosec B108
         )
 
     # -------------------------------------------------------------
@@ -677,7 +677,7 @@ class Ci:
                 --predicate sbom.spdx.json \\
                 --type spdxjson "$REF"
         """
-        cfg = _resolve_service(service)
+        cfg = _lookup_build(service)
         image = self.build(source, service)
         ref = f"{registry}/{cfg.image_name}:{version}"
         return await image.publish(ref)

@@ -355,6 +355,20 @@ def step_exempt_service(
     context.services.pop(name, None)
 
 
+@given(
+    '"{first}" and "{second}" are exempt as' " {reason}",
+)
+def step_exempt_services(
+    context: object,
+    first: str,
+    second: str,
+    reason: str,
+) -> None:
+    """Remove two services from the inspection set."""
+    context.services.pop(first, None)
+    context.services.pop(second, None)
+
+
 @given("the nginx default.conf configuration")
 def step_read_nginx_default(context: object) -> None:
     """Load the nginx default.conf as text."""

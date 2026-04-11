@@ -619,20 +619,20 @@ class Ci:
             dag.container()
             .from_("anchore/syft:latest")
             .with_mounted_file(
-                "/tmp/image.tar",
-                tarball,  # nosec B108
+                "/work/image.tar",
+                tarball,
             )
             .with_exec(
                 [
                     "/syft",
-                    "oci-archive:/tmp/image.tar",
+                    "oci-archive:/work/image.tar",
                     "--source-name",
                     cfg.image_name,
                     "-o",
-                    "spdx-json=/tmp/sbom.spdx.json",
+                    "spdx-json=/work/sbom.spdx.json",
                 ]
             )
-            .file("/tmp/sbom.spdx.json")  # nosec B108
+            .file("/work/sbom.spdx.json")
         )
 
     # -------------------------------------------------------------

@@ -184,7 +184,7 @@ repos:
       - id: trailing-whitespace
 
   - repo: https://github.com/rbubley/mirrors-prettier
-    rev: v3.8.2
+    rev: v3.8.1
     hooks:
       - id: prettier
         types_or: [css, gherkin]
@@ -277,6 +277,8 @@ repos:
     hooks:
       - id: commitizen
         stages: [commit-msg]
+      - id: commitizen-branch
+        stages: [pre-push]
 
 # Configure automated updates and autofix behaviour
 # for pre-commit.ci.

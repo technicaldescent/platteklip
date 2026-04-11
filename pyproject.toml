@@ -454,31 +454,33 @@ installer = "pip"
 # =================================================================
 #
 # Version tags are created by python-semantic-release
-# from Conventional Commits.  Tags MUST be signed via
-# SSH:
+# from Conventional Commits.  Tags are signed via SSH
+# by gitconfig (tag.gpgSign, gpg.format, user.signingKey).
 #
-#   git config tag.gpgSign true
-#   git config gpg.format ssh
-#   git config user.signingKey ~/.ssh/id_ed25519.pub
+# semantic-release does NOT create a release commit.
+# hatch-vcs reads the version directly from the signed
+# git tag.  This keeps the release process VCS-independent
+# and ensures every tag in the history is verified.
 #
 # The Dagger pipeline reads the tag via hatch-vcs,
 # applies it to container image tags, and signs the
-# images with cosign (Sigstore).  Syft generates an
-# SPDX SBOM for each image and cosign attaches it as
+# images with cosign (Sigstore keyless).  Syft generates
+# an SPDX SBOM for each image and cosign attaches it as
 # an in-toto attestation.
+#
+# Local release workflow:
+#
+#   ssh-add ~/.ssh/ed25519
+#   semantic-release version
+#   git push --follow-tags
 
 [tool.semantic_release]
-version_variable = [
-    "src/platteklip/__init__.py:__version__",
-]
 commit_parser = "conventional"
 major_on_zero = false
 allow_zero_version = true
 upload_to_pypi = false
 upload_to_release = true
-commit_message = "ci(release): {version}"
-tag_commit_message = "ci: release {version}"
-no_git_verify = false
+commit = false
 tag_format = "v{version}"
 
 [tool.semantic_release.publish]

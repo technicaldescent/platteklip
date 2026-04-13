@@ -179,7 +179,7 @@ def shutdown_telemetry() -> None:
     global _meter_provider  # noqa: PLW0603
 
     if _logger_provider is not None:
-        _logger_provider.shutdown()  # type: ignore[no-untyped-call]
+        _logger_provider.shutdown()
         _logger_provider = None
 
     if _meter_provider is not None:

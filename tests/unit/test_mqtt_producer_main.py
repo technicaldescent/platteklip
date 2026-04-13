@@ -12,24 +12,51 @@ and exception-path teardown.
 
 import asyncio
 import json
+import sys
 import types
 import unittest
-from unittest.mock import (
-    AsyncMock,
-    MagicMock,
-    patch,
-)
+from unittest.mock import AsyncMock, MagicMock, patch
+
+# ---------------------------------------------------------
+# Stub platteklip.instrumentation.setup in sys.modules
+# ---------------------------------------------------------
+#
+# main() performs a deferred import:
+#
+#     from platteklip.instrumentation.setup import (
+#         configure_telemetry, shutdown_telemetry,
+#     )
+#
+# mock.patch needs to resolve the dotted path
+# ``platteklip.instrumentation.setup`` as a module
+# attribute, which Python 3.14 does not auto-expose
+# for submodules.  Importing the real module triggers
+# the full OTel dependency chain (grpc, protobuf,
+# exporters), which is not installed in the test
+# environment.
+#
+# Registering a lightweight stub avoids both problems:
+# mock.patch can resolve the path, and no OTel imports
+# are triggered at collection time.
+
+if "platteklip.instrumentation.setup" not in sys.modules:
+    _setup_stub = types.ModuleType(
+        "platteklip.instrumentation.setup",
+    )
+    _setup_stub.configure_telemetry = lambda: None  # type: ignore[attr-defined]
+    _setup_stub.shutdown_telemetry = lambda: None  # type: ignore[attr-defined]
+    sys.modules["platteklip.instrumentation.setup"] = _setup_stub
+
+    import platteklip.instrumentation
+
+    platteklip.instrumentation.setup = _setup_stub
 
 from platteklip.instrumentation.edge_semconv import (
     EDGE_SOURCE_ID,
     EDGE_SOURCE_TYPE,
     EDGE_VEHICLE_ID,
 )
-from platteklip.mqtt_producer import (
-    MQTTProducerError,
-    _parse_env_int,
-    main,
-)
+from platteklip.mqtt_producer import MQTTProducerError, _parse_env_int, main
 
 # ----------------------------------------------------------
 # _parse_env_int

@@ -1,0 +1,210 @@
+{
+  "expires": "2027-12-31T23:59:59Z",
+  "steps": {
+    "test-unit": {
+      "name": "test-unit",
+      "attestations": [
+        {
+          "type": "https://witness.dev/attestations/command-run/v0.1"
+        },
+        {
+          "type": "https://witness.dev/attestations/git/v0.1"
+        },
+        {
+          "type": "https://witness.dev/attestations/environment/v0.1"
+        },
+        {
+          "type": "https://witness.dev/attestations/material/v0.1"
+        },
+        {
+          "type": "https://witness.dev/attestations/product/v0.1"
+        }
+      ],
+      "functionaries": [
+        {
+          "type": "root",
+          "certConstraint": {
+            "commonname": "*",
+            "dnsnames": [
+              "*"
+            ],
+            "emails": [
+              "raymond.ellis@gmail.com"
+            ],
+            "organizations": [
+              "*"
+            ],
+            "uris": [
+              "*"
+            ],
+            "roots": [
+              "fulcio"
+            ]
+          }
+        }
+      ],
+      "policies": [
+        {
+          "type": "rego",
+          "name": "ci-policy",
+          "policy": "witness/ci.rego"
+        }
+      ]
+    },
+    "quality": {
+      "name": "quality",
+      "attestations": [
+        {
+          "type": "https://witness.dev/attestations/command-run/v0.1"
+        },
+        {
+          "type": "https://witness.dev/attestations/git/v0.1"
+        },
+        {
+          "type": "https://witness.dev/attestations/environment/v0.1"
+        },
+        {
+          "type": "https://witness.dev/attestations/material/v0.1"
+        },
+        {
+          "type": "https://witness.dev/attestations/product/v0.1"
+        }
+      ],
+      "functionaries": [
+        {
+          "type": "root",
+          "certConstraint": {
+            "commonname": "*",
+            "dnsnames": [
+              "*"
+            ],
+            "emails": [
+              "raymond.ellis@gmail.com"
+            ],
+            "organizations": [
+              "*"
+            ],
+            "uris": [
+              "*"
+            ],
+            "roots": [
+              "fulcio"
+            ]
+          }
+        }
+      ],
+      "policies": [
+        {
+          "type": "rego",
+          "name": "ci-policy",
+          "policy": "witness/ci.rego"
+        }
+      ]
+    },
+    "acceptance": {
+      "name": "acceptance",
+      "attestations": [
+        {
+          "type": "https://witness.dev/attestations/command-run/v0.1"
+        },
+        {
+          "type": "https://witness.dev/attestations/git/v0.1"
+        },
+        {
+          "type": "https://witness.dev/attestations/environment/v0.1"
+        },
+        {
+          "type": "https://witness.dev/attestations/material/v0.1"
+        },
+        {
+          "type": "https://witness.dev/attestations/product/v0.1"
+        }
+      ],
+      "functionaries": [
+        {
+          "type": "root",
+          "certConstraint": {
+            "commonname": "*",
+            "dnsnames": [
+              "*"
+            ],
+            "emails": [
+              "raymond.ellis@gmail.com"
+            ],
+            "organizations": [
+              "*"
+            ],
+            "uris": [
+              "*"
+            ],
+            "roots": [
+              "fulcio"
+            ]
+          }
+        }
+      ],
+      "policies": [
+        {
+          "type": "rego",
+          "name": "ci-policy",
+          "policy": "witness/ci.rego"
+        }
+      ]
+    },
+    "policy": {
+      "name": "policy",
+      "attestations": [
+        {
+          "type": "https://witness.dev/attestations/command-run/v0.1"
+        },
+        {
+          "type": "https://witness.dev/attestations/git/v0.1"
+        },
+        {
+          "type": "https://witness.dev/attestations/environment/v0.1"
+        },
+        {
+          "type": "https://witness.dev/attestations/material/v0.1"
+        },
+        {
+          "type": "https://witness.dev/attestations/product/v0.1"
+        }
+      ],
+      "functionaries": [
+        {
+          "type": "root",
+          "certConstraint": {
+            "commonname": "*",
+            "dnsnames": [
+              "*"
+            ],
+            "emails": [
+              "raymond.ellis@gmail.com"
+            ],
+            "organizations": [
+              "*"
+            ],
+            "uris": [
+              "*"
+            ],
+            "roots": [
+              "fulcio"
+            ]
+          }
+        }
+      ],
+      "policies": [
+        {
+          "type": "rego",
+          "name": "ci-policy",
+          "policy": "witness/ci.rego"
+        }
+      ]
+    }
+  },
+  "roots": {
+    "fulcio": {
+      "certificate": "REPLACE_WITH_BASE64_FULCIO_ROOT"
+    }
+  }
+}

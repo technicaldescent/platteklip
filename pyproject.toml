@@ -477,6 +477,7 @@ tag_format = "v$version"
 update_changelog_on_bump = true
 changelog_file = "CHANGELOG.md"
 gpg_sign = true
+bump_message = "chore(release): v$new_version"
 
 [tool.sigstore]
 enabled = true

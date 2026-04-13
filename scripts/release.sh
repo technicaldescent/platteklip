@@ -11,15 +11,15 @@
 # ``witness run`` for in-toto attestation.
 #
 # Version is read from the latest git tag, which must
-# have been created by ``semantic-release version``
-# before running this script.
+# have been created by ``cz bump`` before running this
+# script.  hatch-vcs reads the same tag at build time.
 #
 # Usage:
 #
-#   semantic-release version       # creates signed tag
 #   ./scripts/ci.sh                # attested pipeline
-#   ./scripts/release.sh           # publish and sign
-#   git push --follow-tags         # push everything
+#   cz bump                        # signed tag + changelog
+#   ./scripts/release.sh           # build, publish, sign
+#   git push --follow-tags         # push tag and code
 #
 # Options:
 #
@@ -35,7 +35,7 @@
 #
 #   - dagger, witness, cosign on PATH
 #   - Docker authenticated to the registry
-#   - A signed git tag (from semantic-release)
+#   - A signed git tag (from cz bump)
 #   - Sigstore OIDC (opens browser on first attestation)
 #   - ci.sh must have been run first
 #
@@ -59,7 +59,7 @@ TAG=$(git describe --tags --abbrev=0 2>/dev/null || true)
 
 if [[ -z "${TAG}" ]]; then
     echo "ERROR: no git tag found." >&2
-    echo "Run 'semantic-release version' first." >&2
+    echo "Run 'cz bump' first." >&2
     exit 1
 fi
 
@@ -127,34 +127,38 @@ echo ""
 echo "--- CI attestations verified"
 
 # -----------------------------------------------------------------
-# Release stages
+# Build
 # -----------------------------------------------------------------
 
 _step build \
     dagger call build --source=. \
-        --service="${SERVICE}" \
-        export --path="./build-${SERVICE}.tar"
+        --service="${SERVICE}"
+
+# -----------------------------------------------------------------
+# SBOM
+# -----------------------------------------------------------------
 
 _step sbom \
     dagger call sbom --source=. \
-        --service="${SERVICE}" \
-        export --path="./${SERVICE}.spdx.json"
+        --service="${SERVICE}"
 
-_step publish \
-    dagger call publish --source=. \
+# -----------------------------------------------------------------
+# Publish and capture digest reference
+# -----------------------------------------------------------------
+
+echo ""
+echo "=== publish ==="
+
+REF=$(witness run \
+    --step "publish" \
+    --outfile "${ATTESTATION_DIR}/publish.json" \
+    "${WITNESS_COMMON[@]}" \
+    -- dagger call publish --source=. \
         --service="${SERVICE}" \
         --registry="${REGISTRY}" \
-        --version="${VERSION}"
+        --version="${VERSION}")
 
-# -----------------------------------------------------------------
-# Capture the published digest reference
-# -----------------------------------------------------------------
-
-REF=$(dagger call publish --source=. \
-    --service="${SERVICE}" \
-    --registry="${REGISTRY}" \
-    --version="${VERSION}")
-
+echo "--- attestation: ${ATTESTATION_DIR}/publish.json"
 echo ""
 echo "=== published ==="
 echo "${REF}"
@@ -169,13 +173,12 @@ if [[ -f "${POLICY_FILE}" ]]; then
 
     witness verify \
         --policy "${POLICY_FILE}" \
-        --attestations "${ATTESTATION_DIR}" \
-        --artifact-file "./build-${SERVICE}.tar"
+        --attestations "${ATTESTATION_DIR}"
 
     echo "--- policy verification passed"
 else
     echo ""
-    echo "--- WARN: no witness policy at ${POLICY_FILE}"
+    echo "--- WARN: no signed policy at ${POLICY_FILE}"
     echo "--- skipping verification gate"
     echo "--- see witness/README.md for setup"
 fi
